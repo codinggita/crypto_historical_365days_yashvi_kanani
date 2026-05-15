@@ -1,10 +1,22 @@
+const ApiError = require('../utils/ApiError');
+
 const errorMiddleware = (err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode).json({
+  let error = err;
+
+  if (!(error instanceof ApiError)) {
+    const statusCode = error.statusCode || 500;
+    const message = error.message || "Something went wrong";
+    error = new ApiError(statusCode, message, [], err.stack);
+  }
+
+  const response = {
     success: false,
-    message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-  });
+    message: error.message,
+    errors: error.errors || [],
+    stack: process.env.NODE_ENV === 'production' ? '' : error.stack,
+  };
+
+  res.status(error.statusCode).json(response);
 };
 
 module.exports = errorMiddleware;
