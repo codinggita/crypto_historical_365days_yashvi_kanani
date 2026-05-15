@@ -1,22 +1,5 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-
-// Load env vars
-dotenv.config();
-
-const app = express();
-
-// Body parser
-app.use(express.json());
-
-// Enable CORS
-app.use(cors());
-
-// Test Route
-app.get('/', (req, res) => {
-  res.send('CryptoVerseX Backend Running');
-});
+require('dotenv').config();
+const app = require('./src/config/app');
 
 const PORT = process.env.PORT || 5000;
 
