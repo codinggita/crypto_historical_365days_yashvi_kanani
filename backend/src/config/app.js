@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit');
 
 const v1Routes = require('../routes/v1');
 const notFoundMiddleware = require('../middlewares/notFoundMiddleware');
-const errorMiddleware = require('../middlewares/errorMiddleware');
+const errorMiddleware = require('../middlewares/error.middleware');
 
 const app = express();
 
