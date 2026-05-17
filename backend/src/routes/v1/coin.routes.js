@@ -1,5 +1,5 @@
-const { Router } = require("express");
-const {
+import { Router } from "express";
+import {
   getAllCoins,
   getCoinById,
   createCoin,
@@ -7,15 +7,15 @@ const {
   deleteCoin,
   searchCoins,
   getTrendingCoins,
-} = require("../../controllers/coin.controller");
-const { verifyJWT } = require("../../middlewares/auth.middleware");
-const authorizeRoles = require("../../middlewares/role.middleware");
-const {
+} from "../../controllers/coin.controller.js";
+import { verifyJWT } from "../../middlewares/auth.middleware.js";
+import authorizeRoles from "../../middlewares/role.middleware.js";
+import {
   createCoinValidator,
   updateCoinValidator,
   queryCoinValidator,
   searchCoinValidator,
-} = require("../../validators/coin.validator");
+} from "../../validators/coin.validator.js";
 
 const router = Router();
 
@@ -34,4 +34,4 @@ router
   .patch(verifyJWT, authorizeRoles("admin"), updateCoinValidator(), updateCoin)
   .delete(verifyJWT, authorizeRoles("admin"), deleteCoin);
 
-module.exports = router;
+export default router;

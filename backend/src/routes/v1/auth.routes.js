@@ -1,14 +1,14 @@
-const { Router } = require("express");
-const {
+import { Router } from "express";
+import {
   registerUser,
   loginUser,
   getCurrentUser,
-} = require("../../controllers/auth.controller");
-const { verifyJWT } = require("../../middlewares/auth.middleware");
-const {
+} from "../../controllers/auth.controller.js";
+import { verifyJWT } from "../../middlewares/auth.middleware.js";
+import {
   registerValidator,
   loginValidator,
-} = require("../../validators/auth.validator");
+} from "../../validators/auth.validator.js";
 
 const router = Router();
 
@@ -18,4 +18,4 @@ router.route("/login").post(loginValidator(), loginUser);
 
 router.route("/me").get(verifyJWT, getCurrentUser);
 
-module.exports = router;
+export default router;

@@ -1,6 +1,6 @@
-const Coin = require("../models/Coin");
-const ApiError = require("../utils/ApiError");
-const { getPaginationOptions, getPaginationMeta } = require("../utils/pagination");
+import Coin from "../models/Coin.js";
+import ApiError from "../utils/ApiError.js";
+import { getPaginationOptions, getPaginationMeta } from "../utils/pagination.js";
 
 const buildCoinQuery = (queryParams) => {
   const query = {};
@@ -26,7 +26,7 @@ const buildCoinQuery = (queryParams) => {
   return query;
 };
 
-const getAllCoins = async (queryParams) => {
+export const getAllCoins = async (queryParams) => {
   const query = buildCoinQuery(queryParams);
   const { page, limit, skip } = getPaginationOptions(queryParams);
 
@@ -45,7 +45,7 @@ const getAllCoins = async (queryParams) => {
   return { coins, meta };
 };
 
-const getCoinById = async (id) => {
+export const getCoinById = async (id) => {
   const coin = await Coin.findById(id);
   if (!coin) {
     throw new ApiError(404, "Coin not found");
@@ -53,7 +53,7 @@ const getCoinById = async (id) => {
   return coin;
 };
 
-const createCoin = async (coinData) => {
+export const createCoin = async (coinData) => {
   const existedCoin = await Coin.findOne({ coinId: coinData.coinId.toLowerCase() });
   if (existedCoin) {
     throw new ApiError(409, "Coin with this coinId already exists");
@@ -67,7 +67,7 @@ const createCoin = async (coinData) => {
   return coin;
 };
 
-const updateCoin = async (id, coinData) => {
+export const updateCoin = async (id, coinData) => {
   if (coinData.coinId) {
     coinData.coinId = coinData.coinId.toLowerCase();
     const existedCoin = await Coin.findOne({ coinId: coinData.coinId, _id: { $ne: id } });
@@ -88,7 +88,7 @@ const updateCoin = async (id, coinData) => {
   return coin;
 };
 
-const deleteCoin = async (id) => {
+export const deleteCoin = async (id) => {
   const coin = await Coin.findByIdAndDelete(id);
   if (!coin) {
     throw new ApiError(404, "Coin not found");
@@ -96,7 +96,7 @@ const deleteCoin = async (id) => {
   return coin;
 };
 
-const searchCoins = async (queryParams) => {
+export const searchCoins = async (queryParams) => {
   const { q } = queryParams;
   if (!q) {
     throw new ApiError(400, "Search query parameter 'q' is required");
@@ -122,23 +122,11 @@ const searchCoins = async (queryParams) => {
   return { coins, meta };
 };
 
-const getTrendingCoins = async (limitParam = 5) => {
+export const getTrendingCoins = async (limitParam = 5) => {
   const limit = parseInt(limitParam, 10) || 5;
-  // Trending can be sorted by a custom logic, e.g. dailyReturn descending or volatility, or rank ascending.
-  // Let's sort by dailyReturn descending.
   const coins = await Coin.find({})
     .sort({ dailyReturn: -1 })
     .limit(limit);
 
   return coins;
-};
-
-module.exports = {
-  getAllCoins,
-  getCoinById,
-  createCoin,
-  updateCoin,
-  deleteCoin,
-  searchCoins,
-  getTrendingCoins,
 };

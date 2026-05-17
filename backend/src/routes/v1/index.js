@@ -1,24 +1,24 @@
-const express = require('express');
+import express from "express";
+import ApiError from "../../utils/ApiError.js";
+import httpStatus from "../../constants/httpStatus.js";
+
+import authRoutes from "./auth.routes.js";
+import coinRoutes from "./coin.routes.js";
+
 const router = express.Router();
 
-const ApiError = require('../../utils/ApiError');
-const httpStatus = require('../../constants/httpStatus');
-
-router.get('/health', (req, res) => {
+router.get("/health", (req, res) => {
   res.json({
     success: true,
-    message: 'API working'
+    message: "API working",
   });
 });
 
-router.get('/error-test', (req, res) => {
-  throw new ApiError(httpStatus.BAD_REQUEST, 'This is a test error');
+router.get("/error-test", (req, res) => {
+  throw new ApiError(httpStatus.BAD_REQUEST, "This is a test error");
 });
 
-const authRoutes = require('./auth.routes');
-const coinRoutes = require('./coin.routes');
+router.use("/auth", authRoutes);
+router.use("/coins", coinRoutes);
 
-router.use('/auth', authRoutes);
-router.use('/coins', coinRoutes);
-
-module.exports = router;
+export default router;

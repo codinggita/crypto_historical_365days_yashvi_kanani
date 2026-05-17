@@ -1,7 +1,7 @@
-const { body, query, param } = require("express-validator");
-const validate = require("../middlewares/validate.middleware");
+import { body, query } from "express-validator";
+import validate from "../middlewares/validate.middleware.js";
 
-const createCoinValidator = () => {
+export const createCoinValidator = () => {
   return [
     body("coinId")
       .trim()
@@ -54,7 +54,7 @@ const createCoinValidator = () => {
   ];
 };
 
-const updateCoinValidator = () => {
+export const updateCoinValidator = () => {
   return [
     body("coinId")
       .optional()
@@ -109,7 +109,7 @@ const updateCoinValidator = () => {
   ];
 };
 
-const queryCoinValidator = () => {
+export const queryCoinValidator = () => {
   return [
     query("page")
       .optional()
@@ -147,7 +147,7 @@ const queryCoinValidator = () => {
   ];
 };
 
-const searchCoinValidator = () => {
+export const searchCoinValidator = () => {
   return [
     query("q")
       .trim()
@@ -165,11 +165,4 @@ const searchCoinValidator = () => {
       .withMessage("limit must be an integer between 1 and 100"),
     validate,
   ];
-};
-
-module.exports = {
-  createCoinValidator,
-  updateCoinValidator,
-  queryCoinValidator,
-  searchCoinValidator,
 };

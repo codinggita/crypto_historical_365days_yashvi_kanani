@@ -1,9 +1,9 @@
-const jwt = require("jsonwebtoken");
-const ApiError = require("../utils/ApiError");
-const asyncHandler = require("../utils/asyncHandler");
-const User = require("../models/User");
+import jwt from "jsonwebtoken";
+import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import User from "../models/User.js";
 
-const verifyJWT = asyncHandler(async (req, res, next) => {
+export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
     const token =
       req.cookies?.accessToken ||
@@ -15,7 +15,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decodedToken?.id).select("-password");
+    const user = await User.findById(decodedToken?.userId || decodedToken?.id).select("-password");
 
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");
@@ -27,5 +27,3 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, error?.message || "Invalid access token");
   }
 });
-
-module.exports = { verifyJWT };

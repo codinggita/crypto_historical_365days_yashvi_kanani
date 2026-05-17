@@ -1,4 +1,4 @@
-const ApiError = require('../utils/ApiError');
+import ApiError from "../utils/ApiError.js";
 
 const errorMiddleware = (err, req, res, next) => {
   let error = err;
@@ -13,10 +13,10 @@ const errorMiddleware = (err, req, res, next) => {
     success: false,
     message: error.message,
     errors: error.errors || [],
-    stack: process.env.NODE_ENV === 'production' ? '' : error.stack,
+    stack: process.env.NODE_ENV === "production" ? "" : error.stack,
   };
 
   res.status(error.statusCode).json(response);
 };
 
-module.exports = errorMiddleware;
+export default errorMiddleware;
