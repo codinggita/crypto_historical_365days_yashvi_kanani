@@ -15,4 +15,8 @@ router.get('/error-test', (req, res) => {
   throw new ApiError(httpStatus.BAD_REQUEST, 'This is a test error');
 });
 
+const authRoutes = require('./auth.routes');
+
+router.use('/auth', authRoutes);
+
 module.exports = router;
