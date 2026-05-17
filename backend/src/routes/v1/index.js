@@ -16,7 +16,9 @@ router.get('/error-test', (req, res) => {
 });
 
 const authRoutes = require('./auth.routes');
+const coinRoutes = require('./coin.routes');
 
 router.use('/auth', authRoutes);
+router.use('/coins', coinRoutes);
 
 module.exports = router;
