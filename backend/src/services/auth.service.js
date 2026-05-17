@@ -1,21 +1,9 @@
-const User = require("../models/User");
-const ApiError = require("../utils/ApiError");
+import User from "../models/User.js";
+import ApiError from "../utils/ApiError.js";
+import generateToken from "../utils/generateToken.js";
 
-const generateAccessAndRefreshTokens = async (userId) => {
-  try {
-    const user = await User.findById(userId);
-    const token = user.generateAccessToken();
-    return token;
-  } catch (error) {
-    throw new ApiError(
-      500,
-      "Something went wrong while generating access token"
-    );
-  }
-};
-
-const registerUser = async (userData) => {
-  const { name, email, password } = userData;
+export const registerUser = async (userData) => {
+  const { fullName, email, password } = userData;
 
   const existedUser = await User.findOne({ email });
   if (existedUser) {
@@ -23,7 +11,7 @@ const registerUser = async (userData) => {
   }
 
   const user = await User.create({
-    name,
+    fullName,
     email,
     password,
   });
@@ -34,12 +22,12 @@ const registerUser = async (userData) => {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
-  const token = await generateAccessAndRefreshTokens(user._id);
+  const token = generateToken(user);
 
   return { user: createdUser, token };
 };
 
-const loginUser = async (userData) => {
+export const loginUser = async (userData) => {
   const { email, password } = userData;
 
   const user = await User.findOne({ email }).select("+password");
@@ -54,13 +42,8 @@ const loginUser = async (userData) => {
     throw new ApiError(401, "Invalid user credentials");
   }
 
-  const token = await generateAccessAndRefreshTokens(user._id);
+  const token = generateToken(user);
   const loggedInUser = await User.findById(user._id).select("-password");
 
   return { user: loggedInUser, token };
-};
-
-module.exports = {
-  registerUser,
-  loginUser,
 };

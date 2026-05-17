@@ -1,8 +1,8 @@
-const coinService = require("../services/coin.service");
-const asyncHandler = require("../utils/asyncHandler");
-const ApiResponse = require("../utils/ApiResponse");
+import * as coinService from "../services/coin.service.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import ApiResponse from "../utils/ApiResponse.js";
 
-const getAllCoins = asyncHandler(async (req, res) => {
+export const getAllCoins = asyncHandler(async (req, res) => {
   const { coins, meta } = await coinService.getAllCoins(req.query);
 
   return res.status(200).json(
@@ -15,7 +15,7 @@ const getAllCoins = asyncHandler(async (req, res) => {
   );
 });
 
-const getCoinById = asyncHandler(async (req, res) => {
+export const getCoinById = asyncHandler(async (req, res) => {
   const coin = await coinService.getCoinById(req.params.id);
 
   return res.status(200).json(
@@ -27,7 +27,7 @@ const getCoinById = asyncHandler(async (req, res) => {
   );
 });
 
-const createCoin = asyncHandler(async (req, res) => {
+export const createCoin = asyncHandler(async (req, res) => {
   const coin = await coinService.createCoin(req.body);
 
   return res.status(201).json(
@@ -39,7 +39,7 @@ const createCoin = asyncHandler(async (req, res) => {
   );
 });
 
-const updateCoin = asyncHandler(async (req, res) => {
+export const updateCoin = asyncHandler(async (req, res) => {
   const coin = await coinService.updateCoin(req.params.id, req.body);
 
   return res.status(200).json(
@@ -51,7 +51,7 @@ const updateCoin = asyncHandler(async (req, res) => {
   );
 });
 
-const deleteCoin = asyncHandler(async (req, res) => {
+export const deleteCoin = asyncHandler(async (req, res) => {
   const coin = await coinService.deleteCoin(req.params.id);
 
   return res.status(200).json(
@@ -63,7 +63,7 @@ const deleteCoin = asyncHandler(async (req, res) => {
   );
 });
 
-const searchCoins = asyncHandler(async (req, res) => {
+export const searchCoins = asyncHandler(async (req, res) => {
   const { coins, meta } = await coinService.searchCoins(req.query);
 
   return res.status(200).json(
@@ -76,7 +76,7 @@ const searchCoins = asyncHandler(async (req, res) => {
   );
 });
 
-const getTrendingCoins = asyncHandler(async (req, res) => {
+export const getTrendingCoins = asyncHandler(async (req, res) => {
   const limit = req.query.limit || 5;
   const coins = await coinService.getTrendingCoins(limit);
 
@@ -88,13 +88,3 @@ const getTrendingCoins = asyncHandler(async (req, res) => {
     )
   );
 });
-
-module.exports = {
-  getAllCoins,
-  getCoinById,
-  createCoin,
-  updateCoin,
-  deleteCoin,
-  searchCoins,
-  getTrendingCoins,
-};

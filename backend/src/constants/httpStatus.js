@@ -9,4 +9,4 @@ const httpStatus = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-module.exports = httpStatus;
+export default httpStatus;

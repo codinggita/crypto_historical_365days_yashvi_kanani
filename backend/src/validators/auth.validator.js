@@ -1,14 +1,14 @@
-const { body } = require("express-validator");
-const validate = require("../middlewares/validate.middleware");
+import { body } from "express-validator";
+import validate from "../middlewares/validate.middleware.js";
 
-const registerValidator = () => {
+export const registerValidator = () => {
   return [
-    body("name")
+    body("fullName")
       .trim()
       .notEmpty()
-      .withMessage("Name is required")
+      .withMessage("fullName is required")
       .isLength({ min: 2, max: 50 })
-      .withMessage("Name must be between 2 and 50 characters"),
+      .withMessage("fullName must be between 2 and 50 characters"),
     body("email")
       .trim()
       .notEmpty()
@@ -26,7 +26,7 @@ const registerValidator = () => {
   ];
 };
 
-const loginValidator = () => {
+export const loginValidator = () => {
   return [
     body("email")
       .trim()
@@ -41,9 +41,4 @@ const loginValidator = () => {
       .withMessage("Password is required"),
     validate,
   ];
-};
-
-module.exports = {
-  registerValidator,
-  loginValidator,
 };
