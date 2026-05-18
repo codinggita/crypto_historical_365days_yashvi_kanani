@@ -4,6 +4,7 @@ import httpStatus from "../../constants/httpStatus.js";
 
 import authRoutes from "./auth.routes.js";
 import coinRoutes from "./coin.routes.js";
+import analyticsRoutes from "./analytics.routes.js";
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.get("/error-test", (req, res) => {
 
 router.use("/auth", authRoutes);
 router.use("/coins", coinRoutes);
+router.use("/analytics", analyticsRoutes);
 
 export default router;
