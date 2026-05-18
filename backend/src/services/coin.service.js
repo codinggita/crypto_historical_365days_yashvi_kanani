@@ -5,37 +5,63 @@ import { getPaginationOptions, getPaginationMeta } from "../utils/pagination.js"
 const buildCoinQuery = (queryParams) => {
   const query = {};
 
-  if (queryParams.symbol) {
-    query.symbol = queryParams.symbol.toUpperCase();
+  // Global search via q or search (case-insensitive regex)
+  const searchVal = queryParams.q || queryParams.search;
+  if (searchVal && searchVal.trim() !== "") {
+    query.$or = [
+      { name: { $regex: searchVal, $options: "i" } },
+      { symbol: { $regex: searchVal, $options: "i" } },
+      { coinId: { $regex: searchVal, $options: "i" } },
+    ];
   }
 
-  if (queryParams.minPrice || queryParams.maxPrice) {
-    query.price = {};
-    if (queryParams.minPrice) {
-      query.price.$gte = parseFloat(queryParams.minPrice);
-    }
-    if (queryParams.maxPrice) {
-      query.price.$lte = parseFloat(queryParams.maxPrice);
-    }
+  if (queryParams.symbol) {
+    query.symbol = queryParams.symbol.toUpperCase();
   }
 
   if (queryParams.coinId) {
     query.coinId = queryParams.coinId.toLowerCase();
   }
 
+  // Price Range
+  if (queryParams.minPrice || queryParams.maxPrice) {
+    query.price = {};
+    if (queryParams.minPrice) query.price.$gte = parseFloat(queryParams.minPrice);
+    if (queryParams.maxPrice) query.price.$lte = parseFloat(queryParams.maxPrice);
+  }
+
+  // MarketCap Range
+  if (queryParams.minMarketCap || queryParams.maxMarketCap) {
+    query.marketCap = {};
+    if (queryParams.minMarketCap) query.marketCap.$gte = parseFloat(queryParams.minMarketCap);
+    if (queryParams.maxMarketCap) query.marketCap.$lte = parseFloat(queryParams.maxMarketCap);
+  }
+
+  // Volume Range
+  if (queryParams.minVolume || queryParams.maxVolume) {
+    query.volume = {};
+    if (queryParams.minVolume) query.volume.$gte = parseFloat(queryParams.minVolume);
+    if (queryParams.maxVolume) query.volume.$lte = parseFloat(queryParams.maxVolume);
+  }
+
+  // Exact Month
   if (queryParams.month) {
     query.month = { $regex: new RegExp(`^${queryParams.month}$`, "i") };
   }
 
+  // Exact Year
   if (queryParams.year) {
     query.year = parseInt(queryParams.year, 10);
   }
 
-  if (queryParams.search) {
-    query.$or = [
-      { name: { $regex: queryParams.search, $options: "i" } },
-      { symbol: { $regex: queryParams.search, $options: "i" } },
-    ];
+  // Exact Rank
+  if (queryParams.rank) {
+    query.rank = parseInt(queryParams.rank, 10);
+  }
+
+  // Exact Volatility
+  if (queryParams.volatility) {
+    query.volatility = parseFloat(queryParams.volatility);
   }
 
   return query;
@@ -43,14 +69,29 @@ const buildCoinQuery = (queryParams) => {
 
 export const getAllCoins = async (queryParams) => {
   const query = buildCoinQuery(queryParams);
-  const { page, limit, skip } = getPaginationOptions(queryParams);
 
-  const sortBy = queryParams.sortBy || "rank";
-  const sortOrder = queryParams.sortOrder === "desc" ? -1 : 1;
+  // Sanitize pagination to prevent negative or zero parameters
+  const sanitizedQuery = { ...queryParams };
+  sanitizedQuery.page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+  sanitizedQuery.limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
+
+  const { page, limit, skip } = getPaginationOptions(sanitizedQuery);
+
+  // Sortable fields validation
+  const allowedSortFields = ["price", "marketCap", "volume", "rank", "dailyReturn", "volatility", "createdAt"];
+  const sortBy = allowedSortFields.includes(queryParams.sortBy) ? queryParams.sortBy : "rank";
+  const sortOrder = queryParams.sortOrder === "asc" ? 1 : -1;
   const sort = { [sortBy]: sortOrder };
+
+  // Field selection projection
+  let projection = "";
+  if (queryParams.fields) {
+    projection = queryParams.fields.split(",").join(" ");
+  }
 
   const totalItems = await Coin.countDocuments(query);
   const coins = await Coin.find(query)
+    .select(projection)
     .sort(sort)
     .skip(skip)
     .limit(limit);
@@ -112,7 +153,7 @@ export const deleteCoin = async (id) => {
 };
 
 export const searchCoins = async (queryParams) => {
-  const { q } = queryParams;
+  const q = queryParams.q || queryParams.search;
   if (!q) {
     throw new ApiError(400, "Search query parameter 'q' is required");
   }
@@ -125,7 +166,11 @@ export const searchCoins = async (queryParams) => {
     ],
   };
 
-  const { page, limit, skip } = getPaginationOptions(queryParams);
+  const sanitizedQuery = { ...queryParams };
+  sanitizedQuery.page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+  sanitizedQuery.limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
+
+  const { page, limit, skip } = getPaginationOptions(sanitizedQuery);
 
   const totalItems = await Coin.countDocuments(query);
   const coins = await Coin.find(query)
@@ -137,11 +182,45 @@ export const searchCoins = async (queryParams) => {
   return { coins, meta };
 };
 
-export const getTrendingCoins = async (limitParam = 5) => {
-  const limit = parseInt(limitParam, 10) || 5;
-  const coins = await Coin.find({})
-    .sort({ dailyReturn: -1 })
-    .limit(limit);
+export const getTrendingCoins = async () => {
+  return await Coin.find({})
+    .sort({ marketCap: -1 })
+    .limit(10);
+};
 
-  return coins;
+export const getTopGainers = async () => {
+  return await Coin.find({})
+    .sort({ dailyReturn: -1 })
+    .limit(10);
+};
+
+export const getTopLosers = async () => {
+  return await Coin.find({})
+    .sort({ dailyReturn: 1 })
+    .limit(10);
+};
+
+export const getRecentCoins = async () => {
+  return await Coin.find({})
+    .sort({ createdAt: -1 })
+    .limit(10);
+};
+
+export const getRandomCoin = async () => {
+  const result = await Coin.aggregate([{ $sample: { size: 1 } }]);
+  return result[0] || null;
+};
+
+export const getSuggestions = async (q) => {
+  if (!q || q.trim() === "") return [];
+  return await Coin.find(
+    {
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { symbol: { $regex: q, $options: "i" } },
+        { coinId: { $regex: q, $options: "i" } },
+      ],
+    },
+    { name: 1, symbol: 1, coinId: 1, _id: 0 }
+  ).limit(5);
 };
