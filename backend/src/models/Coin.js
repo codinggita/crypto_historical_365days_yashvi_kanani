@@ -30,6 +30,7 @@ const coinSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
+      index: true,
     },
     marketCap: {
       type: Number,
@@ -69,6 +70,7 @@ const coinSchema = new mongoose.Schema(
 
 coinSchema.index({ coinId: 1 }, { unique: true });
 coinSchema.index({ name: "text", symbol: "text" });
+coinSchema.index({ createdAt: -1 });
 
 const Coin = mongoose.model("Coin", coinSchema);
 

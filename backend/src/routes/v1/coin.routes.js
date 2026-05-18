@@ -7,6 +7,11 @@ import {
   deleteCoin,
   searchCoins,
   getTrendingCoins,
+  getTopGainers,
+  getTopLosers,
+  getRecentCoins,
+  getRandomCoin,
+  getSuggestions,
 } from "../../controllers/coin.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 import authorizeRoles from "../../middlewares/role.middleware.js";
@@ -20,8 +25,12 @@ import {
 const router = Router();
 
 router.route("/search").get(verifyJWT, searchCoinValidator(), searchCoins);
-
 router.route("/trending").get(verifyJWT, getTrendingCoins);
+router.route("/gainers").get(verifyJWT, getTopGainers);
+router.route("/losers").get(verifyJWT, getTopLosers);
+router.route("/recent").get(verifyJWT, getRecentCoins);
+router.route("/random").get(verifyJWT, getRandomCoin);
+router.route("/suggestions").get(verifyJWT, getSuggestions);
 
 router
   .route("/")
