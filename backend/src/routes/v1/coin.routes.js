@@ -19,18 +19,19 @@ import {
 
 const router = Router();
 
-router.route("/search").get(searchCoinValidator(), searchCoins);
+router.route("/search").get(verifyJWT, searchCoinValidator(), searchCoins);
 
-router.route("/trending").get(getTrendingCoins);
+router.route("/trending").get(verifyJWT, getTrendingCoins);
 
 router
   .route("/")
-  .get(queryCoinValidator(), getAllCoins)
+  .get(verifyJWT, queryCoinValidator(), getAllCoins)
   .post(verifyJWT, authorizeRoles("admin"), createCoinValidator(), createCoin);
 
 router
   .route("/:id")
-  .get(getCoinById)
+  .get(verifyJWT, getCoinById)
+  .put(verifyJWT, authorizeRoles("admin"), updateCoinValidator(), updateCoin)
   .patch(verifyJWT, authorizeRoles("admin"), updateCoinValidator(), updateCoin)
   .delete(verifyJWT, authorizeRoles("admin"), deleteCoin);
 

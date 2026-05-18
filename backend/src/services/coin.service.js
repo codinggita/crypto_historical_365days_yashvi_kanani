@@ -23,6 +23,21 @@ const buildCoinQuery = (queryParams) => {
     query.coinId = queryParams.coinId.toLowerCase();
   }
 
+  if (queryParams.month) {
+    query.month = { $regex: new RegExp(`^${queryParams.month}$`, "i") };
+  }
+
+  if (queryParams.year) {
+    query.year = parseInt(queryParams.year, 10);
+  }
+
+  if (queryParams.search) {
+    query.$or = [
+      { name: { $regex: queryParams.search, $options: "i" } },
+      { symbol: { $regex: queryParams.search, $options: "i" } },
+    ];
+  }
+
   return query;
 };
 

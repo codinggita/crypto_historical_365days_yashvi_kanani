@@ -8,11 +8,9 @@ export const getPaginationOptions = (query) => {
 export const getPaginationMeta = (totalItems, page, limit) => {
   const totalPages = Math.ceil(totalItems / limit);
   return {
-    totalItems,
-    totalPages,
-    currentPage: page,
+    page,
     limit,
-    hasNextPage: page < totalPages,
-    hasPrevPage: page > 1,
+    total: totalItems,
+    totalPages
   };
 };
