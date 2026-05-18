@@ -25,6 +25,7 @@ const coinSchema = new mongoose.Schema(
     rank: {
       type: Number,
       default: 1,
+      index: true,
     },
     price: {
       type: Number,
@@ -33,6 +34,7 @@ const coinSchema = new mongoose.Schema(
     marketCap: {
       type: Number,
       default: 0,
+      index: true,
     },
     volume: {
       type: Number,
@@ -49,6 +51,10 @@ const coinSchema = new mongoose.Schema(
     month: {
       type: String,
       trim: true,
+    },
+    year: {
+      type: Number,
+      index: true,
     },
     timestamp: {
       type: Date,

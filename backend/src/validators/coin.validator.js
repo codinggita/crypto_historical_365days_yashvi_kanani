@@ -50,6 +50,10 @@ export const createCoinValidator = () => {
       .optional()
       .isString()
       .withMessage("month must be a string"),
+    body("year")
+      .optional()
+      .isInt({ min: 1800, max: 2100 })
+      .withMessage("year must be a valid positive integer"),
     validate,
   ];
 };
@@ -105,6 +109,10 @@ export const updateCoinValidator = () => {
       .optional()
       .isString()
       .withMessage("month must be a string"),
+    body("year")
+      .optional()
+      .isInt({ min: 1800, max: 2100 })
+      .withMessage("year must be a valid positive integer"),
     validate,
   ];
 };
@@ -143,6 +151,18 @@ export const queryCoinValidator = () => {
       .optional()
       .isString()
       .withMessage("coinId must be a string"),
+    query("search")
+      .optional()
+      .isString()
+      .withMessage("search must be a string"),
+    query("month")
+      .optional()
+      .isString()
+      .withMessage("month must be a string"),
+    query("year")
+      .optional()
+      .isInt()
+      .withMessage("year must be an integer"),
     validate,
   ];
 };

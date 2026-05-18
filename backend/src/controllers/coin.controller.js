@@ -5,14 +5,14 @@ import ApiResponse from "../utils/ApiResponse.js";
 export const getAllCoins = asyncHandler(async (req, res) => {
   const { coins, meta } = await coinService.getAllCoins(req.query);
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      coins,
-      "Coins fetched successfully",
-      meta
-    )
+  const response = new ApiResponse(
+    200,
+    coins,
+    "Coins fetched successfully"
   );
+  response.pagination = meta;
+
+  return res.status(200).json(response);
 });
 
 export const getCoinById = asyncHandler(async (req, res) => {
@@ -66,14 +66,14 @@ export const deleteCoin = asyncHandler(async (req, res) => {
 export const searchCoins = asyncHandler(async (req, res) => {
   const { coins, meta } = await coinService.searchCoins(req.query);
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      coins,
-      "Coins search results fetched successfully",
-      meta
-    )
+  const response = new ApiResponse(
+    200,
+    coins,
+    "Coins search results fetched successfully"
   );
+  response.pagination = meta;
+
+  return res.status(200).json(response);
 });
 
 export const getTrendingCoins = asyncHandler(async (req, res) => {
