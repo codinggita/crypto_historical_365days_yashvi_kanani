@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
       select: false,
     },
     role: {
@@ -29,6 +29,14 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    avatar: {
+      type: String,
+      default: "",
+    },
+    lastLogin: {
+      type: Date,
+      default: null,
     },
   },
   {
