@@ -8,6 +8,7 @@ import {
   getAnalyticsSummary,
   getAnalyticsDistribution,
   getAnalyticsHistory,
+  getDashboardOverview,
 } from "../../controllers/portfolio.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 
@@ -17,6 +18,7 @@ const router = Router();
 router.use(verifyJWT);
 
 // Map high-performance analytical aggregates prior to dynamic id routes to avoid collisions
+router.route("/dashboard/overview").get(getDashboardOverview);
 router.route("/analytics/summary").get(getAnalyticsSummary);
 router.route("/analytics/distribution").get(getAnalyticsDistribution);
 router.route("/analytics/history").get(getAnalyticsHistory);
