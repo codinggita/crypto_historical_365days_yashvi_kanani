@@ -7,7 +7,8 @@ const coinSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
-      // Unique index is declared below via coinSchema.index() to avoid duplicate index warning
+      unique: true,
+      index: true,
     },
     name: {
       type: String,
@@ -39,21 +40,47 @@ const coinSchema = new mongoose.Schema(
     volume: {
       type: Number,
       default: 0,
+      index: true,
     },
     dailyReturn: {
       type: Number,
       default: 0,
+      index: true,
     },
     volatility: {
       type: Number,
       default: 0,
     },
-    month: {
+    circulatingSupply: {
+      type: Number,
+      default: 0,
+    },
+    totalSupply: {
+      type: Number,
+      default: 0,
+    },
+    maxSupply: {
+      type: Number,
+      default: 0,
+    },
+    category: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+    image: {
       type: String,
       trim: true,
     },
-    year: {
-      type: Number,
+    marketStatus: {
+      type: String,
+      trim: true,
+      default: "active",
+      index: true,
+    },
+    tags: {
+      type: [String],
+      default: [],
       index: true,
     },
     timestamp: {
@@ -67,8 +94,8 @@ const coinSchema = new mongoose.Schema(
   }
 );
 
-coinSchema.index({ coinId: 1 }, { unique: true });
-coinSchema.index({ name: "text", symbol: "text" });
+// Compound text index for global search support
+coinSchema.index({ name: "text", symbol: "text", tags: "text" });
 
 const Coin = mongoose.model("Coin", coinSchema);
 

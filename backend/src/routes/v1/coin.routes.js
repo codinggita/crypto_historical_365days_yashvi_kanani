@@ -4,9 +4,13 @@ import {
   getCoinById,
   createCoin,
   updateCoin,
+  replaceCoin,
   deleteCoin,
-  searchCoins,
   getTrendingCoins,
+  getTopGainers,
+  getTopLosers,
+  getMarketSummary,
+  getGlobalSearch,
 } from "../../controllers/coin.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 import authorizeRoles from "../../middlewares/role.middleware.js";
@@ -19,20 +23,28 @@ import {
 
 const router = Router();
 
-router.route("/search").get(verifyJWT, searchCoinValidator(), searchCoins);
+// Secure all endpoints with authentication middleware
+router.use(verifyJWT);
 
-router.route("/trending").get(verifyJWT, getTrendingCoins);
+// Register specific routes first to avoid route parameter collision with /:id
+router.route("/trending").get(getTrendingCoins);
+router.route("/top-gainers").get(getTopGainers);
+router.route("/top-losers").get(getTopLosers);
+router.route("/market/summary").get(getMarketSummary);
+router.route("/search/global").get(searchCoinValidator(), getGlobalSearch);
 
+// Generic collection route paths
 router
   .route("/")
-  .get(verifyJWT, queryCoinValidator(), getAllCoins)
-  .post(verifyJWT, authorizeRoles("admin"), createCoinValidator(), createCoin);
+  .get(queryCoinValidator(), getAllCoins)
+  .post(authorizeRoles("admin"), createCoinValidator(), createCoin);
 
+// Resource route paths with dynamic id parameter
 router
   .route("/:id")
-  .get(verifyJWT, getCoinById)
-  .put(verifyJWT, authorizeRoles("admin"), updateCoinValidator(), updateCoin)
-  .patch(verifyJWT, authorizeRoles("admin"), updateCoinValidator(), updateCoin)
-  .delete(verifyJWT, authorizeRoles("admin"), deleteCoin);
+  .get(getCoinById)
+  .patch(authorizeRoles("admin"), updateCoinValidator(), updateCoin)
+  .put(authorizeRoles("admin"), createCoinValidator(), replaceCoin)
+  .delete(authorizeRoles("admin"), deleteCoin);
 
 export default router;
