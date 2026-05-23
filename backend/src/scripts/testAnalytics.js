@@ -27,21 +27,21 @@ async function runTests() {
 
     // ── Seed Users ──────────────────────────────────────────────────────────
     const adminUser = await User.create({
-      fullName: "Admin Yashvi",
+      name: "Admin Yashvi",
       email: "admin@cryptoverse.com",
       password: "Admin@123456",
       role: "admin",
       isActive: true,
     });
     const regularUser = await User.create({
-      fullName: "Regular User",
+      name: "Regular User",
       email: "user@cryptoverse.com",
       password: "User@123456",
       role: "user",
       isActive: true,
     });
     const inactiveUser = await User.create({
-      fullName: "Inactive User",
+      name: "Inactive User",
       email: "inactive@cryptoverse.com",
       password: "User@123456",
       role: "user",
