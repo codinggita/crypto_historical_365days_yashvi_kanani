@@ -2,6 +2,9 @@ import * as coinService from "../services/coin.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
+/**
+ * GET /coins - Retrieve all coins with search, sorting, filtering, and pagination
+ */
 export const getAllCoins = asyncHandler(async (req, res) => {
   const { coins, meta } = await coinService.getAllCoins(req.query);
   return res.status(200).json(
@@ -9,13 +12,19 @@ export const getAllCoins = asyncHandler(async (req, res) => {
   );
 });
 
+/**
+ * GET /coins/:id - Retrieve details of a single coin
+ */
 export const getCoinById = asyncHandler(async (req, res) => {
   const coin = await coinService.getCoinById(req.params.id);
   return res.status(200).json(
-    new ApiResponse(200, coin, "Coin fetched successfully")
+    new ApiResponse(200, coin, "Coin details fetched successfully")
   );
 });
 
+/**
+ * POST /coins - Create new coin (Admin only)
+ */
 export const createCoin = asyncHandler(async (req, res) => {
   const coin = await coinService.createCoin(req.body);
   return res.status(201).json(
@@ -23,13 +32,29 @@ export const createCoin = asyncHandler(async (req, res) => {
   );
 });
 
+/**
+ * PATCH /coins/:id - Partially update coin data (Admin only)
+ */
 export const updateCoin = asyncHandler(async (req, res) => {
   const coin = await coinService.updateCoin(req.params.id, req.body);
   return res.status(200).json(
-    new ApiResponse(200, coin, "Coin updated successfully")
+    new ApiResponse(200, coin, "Coin partially updated successfully")
   );
 });
 
+/**
+ * PUT /coins/:id - Full update / Replace coin data (Admin only)
+ */
+export const replaceCoin = asyncHandler(async (req, res) => {
+  const coin = await coinService.replaceCoin(req.params.id, req.body);
+  return res.status(200).json(
+    new ApiResponse(200, coin, "Coin replaced successfully")
+  );
+});
+
+/**
+ * DELETE /coins/:id - Delete a coin (Admin only)
+ */
 export const deleteCoin = asyncHandler(async (req, res) => {
   const coin = await coinService.deleteCoin(req.params.id);
   return res.status(200).json(
@@ -37,52 +62,76 @@ export const deleteCoin = asyncHandler(async (req, res) => {
   );
 });
 
-export const searchCoins = asyncHandler(async (req, res) => {
-  const { coins, meta } = await coinService.searchCoins(req.query);
-  return res.status(200).json(
-    new ApiResponse(200, coins, "Coins search results fetched successfully", meta)
-  );
-});
-
+/**
+ * GET /coins/trending - Retrieve top trending coins (highest dailyReturn + volume)
+ */
 export const getTrendingCoins = asyncHandler(async (req, res) => {
-  const coins = await coinService.getTrendingCoins();
+  const limit = req.query.limit || 5;
+  const coins = await coinService.getTrendingCoins(limit);
   return res.status(200).json(
     new ApiResponse(200, coins, "Trending coins fetched successfully")
   );
 });
 
+/**
+ * GET /coins/top-gainers - Retrieve top gainers by dailyReturn descending
+ */
 export const getTopGainers = asyncHandler(async (req, res) => {
-  const coins = await coinService.getTopGainers();
+  const limit = req.query.limit || 5;
+  const coins = await coinService.getTopGainers(limit);
   return res.status(200).json(
     new ApiResponse(200, coins, "Top gainers fetched successfully")
   );
 });
 
+/**
+ * GET /coins/top-losers - Retrieve top losers by dailyReturn ascending
+ */
 export const getTopLosers = asyncHandler(async (req, res) => {
-  const coins = await coinService.getTopLosers();
+  const limit = req.query.limit || 5;
+  const coins = await coinService.getTopLosers(limit);
   return res.status(200).json(
     new ApiResponse(200, coins, "Top losers fetched successfully")
   );
 });
 
+/**
+ * GET /coins/market/summary - Retrieve platform-wide market statistics via aggregation
+ */
+export const getMarketSummary = asyncHandler(async (req, res) => {
+  const summary = await coinService.getMarketSummary();
+  return res.status(200).json(
+    new ApiResponse(200, summary, "Market summary statistics fetched successfully")
+  );
+});
+
+/**
+ * GET /coins/search/global - Global regex search on name, symbol, tags
+ */
+export const getGlobalSearch = asyncHandler(async (req, res) => {
+  const { coins, meta } = await coinService.getGlobalSearch(req.query);
+  return res.status(200).json(
+    new ApiResponse(200, coins, "Global search results fetched successfully", meta)
+  );
+});
+
+/**
+ * GET /coins/recent - Retrieve most recently added coins
+ */
 export const getRecentCoins = asyncHandler(async (req, res) => {
-  const coins = await coinService.getRecentCoins();
+  const limit = req.query.limit || 10;
+  const coins = await coinService.getRecentCoins(limit);
   return res.status(200).json(
     new ApiResponse(200, coins, "Recent coins fetched successfully")
   );
 });
 
+/**
+ * GET /coins/random - Retrieve a single random coin
+ */
 export const getRandomCoin = asyncHandler(async (req, res) => {
   const coin = await coinService.getRandomCoin();
   return res.status(200).json(
     new ApiResponse(200, coin, "Random coin fetched successfully")
-  );
-});
-
-export const getSuggestions = asyncHandler(async (req, res) => {
-  const q = req.query.q || req.query.search;
-  const suggestions = await coinService.getSuggestions(q);
-  return res.status(200).json(
-    new ApiResponse(200, suggestions, "Suggestions fetched successfully")
   );
 });

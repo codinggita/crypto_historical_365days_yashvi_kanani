@@ -46,14 +46,38 @@ export const createCoinValidator = () => {
       .optional()
       .isFloat({ min: 0 })
       .withMessage("volatility must be a positive number"),
-    body("month")
+    body("circulatingSupply")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("circulatingSupply must be a positive number"),
+    body("totalSupply")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("totalSupply must be a positive number"),
+    body("maxSupply")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("maxSupply must be a positive number"),
+    body("category")
       .optional()
       .isString()
-      .withMessage("month must be a string"),
-    body("year")
+      .withMessage("category must be a string"),
+    body("image")
       .optional()
-      .isInt({ min: 1800, max: 2100 })
-      .withMessage("year must be a valid positive integer"),
+      .isString()
+      .withMessage("image must be a string"),
+    body("marketStatus")
+      .optional()
+      .isString()
+      .withMessage("marketStatus must be a string"),
+    body("tags")
+      .optional()
+      .isArray()
+      .withMessage("tags must be an array of strings"),
+    body("timestamp")
+      .optional()
+      .isISO8601()
+      .withMessage("timestamp must be a valid date"),
     validate,
   ];
 };
@@ -105,14 +129,38 @@ export const updateCoinValidator = () => {
       .optional()
       .isFloat({ min: 0 })
       .withMessage("volatility must be a positive number"),
-    body("month")
+    body("circulatingSupply")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("circulatingSupply must be a positive number"),
+    body("totalSupply")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("totalSupply must be a positive number"),
+    body("maxSupply")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("maxSupply must be a positive number"),
+    body("category")
       .optional()
       .isString()
-      .withMessage("month must be a string"),
-    body("year")
+      .withMessage("category must be a string"),
+    body("image")
       .optional()
-      .isInt({ min: 1800, max: 2100 })
-      .withMessage("year must be a valid positive integer"),
+      .isString()
+      .withMessage("image must be a string"),
+    body("marketStatus")
+      .optional()
+      .isString()
+      .withMessage("marketStatus must be a string"),
+    body("tags")
+      .optional()
+      .isArray()
+      .withMessage("tags must be an array of strings"),
+    body("timestamp")
+      .optional()
+      .isISO8601()
+      .withMessage("timestamp must be a valid date"),
     validate,
   ];
 };
@@ -151,18 +199,38 @@ export const queryCoinValidator = () => {
       .optional()
       .isString()
       .withMessage("coinId must be a string"),
-    query("search")
+    query("q")
       .optional()
       .isString()
-      .withMessage("search must be a string"),
-    query("month")
+      .withMessage("search query q must be a string"),
+    query("category")
       .optional()
       .isString()
-      .withMessage("month must be a string"),
-    query("year")
+      .withMessage("category filter must be a string"),
+    query("marketStatus")
       .optional()
-      .isInt()
-      .withMessage("year must be an integer"),
+      .isString()
+      .withMessage("marketStatus filter must be a string"),
+    query("rank")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("rank filter must be a positive integer"),
+    query("minVolume")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("minVolume filter must be a positive number"),
+    query("maxVolume")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("maxVolume filter must be a positive number"),
+    query("minMarketCap")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("minMarketCap filter must be a positive number"),
+    query("maxMarketCap")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("maxMarketCap filter must be a positive number"),
     validate,
   ];
 };
