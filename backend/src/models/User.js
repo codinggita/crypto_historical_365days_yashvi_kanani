@@ -34,11 +34,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-      index: true,
-    },
+    bookmarks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Bookmark",
+      },
+    ],
+    watchlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coin",
+      },
+    ],
     passwordChangedAt: {
       type: Date,
       default: null,
@@ -58,16 +65,12 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save hook to hash password
+// Pre-save hook to hash password cleanly and securely
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
 
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-  } catch (error) {
-    throw error;
-  }
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare password method
