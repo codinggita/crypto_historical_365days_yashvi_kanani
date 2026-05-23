@@ -7,6 +7,7 @@ const coinSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
+      unique: true,
       index: true,
     },
     name: {
@@ -30,6 +31,7 @@ const coinSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
+      index: true,
     },
     marketCap: {
       type: Number,
@@ -39,21 +41,47 @@ const coinSchema = new mongoose.Schema(
     volume: {
       type: Number,
       default: 0,
+      index: true,
     },
     dailyReturn: {
       type: Number,
       default: 0,
+      index: true,
     },
     volatility: {
       type: Number,
       default: 0,
     },
-    month: {
+    circulatingSupply: {
+      type: Number,
+      default: 0,
+    },
+    totalSupply: {
+      type: Number,
+      default: 0,
+    },
+    maxSupply: {
+      type: Number,
+      default: 0,
+    },
+    category: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+    image: {
       type: String,
       trim: true,
     },
-    year: {
-      type: Number,
+    marketStatus: {
+      type: String,
+      trim: true,
+      default: "active",
+      index: true,
+    },
+    tags: {
+      type: [String],
+      default: [],
       index: true,
     },
     timestamp: {
@@ -67,8 +95,10 @@ const coinSchema = new mongoose.Schema(
   }
 );
 
-coinSchema.index({ coinId: 1 }, { unique: true });
-coinSchema.index({ name: "text", symbol: "text" });
+// Compound text index for global search across name, symbol, and tags
+coinSchema.index({ name: "text", symbol: "text", tags: "text" });
+// Index for fetching recently added coins efficiently
+coinSchema.index({ createdAt: -1 });
 
 const Coin = mongoose.model("Coin", coinSchema);
 

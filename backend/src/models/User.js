@@ -46,6 +46,10 @@ const userSchema = new mongoose.Schema(
         ref: "Coin",
       },
     ],
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
     lastLogin: {
       type: Date,
       default: null,

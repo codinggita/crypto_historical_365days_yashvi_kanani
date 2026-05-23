@@ -67,14 +67,13 @@ const portfolioSchema = new mongoose.Schema(
 );
 
 // Pre-save hook to calculate invested amount, current value, and profit/loss values automatically
-portfolioSchema.pre("save", function (next) {
+portfolioSchema.pre("save", function () {
   this.investedAmount = this.quantity * this.buyPrice;
   this.currentValue = this.quantity * this.currentPrice;
   this.profitLoss = this.currentValue - this.investedAmount;
   this.profitLossPercentage = this.investedAmount > 0 
     ? (this.profitLoss / this.investedAmount) * 100 
     : 0;
-  next();
 });
 
 const Portfolio = mongoose.model("Portfolio", portfolioSchema);

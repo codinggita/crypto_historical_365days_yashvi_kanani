@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Portfolio from "../models/Portfolio.js";
 import Coin from "../models/Coin.js";
+import Bookmark from "../models/Bookmark.js";
+import SearchLog from "../models/SearchLog.js";
 import ApiError from "../utils/ApiError.js";
 
 /**
@@ -293,4 +295,108 @@ export const getAnalyticsHistory = async (userId) => {
   ]);
 
   return history;
+};
+
+/**
+ * Fetch advanced dashboard overview including portfolio totals, performance, and chronological recent activity
+ */
+export const getDashboardOverview = async (userId) => {
+  // 1. Calculate Portfolio Totals
+  const totalsResult = await Portfolio.aggregate([
+    { $match: { user: new mongoose.Types.ObjectId(userId) } },
+    {
+      $group: {
+        _id: null,
+        totalInvested: { $sum: "$investedAmount" },
+        totalCurrentValue: { $sum: "$currentValue" },
+        totalProfitLoss: { $sum: "$profitLoss" },
+      },
+    },
+  ]);
+
+  const totals = totalsResult[0] || {
+    totalInvested: 0,
+    totalCurrentValue: 0,
+    totalProfitLoss: 0,
+  };
+
+  const totalProfitLossPercentage = totals.totalInvested > 0
+    ? (totals.totalProfitLoss / totals.totalInvested) * 100
+    : 0;
+
+  // 2. Fetch Performance Extremes
+  const bestCoin = await Portfolio.findOne({ user: userId }).sort({ profitLossPercentage: -1 });
+  const worstCoin = await Portfolio.findOne({ user: userId }).sort({ profitLossPercentage: 1 });
+
+  // 3. Gather Recent Activities
+  const recentTransactions = await Portfolio.find({ user: userId })
+    .sort({ createdAt: -1 })
+    .limit(3);
+
+  const recentBookmarks = await Bookmark.find({ user: userId })
+    .sort({ createdAt: -1 })
+    .limit(3);
+
+  const recentSearches = await SearchLog.find({ user: userId })
+    .sort({ createdAt: -1 })
+    .limit(3);
+
+  // Map and compile into a chronological feed
+  const feed = [];
+
+  recentTransactions.forEach(t => {
+    feed.push({
+      type: "transaction",
+      action: `Purchased ${t.quantity} ${t.symbol}`,
+      details: {
+        coinName: t.coinName,
+        symbol: t.symbol,
+        investedAmount: t.investedAmount,
+        buyPrice: t.buyPrice,
+      },
+      timestamp: t.createdAt,
+    });
+  });
+
+  recentBookmarks.forEach(b => {
+    feed.push({
+      type: "bookmark",
+      action: `Bookmarked ${b.coinName}`,
+      details: {
+        coinName: b.coinName,
+        symbol: b.symbol,
+        addedPrice: b.addedPrice,
+        category: b.category,
+      },
+      timestamp: b.createdAt,
+    });
+  });
+
+  recentSearches.forEach(s => {
+    feed.push({
+      type: "search",
+      action: `Searched for "${s.query}"`,
+      details: {
+        query: s.query,
+      },
+      timestamp: s.createdAt,
+    });
+  });
+
+  // Sort unified feed by timestamp descending
+  feed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  return {
+    totals: {
+      totalInvested: totals.totalInvested,
+      totalCurrentValue: totals.totalCurrentValue,
+      totalProfitLoss: totals.totalProfitLoss,
+      profitLossPercentage: totalProfitLossPercentage,
+    },
+    performance: {
+      bestPerformingCoin: bestCoin,
+      worstPerformingCoin: worstCoin,
+    },
+    recentActivity: feed.slice(0, 5), // top 5 overall recent activities
+  };
 };

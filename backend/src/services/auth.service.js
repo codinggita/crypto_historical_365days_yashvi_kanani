@@ -62,14 +62,7 @@ export const loginUser = async (userData) => {
  * Update current user profile details
  */
 export const updateProfile = async (userId, updateData) => {
-  const { name, email, avatar } = updateData;
-
-  if (email) {
-    const existedUser = await User.findOne({ email, _id: { $ne: userId } });
-    if (existedUser) {
-      throw new ApiError(409, "User with this email already exists");
-    }
-  }
+  const { name, avatar } = updateData;
 
   const user = await User.findById(userId);
   if (!user) {
@@ -77,7 +70,6 @@ export const updateProfile = async (userId, updateData) => {
   }
 
   if (name !== undefined) user.name = name;
-  if (email !== undefined) user.email = email;
   if (avatar !== undefined) user.avatar = avatar;
 
   await user.save();
@@ -100,6 +92,7 @@ export const changePassword = async (userId, oldPassword, newPassword) => {
   }
 
   user.password = newPassword;
+  user.passwordChangedAt = new Date();
   await user.save();
 
   return await User.findById(userId).select("-password");
