@@ -9,6 +9,7 @@ import {
   getAllUsers,
   updateUserRole,
   updateUserStatus,
+  checkAdmin,
 } from "../../controllers/auth.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 import authorizeRoles from "../../middlewares/role.middleware.js";
@@ -36,6 +37,7 @@ router
 router.route("/change-password").patch(verifyJWT, changePasswordValidator(), changePassword);
 
 // Admin-Only Routes
+router.route("/admin/check").get(verifyJWT, authorizeRoles("admin"), checkAdmin);
 router.route("/users").get(verifyJWT, authorizeRoles("admin"), getAllUsers);
 router.route("/users/:id/role").patch(verifyJWT, authorizeRoles("admin"), updateUserRole);
 router.route("/users/:id/status").patch(verifyJWT, authorizeRoles("admin"), updateUserStatus);

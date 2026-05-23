@@ -34,6 +34,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
     lastLogin: {
       type: Date,
       default: null,
@@ -45,15 +54,14 @@ const userSchema = new mongoose.Schema(
 );
 
 // Pre-save hook to hash password
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   try {
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
   } catch (error) {
-    next(error);
+    throw error;
   }
 });
 

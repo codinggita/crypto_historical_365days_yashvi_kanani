@@ -44,6 +44,12 @@ export const logoutUser = asyncHandler(async (req, res) => {
   );
 });
 
+export const checkAdmin = asyncHandler(async (req, res) => {
+  return res.status(200).json(
+    new ApiResponse(200, { isAdmin: true }, "Admin access verified successfully")
+  );
+});
+
 export const getAllUsers = asyncHandler(async (req, res) => {
   const { users, meta } = await authService.getAllUsers(req.query);
   return res.status(200).json(
