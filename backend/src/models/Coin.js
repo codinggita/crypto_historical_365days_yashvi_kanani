@@ -7,7 +7,7 @@ const coinSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
-      index: true,
+      // Unique index is declared below via coinSchema.index() to avoid duplicate index warning
     },
     name: {
       type: String,
