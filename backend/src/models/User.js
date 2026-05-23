@@ -34,6 +34,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
     lastLogin: {
       type: Date,
       default: null,
