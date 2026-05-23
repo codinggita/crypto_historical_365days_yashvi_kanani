@@ -7,6 +7,7 @@ import coinRoutes from "./coin.routes.js";
 import analyticsRoutes from "./analytics.routes.js";
 import userRoutes from "./user.routes.js";
 import portfolioRoutes from "./portfolio.routes.js";
+import bookmarkRoutes from "./bookmark.routes.js";
 
 const router = express.Router();
 
@@ -26,5 +27,6 @@ router.use("/coins", coinRoutes);
 router.use("/analytics", analyticsRoutes);
 router.use("/users", userRoutes);
 router.use("/portfolio", portfolioRoutes);
+router.use("/bookmarks", bookmarkRoutes);
 
 export default router;
