@@ -63,7 +63,7 @@ export const deleteCoin = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /coins/trending - Retrieve top trending coins
+ * GET /coins/trending - Retrieve top trending coins (highest dailyReturn + volume)
  */
 export const getTrendingCoins = asyncHandler(async (req, res) => {
   const limit = req.query.limit || 5;
@@ -74,7 +74,7 @@ export const getTrendingCoins = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /coins/top-gainers - Retrieve top gainers by dailyReturn
+ * GET /coins/top-gainers - Retrieve top gainers by dailyReturn descending
  */
 export const getTopGainers = asyncHandler(async (req, res) => {
   const limit = req.query.limit || 5;
@@ -85,7 +85,7 @@ export const getTopGainers = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /coins/top-losers - Retrieve top losers by dailyReturn
+ * GET /coins/top-losers - Retrieve top losers by dailyReturn ascending
  */
 export const getTopLosers = asyncHandler(async (req, res) => {
   const limit = req.query.limit || 5;
@@ -96,7 +96,7 @@ export const getTopLosers = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /coins/market/summary - Retrieve platform-wide market statistics
+ * GET /coins/market/summary - Retrieve platform-wide market statistics via aggregation
  */
 export const getMarketSummary = asyncHandler(async (req, res) => {
   const summary = await coinService.getMarketSummary();
@@ -112,5 +112,26 @@ export const getGlobalSearch = asyncHandler(async (req, res) => {
   const { coins, meta } = await coinService.getGlobalSearch(req.query);
   return res.status(200).json(
     new ApiResponse(200, coins, "Global search results fetched successfully", meta)
+  );
+});
+
+/**
+ * GET /coins/recent - Retrieve most recently added coins
+ */
+export const getRecentCoins = asyncHandler(async (req, res) => {
+  const limit = req.query.limit || 10;
+  const coins = await coinService.getRecentCoins(limit);
+  return res.status(200).json(
+    new ApiResponse(200, coins, "Recent coins fetched successfully")
+  );
+});
+
+/**
+ * GET /coins/random - Retrieve a single random coin
+ */
+export const getRandomCoin = asyncHandler(async (req, res) => {
+  const coin = await coinService.getRandomCoin();
+  return res.status(200).json(
+    new ApiResponse(200, coin, "Random coin fetched successfully")
   );
 });

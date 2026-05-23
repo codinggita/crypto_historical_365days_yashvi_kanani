@@ -31,6 +31,7 @@ const coinSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
+      index: true,
     },
     marketCap: {
       type: Number,
@@ -94,8 +95,10 @@ const coinSchema = new mongoose.Schema(
   }
 );
 
-// Compound text index for global search support
+// Compound text index for global search across name, symbol, and tags
 coinSchema.index({ name: "text", symbol: "text", tags: "text" });
+// Index for fetching recently added coins efficiently
+coinSchema.index({ createdAt: -1 });
 
 const Coin = mongoose.model("Coin", coinSchema);
 

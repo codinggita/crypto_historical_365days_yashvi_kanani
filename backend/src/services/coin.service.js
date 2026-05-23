@@ -4,7 +4,7 @@ import { getPaginationOptions, getPaginationMeta } from "../utils/pagination.js"
 import mongoose from "mongoose";
 
 /**
- * Helper to validate Mongoose ObjectId format or check slug
+ * Helper to find a coin by MongoDB ObjectId or coinId slug
  */
 const findCoinByFlexibleId = async (id) => {
   let coin;
@@ -22,60 +22,81 @@ const findCoinByFlexibleId = async (id) => {
 export const getAllCoins = async (queryParams) => {
   const query = {};
 
-  // Filtering support
+  // Category filter (case-insensitive exact match)
   if (queryParams.category) {
     query.category = { $regex: new RegExp(`^${queryParams.category}$`, "i") };
   }
 
+  // Market status filter
   if (queryParams.marketStatus) {
     query.marketStatus = { $regex: new RegExp(`^${queryParams.marketStatus}$`, "i") };
   }
 
+  // Symbol exact match
+  if (queryParams.symbol) {
+    query.symbol = queryParams.symbol.toUpperCase();
+  }
+
+  // Exact rank filter
   if (queryParams.rank) {
     query.rank = parseInt(queryParams.rank, 10);
+  }
+
+  // Price range filter
+  if (queryParams.minPrice || queryParams.maxPrice) {
+    query.price = {};
+    if (queryParams.minPrice) query.price.$gte = parseFloat(queryParams.minPrice);
+    if (queryParams.maxPrice) query.price.$lte = parseFloat(queryParams.maxPrice);
   }
 
   // Volume range filter
   if (queryParams.minVolume || queryParams.maxVolume) {
     query.volume = {};
-    if (queryParams.minVolume) {
-      query.volume.$gte = parseFloat(queryParams.minVolume);
-    }
-    if (queryParams.maxVolume) {
-      query.volume.$lte = parseFloat(queryParams.maxVolume);
-    }
+    if (queryParams.minVolume) query.volume.$gte = parseFloat(queryParams.minVolume);
+    if (queryParams.maxVolume) query.volume.$lte = parseFloat(queryParams.maxVolume);
   }
 
   // MarketCap range filter
   if (queryParams.minMarketCap || queryParams.maxMarketCap) {
     query.marketCap = {};
-    if (queryParams.minMarketCap) {
-      query.marketCap.$gte = parseFloat(queryParams.minMarketCap);
-    }
-    if (queryParams.maxMarketCap) {
-      query.marketCap.$lte = parseFloat(queryParams.maxMarketCap);
-    }
+    if (queryParams.minMarketCap) query.marketCap.$gte = parseFloat(queryParams.minMarketCap);
+    if (queryParams.maxMarketCap) query.marketCap.$lte = parseFloat(queryParams.maxMarketCap);
   }
 
-  // Regex Search features on name, symbol, tags
-  if (queryParams.q) {
-    const searchRegex = { $regex: queryParams.q.trim(), $options: "i" };
+  // Regex search on name, symbol, coinId, and tags (supports ?q=)
+  const searchVal = queryParams.q || queryParams.search;
+  if (searchVal && searchVal.trim() !== "") {
+    const searchRegex = { $regex: searchVal.trim(), $options: "i" };
     query.$or = [
       { name: searchRegex },
       { symbol: searchRegex },
-      { tags: searchRegex }
+      { coinId: searchRegex },
+      { tags: searchRegex },
     ];
   }
 
-  const { page, limit, skip } = getPaginationOptions(queryParams);
+  // Sanitize and derive pagination
+  const sanitizedQuery = { ...queryParams };
+  sanitizedQuery.page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+  sanitizedQuery.limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
 
-  // Sorting
-  const sortBy = queryParams.sortBy || "rank";
+  const { page, limit, skip } = getPaginationOptions(sanitizedQuery);
+
+  // Validated sorting
+  const allowedSortFields = ["price", "marketCap", "volume", "rank", "dailyReturn", "volatility", "createdAt"];
+  const sortBy = allowedSortFields.includes(queryParams.sortBy) ? queryParams.sortBy : "rank";
   const sortOrder = queryParams.sortOrder === "desc" ? -1 : 1;
   const sort = { [sortBy]: sortOrder };
 
+  // Optional field projection (comma-separated, e.g. ?fields=name,symbol,price)
+  let projection = "";
+  if (queryParams.fields) {
+    projection = queryParams.fields.split(",").join(" ");
+  }
+
   const totalItems = await Coin.countDocuments(query);
   const coins = await Coin.find(query)
+    .select(projection)
     .sort(sort)
     .skip(skip)
     .limit(limit);
@@ -149,7 +170,7 @@ export const updateCoin = async (id, coinData) => {
     coin.symbol = uppercaseSymbol;
   }
 
-  // Update remaining fields
+  // Update all remaining fields
   Object.keys(coinData).forEach((key) => {
     if (key !== "coinId" && key !== "symbol") {
       coin[key] = coinData[key];
@@ -182,7 +203,7 @@ export const replaceCoin = async (id, coinData) => {
     throw new ApiError(409, "Coin with this symbol already exists");
   }
 
-  // Perform full replacement
+  // Full replacement
   coin.coinId = lowercaseCoinId;
   coin.name = coinData.name;
   coin.symbol = uppercaseSymbol;
@@ -218,14 +239,13 @@ export const deleteCoin = async (id) => {
 };
 
 /**
- * Get top trending coins (Highest dailyReturn, then highest volume)
+ * Get top trending coins (highest dailyReturn + volume)
  */
 export const getTrendingCoins = async (limitParam = 5) => {
   const limit = parseInt(limitParam, 10) || 5;
-  const coins = await Coin.find({})
+  return await Coin.find({})
     .sort({ dailyReturn: -1, volume: -1 })
     .limit(limit);
-  return coins;
 };
 
 /**
@@ -233,10 +253,9 @@ export const getTrendingCoins = async (limitParam = 5) => {
  */
 export const getTopGainers = async (limitParam = 5) => {
   const limit = parseInt(limitParam, 10) || 5;
-  const coins = await Coin.find({})
+  return await Coin.find({})
     .sort({ dailyReturn: -1 })
     .limit(limit);
-  return coins;
 };
 
 /**
@@ -244,14 +263,31 @@ export const getTopGainers = async (limitParam = 5) => {
  */
 export const getTopLosers = async (limitParam = 5) => {
   const limit = parseInt(limitParam, 10) || 5;
-  const coins = await Coin.find({})
+  return await Coin.find({})
     .sort({ dailyReturn: 1 })
     .limit(limit);
-  return coins;
 };
 
 /**
- * Get platform-wide market summary using MongoDB aggregation pipeline ($match, $group, $sort, $project, $limit, $facet)
+ * Get most recently added coins sorted by createdAt descending
+ */
+export const getRecentCoins = async (limitParam = 10) => {
+  const limit = parseInt(limitParam, 10) || 10;
+  return await Coin.find({})
+    .sort({ createdAt: -1 })
+    .limit(limit);
+};
+
+/**
+ * Get a single random coin using MongoDB $sample aggregation
+ */
+export const getRandomCoin = async () => {
+  const result = await Coin.aggregate([{ $sample: { size: 1 } }]);
+  return result[0] || null;
+};
+
+/**
+ * Get platform-wide market summary using MongoDB aggregation ($facet, $group, $project)
  */
 export const getMarketSummary = async () => {
   const result = await Coin.aggregate([
@@ -278,19 +314,17 @@ export const getMarketSummary = async () => {
     },
   ]);
 
-  const summary = result[0]?.summary || {
+  return result[0]?.summary || {
     totalMarketCap: 0,
     averagePrice: 0,
     averageVolatility: 0,
     totalVolume: 0,
     totalCoins: 0,
   };
-
-  return summary;
 };
 
 /**
- * Global search on name, symbol, tags using regex
+ * Global search on name, symbol, coinId, tags using regex with pagination
  */
 export const getGlobalSearch = async (queryParams) => {
   const { q } = queryParams;
@@ -303,17 +337,19 @@ export const getGlobalSearch = async (queryParams) => {
     $or: [
       { name: searchRegex },
       { symbol: searchRegex },
-      { tags: searchRegex }
-    ]
+      { coinId: searchRegex },
+      { tags: searchRegex },
+    ],
   };
 
-  const { page, limit, skip } = getPaginationOptions(queryParams);
+  const sanitizedQuery = { ...queryParams };
+  sanitizedQuery.page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+  sanitizedQuery.limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
+
+  const { page, limit, skip } = getPaginationOptions(sanitizedQuery);
 
   const totalItems = await Coin.countDocuments(query);
-  const coins = await Coin.find(query)
-    .skip(skip)
-    .limit(limit);
-
+  const coins = await Coin.find(query).skip(skip).limit(limit);
   const meta = getPaginationMeta(totalItems, page, limit);
 
   return { coins, meta };
