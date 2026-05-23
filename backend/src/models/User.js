@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
       select: false,
     },
     role: {
@@ -30,13 +30,38 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    avatar: {
+      type: String,
+      default: "",
+    },
+    bookmarks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Bookmark",
+      },
+    ],
+    watchlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coin",
+      },
+    ],
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Pre-save hook to hash password
+// Pre-save hook to hash password cleanly and securely
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
 

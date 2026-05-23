@@ -19,6 +19,20 @@ const searchLogSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    searchedAt: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
+    filters: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
+    category: {
+      type: String,
+      default: null,
+      index: true,
+    },
   },
   {
     timestamps: true,
