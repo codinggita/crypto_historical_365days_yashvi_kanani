@@ -81,3 +81,13 @@ export const getAnalyticsHistory = asyncHandler(async (req, res) => {
     new ApiResponse(200, history, "Portfolio analytics history fetched successfully")
   );
 });
+
+/**
+ * Fetch unified advanced dashboard overview including portfolio metrics and chronological activities feed
+ */
+export const getDashboardOverview = asyncHandler(async (req, res) => {
+  const overview = await portfolioService.getDashboardOverview(req.user._id);
+  return res.status(200).json(
+    new ApiResponse(200, overview, "Advanced dashboard overview fetched successfully")
+  );
+});

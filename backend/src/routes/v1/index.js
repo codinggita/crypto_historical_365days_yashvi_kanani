@@ -8,6 +8,7 @@ import analyticsRoutes from "./analytics.routes.js";
 import userRoutes from "./user.routes.js";
 import portfolioRoutes from "./portfolio.routes.js";
 import bookmarkRoutes from "./bookmark.routes.js";
+import searchRoutes from "./search.routes.js";
 
 const router = express.Router();
 
@@ -28,5 +29,6 @@ router.use("/analytics", analyticsRoutes);
 router.use("/users", userRoutes);
 router.use("/portfolio", portfolioRoutes);
 router.use("/bookmarks", bookmarkRoutes);
+router.use("/search", searchRoutes);
 
 export default router;
