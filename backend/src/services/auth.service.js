@@ -162,3 +162,30 @@ export const updateUserStatus = async (id, isActive) => {
 
   return user;
 };
+
+/**
+ * Soft delete own user profile
+ */
+export const deleteProfile = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Prevent deleting the last active admin
+  if (user.role === "admin") {
+    const activeAdmins = await User.countDocuments({
+      role: "admin",
+      isActive: true,
+      isDeleted: { $ne: true }
+    });
+    if (activeAdmins <= 1) {
+      throw new ApiError(400, "Security validation error: Cannot delete the last active admin in the system");
+    }
+  }
+
+  user.isDeleted = true;
+  user.isActive = false;
+  await user.save();
+  return user;
+};

@@ -141,3 +141,78 @@ export const getPriceRanges = asyncHandler(async (req, res) => {
     new ApiResponse(200, data, "Price range distribution fetched successfully")
   );
 });
+
+export const getHighestPrice = asyncHandler(async (req, res) => {
+  const coin = await analyticsService.getHighestPriceCoin();
+  return res.status(200).json(new ApiResponse(200, coin, "Highest priced coin fetched"));
+});
+
+export const getLowestPrice = asyncHandler(async (req, res) => {
+  const coin = await analyticsService.getLowestPriceCoin();
+  return res.status(200).json(new ApiResponse(200, coin, "Lowest priced coin fetched"));
+});
+
+export const getAveragePrice = asyncHandler(async (req, res) => {
+  const avg = await analyticsService.getAveragePriceVal();
+  return res.status(200).json(new ApiResponse(200, { averagePrice: avg }, "Average price calculated"));
+});
+
+export const getPriceHistory = asyncHandler(async (req, res) => {
+  const history = await analyticsService.getPriceHistory(req.params.coinId);
+  return res.status(200).json(new ApiResponse(200, history, "Price history fetched"));
+});
+
+export const getPriceTrend = asyncHandler(async (req, res) => {
+  const trend = await analyticsService.getPriceTrend();
+  return res.status(200).json(new ApiResponse(200, trend, "Price trend analysis completed"));
+});
+
+export const getPriceGrowth = asyncHandler(async (req, res) => {
+  const coins = await analyticsService.getPriceGrowth();
+  return res.status(200).json(new ApiResponse(200, coins, "Price growth coins fetched"));
+});
+
+export const getPriceDrop = asyncHandler(async (req, res) => {
+  const coins = await analyticsService.getPriceDrop();
+  return res.status(200).json(new ApiResponse(200, coins, "Price drop coins fetched"));
+});
+
+export const getHighestVolumeCoin = asyncHandler(async (req, res) => {
+  const coin = await analyticsService.getHighestVolumeCoin();
+  return res.status(200).json(new ApiResponse(200, coin, "Highest traded volume coin fetched"));
+});
+
+export const getLowestVolume = asyncHandler(async (req, res) => {
+  const coin = await analyticsService.getLowestVolumeCoin();
+  return res.status(200).json(new ApiResponse(200, coin, "Lowest traded volume coin fetched"));
+});
+
+export const getAverageVolume = asyncHandler(async (req, res) => {
+  const avg = await analyticsService.getAverageVolumeVal();
+  return res.status(200).json(new ApiResponse(200, { averageVolume: avg }, "Average trading volume calculated"));
+});
+
+export const getVolumeSpike = asyncHandler(async (req, res) => {
+  const coins = await analyticsService.getVolumeSpike();
+  return res.status(200).json(new ApiResponse(200, coins, "Sudden volume spikes detected"));
+});
+
+export const getTopReturns = asyncHandler(async (req, res) => {
+  const coins = await analyticsService.getTopReturns();
+  return res.status(200).json(new ApiResponse(200, coins, "Top return coins fetched"));
+});
+
+export const getNegativeReturns = asyncHandler(async (req, res) => {
+  const coins = await analyticsService.getNegativeReturns();
+  return res.status(200).json(new ApiResponse(200, coins, "Negative return coins fetched"));
+});
+
+export const getCumulativeReturns = asyncHandler(async (req, res) => {
+  const data = await analyticsService.getCumulativeReturns();
+  return res.status(200).json(new ApiResponse(200, data, "Cumulative returns analyzed"));
+});
+
+export const getHighVolatilityCoins = asyncHandler(async (req, res) => {
+  const coins = await analyticsService.getHighVolatilityCoins();
+  return res.status(200).json(new ApiResponse(200, coins, "High volatility coins fetched"));
+});

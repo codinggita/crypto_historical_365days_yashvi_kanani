@@ -17,6 +17,11 @@ import {
 
 const router = Router();
 
+router.options("/coins", (req, res) => {
+  res.set("Allow", "GET, POST, OPTIONS");
+  res.status(200).end();
+});
+
 // All admin routes require authenticated admin
 router.use(verifyJWT);
 router.use(authorizeRoles("admin"));
