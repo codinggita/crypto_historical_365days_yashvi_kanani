@@ -715,3 +715,95 @@ export const getDashboard = async ({ days = 30, limit = 5 } = {}) => {
     period: `Last ${days} days`,
   };
 };
+
+export const getHighestPriceCoin = async () => {
+  return await Coin.findOne({}).sort({ price: -1 });
+};
+
+export const getLowestPriceCoin = async () => {
+  return await Coin.findOne({}).sort({ price: 1 });
+};
+
+export const getAveragePriceVal = async () => {
+  const result = await Coin.aggregate([
+    {
+      $group: {
+        _id: null,
+        averagePrice: { $avg: "$price" },
+      },
+    },
+  ]);
+  return result[0]?.averagePrice || 0;
+};
+
+export const getPriceHistory = async (coinId) => {
+  return await Coin.find({ coinId: coinId.toLowerCase() }).sort({ timestamp: 1 });
+};
+
+export const getPriceTrend = async () => {
+  const coins = await Coin.find({}).sort({ dailyReturn: -1 }).limit(10);
+  return {
+    sentiment: coins.filter((c) => c.dailyReturn > 0).length > 5 ? "bullish" : "bearish",
+    topTrenders: coins,
+  };
+};
+
+export const getPriceGrowth = async () => {
+  return await Coin.find({ dailyReturn: { $gt: 0 } }).sort({ dailyReturn: -1 });
+};
+
+export const getPriceDrop = async () => {
+  return await Coin.find({ dailyReturn: { $lt: 0 } }).sort({ dailyReturn: 1 });
+};
+
+export const getHighestVolumeCoin = async () => {
+  return await Coin.findOne({}).sort({ volume: -1 });
+};
+
+export const getLowestVolumeCoin = async () => {
+  return await Coin.findOne({}).sort({ volume: 1 });
+};
+
+export const getAverageVolumeVal = async () => {
+  const result = await Coin.aggregate([
+    {
+      $group: {
+        _id: null,
+        averageVolume: { $avg: "$volume" },
+      },
+    },
+  ]);
+  return result[0]?.averageVolume || 0;
+};
+
+export const getVolumeSpike = async () => {
+  return await Coin.find({ volume: { $gt: 1000000000 }, dailyReturn: { $gt: 3 } });
+};
+
+export const getTopReturns = async () => {
+  return await Coin.find({}).sort({ dailyReturn: -1 }).limit(10);
+};
+
+export const getNegativeReturns = async () => {
+  return await Coin.find({ dailyReturn: { $lt: 0 } }).sort({ dailyReturn: 1 }).limit(10);
+};
+
+export const getCumulativeReturns = async () => {
+  const result = await Coin.aggregate([
+    {
+      $group: {
+        _id: null,
+        averageReturn: { $avg: "$dailyReturn" },
+      },
+    },
+  ]);
+  return {
+    averageDailyReturn: result[0]?.averageReturn || 0,
+    cumulativePeriodDays: 30,
+    estimatedMonthlyReturn: (result[0]?.averageReturn || 0) * 30,
+  };
+};
+
+export const getHighVolatilityCoins = async () => {
+  return await Coin.find({ volatility: { $gt: 3.0 } }).sort({ volatility: -1 });
+};

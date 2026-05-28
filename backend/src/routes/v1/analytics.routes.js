@@ -17,6 +17,21 @@ import {
   getMonthlyReport,
   getYearlyReport,
   getPriceRanges,
+  getHighestPrice,
+  getLowestPrice,
+  getAveragePrice,
+  getPriceHistory,
+  getPriceTrend,
+  getPriceGrowth,
+  getPriceDrop,
+  getHighestVolumeCoin,
+  getLowestVolume,
+  getAverageVolume,
+  getVolumeSpike,
+  getTopReturns,
+  getNegativeReturns,
+  getCumulativeReturns,
+  getHighVolatilityCoins,
 } from "../../controllers/analytics.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 import authorizeRoles from "../../middlewares/role.middleware.js";
@@ -25,6 +40,35 @@ const router = Router();
 
 // Apply JWT verification globally — all analytics routes are protected
 router.use(verifyJWT);
+
+// HEAD route for highest price analytics
+router.head("/price/highest", (req, res) => {
+  res.set("X-Highest-Price-Analytics", "true");
+  res.status(200).end();
+});
+
+// Price analytics routes
+router.get("/price/highest", getHighestPrice);
+router.get("/price/lowest", getLowestPrice);
+router.get("/price/average", getAveragePrice);
+router.get("/price/history/:coinId", getPriceHistory);
+router.get("/price/trend", getPriceTrend);
+router.get("/price/growth", getPriceGrowth);
+router.get("/price/drop", getPriceDrop);
+
+// Volume analytics routes
+router.get("/volume/highest", getHighestVolumeCoin);
+router.get("/volume/lowest", getLowestVolume);
+router.get("/volume/average", getAverageVolume);
+router.get("/volume/spike", getVolumeSpike);
+
+// Returns analytics routes
+router.get("/returns/top", getTopReturns);
+router.get("/returns/negative", getNegativeReturns);
+router.get("/returns/cumulative", getCumulativeReturns);
+
+// Volatility analytics routes
+router.get("/volatility/high", getHighVolatilityCoins);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PUBLIC (any authenticated user)
@@ -69,7 +113,7 @@ router.get("/top-gainers", getTopGainers);
 router.get("/top-losers", getTopLosers);
 router.get("/highest-marketcap", getHighestMarketCap);
 router.get("/highest-volume", getHighestVolume);
-router.get("/volatility/high", getHighVolatility);
+router.get("/volatility/high-legacy", getHighVolatility);
 router.get("/price-ranges", getPriceRanges);
 router.get("/monthly-report", authorizeRoles("admin"), getMonthlyReport);
 router.get("/yearly-report", authorizeRoles("admin"), getYearlyReport);

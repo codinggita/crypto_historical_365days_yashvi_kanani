@@ -10,6 +10,9 @@ import portfolioRoutes from "./portfolio.routes.js";
 import bookmarkRoutes from "./bookmark.routes.js";
 import searchRoutes from "./search.routes.js";
 import adminRoutes from "./admin.routes.js";
+import statsRoutes from "./stats.routes.js";
+import jwtRoutes from "./jwt.routes.js";
+import middlewareRoutes from "./middleware.routes.js";
 
 const router = express.Router();
 
@@ -32,5 +35,8 @@ router.use("/portfolio", portfolioRoutes);
 router.use("/bookmarks", bookmarkRoutes);
 router.use("/search", searchRoutes);
 router.use("/admin", adminRoutes);
+router.use("/stats", statsRoutes);
+router.use("/jwt", jwtRoutes);
+router.use("/middleware", middlewareRoutes);
 
 export default router;

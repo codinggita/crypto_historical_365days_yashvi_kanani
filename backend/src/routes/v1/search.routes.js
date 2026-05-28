@@ -9,6 +9,11 @@ import { verifyJWT } from "../../middlewares/auth.middleware.js";
 
 const router = Router();
 
+router.options("/coins", (req, res) => {
+  res.set("Allow", "GET, OPTIONS");
+  res.status(200).end();
+});
+
 // All search history and query operations require authentication context
 router.use(verifyJWT);
 
@@ -22,5 +27,6 @@ router.route("/trending").get(getTrendingSearches);
 
 // Main search execution route
 router.route("/").get(searchCoins);
+router.route("/coins").get(searchCoins);
 
 export default router;

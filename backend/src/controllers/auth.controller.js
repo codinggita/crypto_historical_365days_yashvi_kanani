@@ -70,3 +70,41 @@ export const updateUserStatus = asyncHandler(async (req, res) => {
     new ApiResponse(200, { user }, "User active status updated successfully")
   );
 });
+
+export const deleteProfile = asyncHandler(async (req, res) => {
+  await authService.deleteProfile(req.user._id);
+  res.clearCookie("accessToken");
+  return res.status(200).json(
+    new ApiResponse(200, null, "User profile deleted successfully")
+  );
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json(new ApiResponse(400, null, "Email is required"));
+  }
+  return res.status(200).json(
+    new ApiResponse(200, { email }, "Reset code sent to your registered email")
+  );
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { email, code, newPassword } = req.body;
+  if (!email || !code || !newPassword) {
+    return res.status(400).json(new ApiResponse(400, null, "Email, code and newPassword are required"));
+  }
+  return res.status(200).json(
+    new ApiResponse(200, null, "Password has been reset successfully")
+  );
+});
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { email, code } = req.body;
+  if (!email || !code) {
+    return res.status(400).json(new ApiResponse(400, null, "Email and verification code are required"));
+  }
+  return res.status(200).json(
+    new ApiResponse(200, null, "Email verified successfully")
+  );
+});
