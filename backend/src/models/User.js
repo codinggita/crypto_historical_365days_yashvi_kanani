@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
       select: false,
     },
     role: {
@@ -30,23 +30,47 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    avatar: {
+      type: String,
+      default: "",
+    },
+    bookmarks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Bookmark",
+      },
+    ],
+    watchlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coin",
+      },
+    ],
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Pre-save hook to hash password
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// Pre-save hook to hash password cleanly and securely
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare password method

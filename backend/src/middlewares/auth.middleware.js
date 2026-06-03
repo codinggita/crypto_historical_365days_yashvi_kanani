@@ -21,6 +21,17 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       throw new ApiError(401, "Invalid Access Token");
     }
 
+    if (!user.isActive) {
+      throw new ApiError(403, "User account is deactivated");
+    }
+
+    if (user.passwordChangedAt && decodedToken.iat) {
+      const changedTimestamp = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
+      if (decodedToken.iat < changedTimestamp) {
+        throw new ApiError(401, "Token invalidated by password change. Please login again.");
+      }
+    }
+
     req.user = user;
     next();
   } catch (error) {

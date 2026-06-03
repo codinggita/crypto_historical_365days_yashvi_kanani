@@ -1,4 +1,4 @@
-<div align="center">
+ <div align="center">
 
 <img src="https://img.shields.io/badge/CryptoVerseX-Real--Time%20Crypto%20Market%20Analytics-0f172a?style=for-the-badge&logo=bitcoin&logoColor=f59e0b" alt="CryptoVerseX Banner" width="100%"/>
 
@@ -170,20 +170,20 @@ The dataset contains:
 
 ---
 
-# 🎨 Frontend Technologies
+# 🎨 Frontend Technologies & Dependencies
 
-| Technology            | Purpose                    |
-| --------------------- | -------------------------- |
-| **React 18 + Vite**   | Frontend framework         |
-| **Redux Toolkit**     | Global state management    |
-| **Tailwind CSS**      | Utility-first styling      |
-| **Material UI (MUI)** | Professional UI components |
-| **Axios**             | API communication          |
-| **Formik**            | Form handling              |
-| **Yup**               | Validation schemas         |
-| **React Router DOM**  | Routing system             |
-| **React Hot Toast**   | Notification system        |
-| **Recharts**          | Analytics visualization    |
+| Dependency / Tool      | Purpose                                |
+| ---------------------- | -------------------------------------- |
+| **React 18 + Vite**    | Frontend UI library & build tool       |
+| **@reduxjs/toolkit**   | Modern state management logic          |
+| **react-redux**        | React bindings for Redux state         |
+| **react-router-dom**   | Declarative routing & navigation       |
+| **axios**              | HTTP client for backend API queries    |
+| **react-hook-form**    | Lightweight & flexible form validation |
+| **jwt-decode**         | Decode JWT tokens for user sessions    |
+| **react-hot-toast**    | Sleek popup toast notifications        |
+| **react-icons**        | Extensive vector icon pack collection  |
+| **recharts**           | Modern interactive analytics charts    |
 
 ---
 
@@ -637,27 +637,42 @@ http://localhost:5000
 
 # 🎨 Frontend Setup
 
+### 1. Navigate to the Frontend Directory
 ```bash
 cd frontend
+```
+
+### 2. Install Dependencies
+```bash
 npm install
 ```
 
-Create `.env`
-
+### 3. Environment Variable Configuration
+Create a `.env` file in the `frontend` folder (you can copy `.env.example` as a starting template):
+```bash
+cp .env.example .env
+```
+Set the API base URL parameter:
 ```env
-VITE_API_BASE_URL=http://localhost:5000/api/v1
+VITE_API_BASE_URL=your_api_production_url/api/v1
 ```
 
-Run frontend:
-
+### 4. Run the Development Server
 ```bash
 npm run dev
 ```
 
-Frontend URL:
+Once started, the development server is available at:
+- **Local url**: [http://localhost:5173](http://localhost:5173)
 
+### 5. Build and Preview for Production
+To build the static application bundle:
 ```bash
-http://localhost:5173
+npm run build
+```
+To preview the production build locally:
+```bash
+npm run preview
 ```
 
 ---
