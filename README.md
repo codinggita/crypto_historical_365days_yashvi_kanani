@@ -357,25 +357,76 @@ backend/
 
 ```bash
 frontend/
-│
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── layouts/
-│   ├── pages/
-│   ├── hooks/
-│   ├── services/
-│   ├── features/
-│   ├── routes/
-│   ├── store/
-│   ├── utils/
-│   ├── App.jsx
-│   └── main.jsx
-│
 ├── public/
-├── package.json
-└── vite.config.js
+├── src/
+│   ├── api/
+│   ├── assets/
+│   │   ├── images/
+│   │   ├── icons/
+│   │   └── logos/
+│   ├── components/
+│   │   ├── common/
+│   │   ├── cards/
+│   │   ├── charts/
+│   │   ├── tables/
+│   │   ├── forms/
+│   │   └── layout/
+│   ├── pages/
+│   │   ├── Home/
+│   │   ├── Dashboard/
+│   │   ├── Coins/
+│   │   ├── CoinDetails/
+│   │   ├── Analytics/
+│   │   ├── Watchlist/
+│   │   ├── Login/
+│   │   ├── Register/
+│   │   └── NotFound/
+│   ├── routes/
+│   ├── redux/
+│   │   ├── slices/
+│   │   └── thunks/
+│   ├── hooks/
+│   ├── utils/
+│   ├── constants/
+│   ├── context/
+│   ├── layouts/
+│   ├── services/
+│   └── styles/
 ```
+
+### Folder Explanations
+
+- **`public/`**: Stores static assets accessible directly by the browser (e.g., favicon, manifest, robots.txt).
+- **`src/api/`**: Contains API configuration, client setup (e.g., Axios instance), and endpoint definitions.
+- **`src/assets/`**: Houses static resources like images, icons, and logos.
+- **`src/components/`**: Houses reusable UI components categorized into:
+  - `common/`: General, app-wide components (buttons, inputs, loaders, modals).
+  - `cards/`: Info cards, statistical cards, coin cards.
+  - `charts/`: Chart configurations and wrapper components.
+  - `tables/`: Data tables with sorting, filtering, and pagination support.
+  - `forms/`: Authentication and search/filter forms.
+  - `layout/`: UI structural components (sidebar, navbar, footer).
+- **`src/pages/`**: Represents individual pages of the application:
+  - `Home/`: Main landing page.
+  - `Dashboard/`: Central user/admin analytics board.
+  - `Coins/`: Cryptocurrency explorer.
+  - `CoinDetails/`: Detailed view for a single cryptocurrency.
+  - `Analytics/`: Volatility, return, and advanced market insights page.
+  - `Watchlist/`: User's bookmarked or tracked coins list.
+  - `Login/`: Authentication login page.
+  - `Register/`: Authentication registration page.
+  - `NotFound/`: Fallback 404 error page.
+- **`src/routes/`**: Defines application routing config and protected route wrappers.
+- **`src/redux/`**: Manages global state using Redux Toolkit:
+  - `slices/`: Sync and async state slices.
+  - `thunks/`: Thunks for async actions and side effects.
+- **`src/hooks/`**: Custom React hooks for sharing stateful logic (e.g., useAuth, useFetch).
+- **`src/utils/`**: Helper utilities and pure functions.
+- **`src/constants/`**: Reusable configurations, static data, action types, or message strings.
+- **`src/context/`**: React Context providers (e.g., theme toggle, UI alerts).
+- **`src/layouts/`**: Wrappers for different layouts (e.g., dashboard layout, authentication layout).
+- **`src/services/`**: External services integration (e.g., formatting utilities, charting helpers).
+- **`src/styles/`**: Custom styling, theme variables, or global CSS files.
 
 ---
 
