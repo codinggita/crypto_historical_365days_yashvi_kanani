@@ -22,15 +22,18 @@ router.post("/generate-token", async (req, res, next) => {
       throw new ApiError(400, "Email is required");
     }
 
-    // Try finding the user or default to a mock user
+    // Try finding the user or create a real user in the database so verifyJWT succeeds
     let user = await User.findOne({ email });
     if (!user) {
-      // Create a temporary mock user or use request details
-      user = {
-        _id: "60c72b2f9b1d8b2e88a8d111",
-        role: req.body.role || "user",
+      user = await User.create({
+        name: "Developer Admin",
         email: email,
-      };
+        password: password || "Password@123",
+        role: req.body.role || "admin",
+      });
+    } else if (req.body.role && user.role !== req.body.role) {
+      user.role = req.body.role;
+      await user.save({ validateBeforeSave: false });
     }
 
     const token = generateToken(user);

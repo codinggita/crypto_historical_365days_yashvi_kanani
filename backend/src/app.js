@@ -33,14 +33,13 @@ app.use(express.json());
 // Enable CORS
 app.use(cors());
 
-// Interactive API Documentation Sandbox
-app.get("/docs", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "docs.html"));
-});
-
-// Redirect root to docs
+// Root API Endpoint
 app.get("/", (req, res) => {
-  res.redirect("/docs");
+  res.json({
+    status: "success",
+    message: "Welcome to the CryptoVerseX API",
+    version: "1.0.0",
+  });
 });
 
 // Mount Routes
