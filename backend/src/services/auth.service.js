@@ -2,48 +2,190 @@ import User from "../models/User.js";
 import ApiError from "../utils/ApiError.js";
 import generateToken from "../utils/generateToken.js";
 
+/**
+ * Register a new user
+ */
 export const registerUser = async (userData) => {
-  const { fullName, email, password } = userData;
+  const { name, email, password } = userData;
 
   const existedUser = await User.findOne({ email });
   if (existedUser) {
-    throw new ApiError(409, "User with email already exists");
+    throw new ApiError(409, "User with this email already exists");
   }
 
   const user = await User.create({
-    fullName,
+    name,
     email,
     password,
   });
 
   const createdUser = await User.findById(user._id).select("-password");
-
   if (!createdUser) {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
   const token = generateToken(user);
-
   return { user: createdUser, token };
 };
 
+/**
+ * Login user and update lastLogin timestamp
+ */
 export const loginUser = async (userData) => {
   const { email, password } = userData;
 
   const user = await User.findOne({ email }).select("+password");
-
   if (!user) {
     throw new ApiError(404, "User does not exist");
   }
 
-  const isPasswordValid = await user.comparePassword(password);
+  if (!user.isActive) {
+    throw new ApiError(403, "User account is deactivated");
+  }
 
+  const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid user credentials");
   }
+
+  // Update lastLogin
+  user.lastLogin = new Date();
+  await user.save({ validateBeforeSave: false });
 
   const token = generateToken(user);
   const loggedInUser = await User.findById(user._id).select("-password");
 
   return { user: loggedInUser, token };
+};
+
+/**
+ * Update current user profile details
+ */
+export const updateProfile = async (userId, updateData) => {
+  const { name, avatar } = updateData;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (name !== undefined) user.name = name;
+  if (avatar !== undefined) user.avatar = avatar;
+
+  await user.save();
+
+  return await User.findById(userId).select("-password");
+};
+
+/**
+ * Change current user password with old password verification
+ */
+export const changePassword = async (userId, oldPassword, newPassword) => {
+  const user = await User.findById(userId).select("+password");
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const isPasswordValid = await user.comparePassword(oldPassword);
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid old password");
+  }
+
+  user.password = newPassword;
+  user.passwordChangedAt = new Date();
+  await user.save();
+
+  return await User.findById(userId).select("-password");
+};
+
+/**
+ * Get all users with pagination (Admin-only)
+ */
+export const getAllUsers = async (queryParams) => {
+  const page = Math.max(1, parseInt(queryParams.page, 10) || 1);
+  const limit = Math.max(1, parseInt(queryParams.limit, 10) || 10);
+  const skip = (page - 1) * limit;
+
+  const total = await User.countDocuments({});
+  const users = await User.find({}).skip(skip).limit(limit);
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    users,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+  };
+};
+
+/**
+ * Update user role (Admin-only)
+ */
+export const updateUserRole = async (id, role) => {
+  if (!["admin", "user"].includes(role)) {
+    throw new ApiError(400, "Invalid role parameter");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    { role },
+    { new: true, runValidators: true }
+  ).select("-password");
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return user;
+};
+
+/**
+ * Update user status active/inactive (Admin-only)
+ */
+export const updateUserStatus = async (id, isActive) => {
+  if (typeof isActive !== "boolean") {
+    throw new ApiError(400, "Invalid status parameter");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    { isActive },
+    { new: true, runValidators: true }
+  ).select("-password");
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return user;
+};
+
+/**
+ * Soft delete own user profile
+ */
+export const deleteProfile = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Prevent deleting the last active admin
+  if (user.role === "admin") {
+    const activeAdmins = await User.countDocuments({
+      role: "admin",
+      isActive: true,
+      isDeleted: { $ne: true }
+    });
+    if (activeAdmins <= 1) {
+      throw new ApiError(400, "Security validation error: Cannot delete the last active admin in the system");
+    }
+  }
+
+  user.isDeleted = true;
+  user.isActive = false;
+  await user.save();
+  return user;
 };
