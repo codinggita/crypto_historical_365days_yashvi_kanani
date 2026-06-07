@@ -430,6 +430,50 @@ frontend/
 
 ---
 
+# 🛣️ Frontend Routing Architecture
+
+The application implements a robust, client-side routing structure using `react-router-dom` v6. Routes are grouped logically under layouts and protected using route wrapper architectures.
+
+## 📂 File Structure
+- **[AppRoutes.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/routes/AppRoutes.jsx)**: Central routing configuration connecting layouts, pages, and route wrapper mechanisms.
+- **[ProtectedRoute.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/routes/ProtectedRoute.jsx)**: A wrapper component that validates user authentication state (pre-configured to allow access for now) and redirects unauthenticated users to `/login`.
+- **[PublicRoute.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/routes/PublicRoute.jsx)**: A wrapper component for public authentication views (like Login/Register) that redirects authenticated users to the `/dashboard`.
+
+---
+
+## 🎨 Layouts
+The routing tree uses layout wrapping patterns to render views inside shared outer wrappers:
+1. **[MainLayout.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/layouts/MainLayout.jsx)**: The base container layout for normal application flows, utilizing `<Outlet />` to render page components.
+2. **[AuthLayout.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/layouts/AuthLayout.jsx)**: The authentication wrapper layout for login and signup pages.
+
+---
+
+## 🧭 Routes Map
+
+### 🔓 Public Routes
+These routes are accessible publicly, or restrict logged-in users away from auth panels:
+- `/` — Landing page / Home
+- `/login` — Login screen (wrapped in `PublicRoute`)
+- `/register` — Sign Up screen (wrapped in `PublicRoute`)
+
+### 🔒 Protected Routes
+These routes represent application views that require active authentication (wrapped in `ProtectedRoute`):
+- `/dashboard` — Market analytics dashboard
+- `/coins` — Cryptocurrency listing table
+- `/analytics` — High return & high volatility metrics
+- `/stats` — Cryptocurrency statistics page
+- `/watchlist` — Bookmarked coins
+- `/profile` — User profile details
+
+### ⚡ Dynamic Routes
+- `/coins/:id` — Details view for a specific cryptocurrency, where `:id` represents the dynamic coin ID parameter.
+
+### 🚫 404 Error Handling
+- `/not-found` — Explicit 404 page
+- `/*` — Fallback catch-all route that automatically redirects unmatched paths to `/not-found`.
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
