@@ -474,6 +474,96 @@ These routes represent application views that require active authentication (wra
 
 ---
 
+# 🧮 Frontend Redux State Management Architecture
+
+The application implements a central state management architecture using **Redux Toolkit** (`@reduxjs/toolkit` and `react-redux`). All state slices are registered and configured inside a single global store.
+
+## 📂 File Structure
+- **[store.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/store.js)**: Central store configuration combining all slice reducers.
+- **[authSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/authSlice.js)**: Authentication state, user details, and tokens.
+- **[coinSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/coinSlice.js)**: Selected coin details and loaded cryptocurrencies data lists.
+- **[analyticsSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/analyticsSlice.js)**: Aggregated market return and volatility metrics state.
+- **[watchlistSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/watchlistSlice.js)**: User bookmarked coin watchlists state.
+- **[uiSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/uiSlice.js)**: App-wide layout states (sidebar toggles, themes).
+
+---
+
+## ⚙️ Store Configuration & Provider Connect
+The application is wrapped with the Redux `<Provider>` inside [main.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/main.jsx) to make the store globally available to all React components:
+```javascript
+import { Provider } from 'react-redux';
+import store from './redux/store';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+```
+
+---
+
+## 🗃️ State Structures & Reducers Map
+
+### 1. Authentication (`auth`)
+* **State Structure:**
+  ```json
+  {
+    "user": null,
+    "token": null,
+    "isAuthenticated": false,
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `setUser`, `logout`, `setLoading`, `setError`
+
+### 2. Coins (`coins`)
+* **State Structure:**
+  ```json
+  {
+    "coins": [],
+    "selectedCoin": null,
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `setCoins`, `setSelectedCoin`, `setLoading`, `setError`
+
+### 3. Analytics (`analytics`)
+* **State Structure:**
+  ```json
+  {
+    "analyticsData": null,
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `setAnalyticsData`, `setLoading`, `setError`
+
+### 4. Watchlist (`watchlist`)
+* **State Structure:**
+  ```json
+  {
+    "watchlist": [],
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `addToWatchlist`, `removeFromWatchlist`, `setLoading`, `setError`
+
+### 5. UI State (`ui`)
+* **State Structure:**
+  ```json
+  {
+    "sidebarOpen": false,
+    "theme": "light"
+  }
+  ```
+* **Actions:** `toggleSidebar`, `changeTheme`
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
