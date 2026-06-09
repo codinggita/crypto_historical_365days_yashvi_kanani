@@ -12,13 +12,18 @@ export const API_ENDPOINTS = {
     GET_ALL: '/coins',
     GET_BY_ID: (id) => `/coins/${id}`,
     SEARCH: '/search/coins',
+    LATEST: '/coins/latest',
     TOP_GAINERS: '/coins/top-gainers',
     TOP_LOSERS: '/coins/top-losers',
+    TOP_MARKET_CAP: '/coins/top-market-cap',
+    TOP_VOLUME: '/coins/top-volume',
     TRENDING: '/coins/trending',
+    MARKET_SUMMARY: '/coins/market/summary',
+    FILTER: '/coins',
     HISTORY: (coinId) => `/coins/history/${coinId}`,
     PERFORMANCE: (coinId) => `/coins/performance/${coinId}`,
     VOLATILITY: (coinId) => `/coins/volatility/${coinId}`,
-    COMPARE: (coin1, coin2, coin3) => 
+    COMPARE: (coin1, coin2, coin3) =>
       coin3 ? `/coins/compare/${coin1}/${coin2}/${coin3}` : `/coins/compare/${coin1}/${coin2}`,
   },
   ANALYTICS: {
