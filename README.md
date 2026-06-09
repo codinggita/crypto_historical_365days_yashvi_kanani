@@ -564,6 +564,57 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 ---
 
+# 🏛️ Dashboard Layout System
+
+The application features a responsive, premium, themeable dashboard layout system implemented entirely via vanilla CSS.
+
+## 🎨 Theme Tokens & Custom Properties
+Colors, backgrounds, cards, and input controls adapt automatically when a user switches between light and dark modes. The layout defines distinct variables under target states:
+* `[data-theme='dark']` / `:root`: Configures rich, deep-slate backgrounds, transparent glassmorphism boundaries, active glows, and light typography.
+* `[data-theme='light']`: Adapts components to standard white card backgrounds, soft borders, and dark typography.
+
+## 🧩 Key Structure Elements
+The layout system divides responsibilities into key modules:
+1. **[MainLayout.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/layouts/MainLayout.jsx)**: Wires together the layout components and synchronizes the active theme. It listens to the Redux `ui.theme` state and updates the `data-theme` attribute on the root HTML element.
+2. **[Sidebar.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/layout/Sidebar.jsx)**: Handles primary navigation links with active route highlighting. It collapses automatically on mobile screens, displaying a dimmed overlay when opened.
+3. **[Navbar.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/layout/Navbar.jsx)**: Displays the current page search bar, theme switcher toggle button, alert notifications bell, and user avatar dropdown menu (with Profile and Logout links).
+
+## 🗂️ Grid Layout & Page Shells
+* **Dashboard Shell**: Utilizes a highly flexible CSS grid (`.stats-grid`) to display 6 key stat cards (Market Overview, Top Gainers, Top Losers, Market Cap, Volume, Watchlist Summary) that adapt from 4 columns down to 2 columns on tablets, and 1 column on mobile. Features a two-column `.content-grid` for list leaderboards.
+* **Component Page Shells**: Sub-route shells (Coins, Analytics, Statistics, Watchlist, Profile) use card frameworks (`.shell-card`) with centered action states and descriptive graphics.
+
+---
+
+# 🪙 Coin Listing Module
+
+The **Coin Listing Module** is the primary, feature-rich view of the platform located at `/coins`. It displays a list of all supported cryptocurrencies with real-time statistics, advanced filtering, multi-column sorting, pagination, and toggleable view modes (Table vs. Grid).
+
+## 🧩 Component Breakdown
+1. **[Coins.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/pages/Coins/Coins.jsx)**: The page orchestrator. It triggers API fetches for both market summary data and coin records, coordinates local/global states, handles search debounce, and switches views.
+2. **[MarketSummaryCards.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/MarketSummaryCards.jsx)**: Displays global cryptocurrency market statistics:
+   * Total Market Cap, 24h Volume, BTC Dominance, Active Cryptos, and Exchanges count.
+   * Percentage change values are styled dynamically with custom micro-animations (green/red indicators).
+3. **[CoinFilters.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinFilters.jsx)**: Houses filter inputs:
+   * Debounced text search (for names/symbols).
+   * Exact symbol match input.
+   * Dropdown selector for sort fields (Rank, Price, 24h Change, Market Cap, Volume, Name) and sorting direction (Ascending/Descending).
+   * Month selector for historical data slicing.
+   * Price range input (Min Price, Max Price).
+   * "Per Page" row limits (10, 20, 50, 100).
+   * Contextual "Reset Filters" button.
+4. **[CoinTable.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinTable.jsx)**: Standard multi-column layout with clickable headers that toggle column-specific sort states dynamically. Includes responsive overflow support.
+5. **[CoinCard.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinCard.jsx)**: A grid card layout using CSS glassmorphism, visual borders, hover lift translations, and high-contrast metric layouts.
+6. **[LoadingSkeleton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/LoadingSkeleton.jsx)**: Shimmer placeholders that match the structure of the active view mode (Table rows vs. Grid cards vs. Market summary cards).
+7. **[Pagination.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/Pagination.jsx)**: Renders numbered page buttons with smart ellipsis boundaries (`1 ... 4 5 6 ... 15`), absolute page controls (First/Last), and active states.
+
+## 🎨 Stylesheet & CSS tokens
+All styles are structured using vanilla CSS in **[coins.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/coins.css)**. It utilizes the dashboard's design tokens:
+* Glassmorphism backgrounds: `var(--card-bg)`, `backdrop-filter: blur(12px)`.
+* Adaptive border glows & hover shifts (`transform: translateY(-3px)`).
+* Strict font family stacks and clean table alignments with responsive media breakpoints.
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
