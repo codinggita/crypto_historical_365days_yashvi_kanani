@@ -474,6 +474,96 @@ These routes represent application views that require active authentication (wra
 
 ---
 
+# 🧮 Frontend Redux State Management Architecture
+
+The application implements a central state management architecture using **Redux Toolkit** (`@reduxjs/toolkit` and `react-redux`). All state slices are registered and configured inside a single global store.
+
+## 📂 File Structure
+- **[store.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/store.js)**: Central store configuration combining all slice reducers.
+- **[authSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/authSlice.js)**: Authentication state, user details, and tokens.
+- **[coinSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/coinSlice.js)**: Selected coin details and loaded cryptocurrencies data lists.
+- **[analyticsSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/analyticsSlice.js)**: Aggregated market return and volatility metrics state.
+- **[watchlistSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/watchlistSlice.js)**: User bookmarked coin watchlists state.
+- **[uiSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/uiSlice.js)**: App-wide layout states (sidebar toggles, themes).
+
+---
+
+## ⚙️ Store Configuration & Provider Connect
+The application is wrapped with the Redux `<Provider>` inside [main.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/main.jsx) to make the store globally available to all React components:
+```javascript
+import { Provider } from 'react-redux';
+import store from './redux/store';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+```
+
+---
+
+## 🗃️ State Structures & Reducers Map
+
+### 1. Authentication (`auth`)
+* **State Structure:**
+  ```json
+  {
+    "user": null,
+    "token": null,
+    "isAuthenticated": false,
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `setUser`, `logout`, `setLoading`, `setError`
+
+### 2. Coins (`coins`)
+* **State Structure:**
+  ```json
+  {
+    "coins": [],
+    "selectedCoin": null,
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `setCoins`, `setSelectedCoin`, `setLoading`, `setError`
+
+### 3. Analytics (`analytics`)
+* **State Structure:**
+  ```json
+  {
+    "analyticsData": null,
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `setAnalyticsData`, `setLoading`, `setError`
+
+### 4. Watchlist (`watchlist`)
+* **State Structure:**
+  ```json
+  {
+    "watchlist": [],
+    "loading": false,
+    "error": null
+  }
+  ```
+* **Actions:** `addToWatchlist`, `removeFromWatchlist`, `setLoading`, `setError`
+
+### 5. UI State (`ui`)
+* **State Structure:**
+  ```json
+  {
+    "sidebarOpen": false,
+    "theme": "light"
+  }
+  ```
+* **Actions:** `toggleSidebar`, `changeTheme`
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
@@ -906,6 +996,49 @@ Commit Convention:
 ```bash
 feat | fix | docs | refactor | chore | test
 ```
+
+---
+
+# 🔌 Frontend API Architecture
+
+The frontend communicates with the backend APIs via a modular, scalable, and service-based architecture.
+
+## 📡 Axios Client Config (`src/api/apiClient.js`)
+A reusable Axios client is configured as the central point for HTTP communication:
+* **Base URL**: Dynamically resolved using Vite environment variables: `import.meta.env.VITE_API_BASE_URL`.
+* **Request Timeout**: Configured with a default timeout of `10000ms` (10 seconds) to handle slower network responses gracefully.
+
+## 🔒 Request Interceptor
+To secure communication, a request interceptor automatically:
+* Retrieves the authentication JWT token from `localStorage` under the key `'token'`.
+* Automatically attaches the authorization token to the outgoing request headers using the `Authorization: Bearer <token>` convention.
+
+## 🛡️ Response Interceptor & Centralized Error Handling
+The response interceptor standardizes the API error format:
+* Intercepts standard server error statuses including:
+  * `401 Unauthorized`: Triggers localized messages for session expirations.
+  * `403 Forbidden`: Handles access denial.
+  * `404 Not Found`: Alerts users when resources are missing.
+  * `500 Internal Server Error`: Reports unexpected server issues.
+* Gracefully intercepts non-response errors such as:
+  * **Network Errors**: Detects dropped connections or down servers.
+  * **Timeout Errors**: Detects slow network timeouts (rejections mapped with code `'TIMEOUT'`).
+* Formulates a unified JSON schema for all errors before resolving them as rejected promises.
+
+## 🗂️ Centralized Endpoint Management (`src/api/apiEndpoints.js`)
+All api route paths are grouped and structured constants:
+* **AUTH**: Register, Login, Logout, Profile details, Change Password, Reset/Forgot Password.
+* **COINS**: All coins queries, Detail pages, Trending, Top gainers/losers, search operations, historical datasets, and comparison methods.
+* **ANALYTICS**: Market summary overview, average/highest price reports, volume metrics, daily/cumulative returns, and high volatility assets.
+* **WATCHLIST**: User bookmark configurations (Fetch all, Add, Delete, Check status, and aggregate Analytics).
+* **STATS**: Main metrics totals (Market capitalization, Average price, and Average volume).
+
+## 🏢 Service Layer Design (`src/services/`)
+Separates API queries from pages and components logic. Individual services handle queries:
+1. **[authService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/auth.service.js)**: Manages registrations, credentials verification, session closures, and user profiles.
+2. **[coinService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/coin.service.js)**: Collects all coin indices, detail lists, historical records, and multi-asset comparisons.
+3. **[analyticsService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/analytics.service.js)**: Aggregates analytics reporting.
+4. **[watchlistService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/watchlist.service.js)**: Accesses user-defined bookmarks lists and performs preference analytical checks.
 
 ---
 
