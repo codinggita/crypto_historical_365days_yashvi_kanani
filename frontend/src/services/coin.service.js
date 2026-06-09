@@ -107,6 +107,38 @@ export const coinService = {
   },
 
   /**
+   * Fetch price only for a specific coin
+   */
+  getCoinPriceOnly: async (coinId) => {
+    const response = await apiClient.get(API_ENDPOINTS.COINS.PRICE(coinId));
+    return response.data;
+  },
+
+  /**
+   * Fetch market cap details for a specific coin
+   */
+  getCoinMarketCapDetails: async (coinId) => {
+    const response = await apiClient.get(API_ENDPOINTS.COINS.MARKET_CAP(coinId));
+    return response.data;
+  },
+
+  /**
+   * Fetch volume details for a specific coin
+   */
+  getCoinVolumeDetails: async (coinId) => {
+    const response = await apiClient.get(API_ENDPOINTS.COINS.VOLUME(coinId));
+    return response.data;
+  },
+
+  /**
+   * Fetch returns analytics for a specific coin
+   */
+  getCoinReturns: async (coinId) => {
+    const response = await apiClient.get(API_ENDPOINTS.COINS.RETURNS(coinId));
+    return response.data;
+  },
+
+  /**
    * Compare multiple coins metrics
    */
   compareCoins: async (coin1, coin2, coin3) => {

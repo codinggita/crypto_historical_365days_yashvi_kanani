@@ -615,6 +615,54 @@ All styles are structured using vanilla CSS in **[coins.css](file:///c:/Users/ka
 
 ---
 
+# 📊 Coin Details Module
+
+The **Coin Details Module** (accessible via `/coins/:coinId`) serves as the comprehensive analytics and charting interface of the platform, matching the high standards of platforms like CoinMarketCap and TradingView.
+
+## 🧩 Component Breakdown
+1. **[CoinDetails.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/pages/CoinDetails/CoinDetails.jsx)**: Orchestrates page layout, resolves routes, handles concurrent API request dispatches, and handles state selectors.
+2. **[CoinHeader.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinHeader.jsx)**: Displays general token metadata (logo initials, name, symbol, rank, price, 24h change indicators) and handles active watchlist status checking/toggling.
+3. **[CoinChart.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinChart.jsx)**: Implements interactive, responsive charts using **Recharts**:
+   * Toggles between **Area Chart** and **Line Chart** configurations.
+   * Tracks **Price**, **Market Cap**, and **Volume** historical trends.
+   * Leverages SVG color gradients, custom tooltips, responsive view scaling, and interactive grid styling.
+4. **[RangeSelector.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/RangeSelector.jsx)**: Provides quick-zoom filters: `7 Days`, `30 Days`, `90 Days`, `180 Days`, `365 Days`, and `All Time` with synchronous client-side filtering.
+5. **[PerformanceCards.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/PerformanceCards.jsx)**: Grid layout presenting 6 metrics: Daily Return, Monthly Return, calculated ROI/Annual Return, Volatility (Risk Assessment), Live Market Cap, and Traded Volume.
+6. **[CoinStatistics.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinStatistics.jsx)**: Detailed price/volume stats (timeline averages, highest points, lowest points) and circulating/total supply summaries.
+7. **[HistoricalTable.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/HistoricalTable.jsx)**: Chronological lists of historical price records with custom table pagination (10 items per page).
+8. **[CoinDetailsSkeleton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinDetailsSkeleton.jsx)**: Shimmer loader replicating the final page layout block-by-block.
+9. **[CoinDetailsErrorState.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/coins/CoinDetailsErrorState.jsx)**: Graceful error fallback containing "Retry loading" and "Back to List" navigation triggers.
+
+## 📡 API Integration & Redux Flow
+The page coordinates calls concurrently using `Promise.all` for efficiency, wrapping optional indicators defensively so the core layout still loads if secondary stats are empty:
+* `GET /coins/:coinId` - Retreives asset meta.
+* `GET /coins/history/:coinId` - Retrieves comprehensive chronological timeline data.
+* `GET /coins/performance/:coinId` - Performance tiers.
+* `GET /coins/returns/:coinId` - Estimated return summaries.
+* `GET /coins/volatility/:coinId` - Volatility metric rates.
+* `GET /coins/price/:coinId`, `/coins/market-cap/:coinId`, `/coins/volume/:coinId` - Live granular feeds.
+
+All state transitions, range filters, and view toggles are dispatched to **[coinDetailsSlice.js](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/redux/slices/coinDetailsSlice.js)**:
+```js
+state: {
+  coinDetails: null,
+  history: [],
+  performance: null,
+  returns: null,
+  volatility: null,
+  loading: false,
+  error: null,
+  selectedRange: '30',
+  chartMode: 'price',
+  chartType: 'area'
+}
+```
+
+## 🎨 Styles & Glassmorphism Design
+All layout structures are written in **[coinDetails.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/coinDetails.css)**. It leverages glassmorphic panels (`backdrop-filter: blur(16px)`), CSS grid responsive columns (`.performance-grid`), hover states, and transitions.
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
