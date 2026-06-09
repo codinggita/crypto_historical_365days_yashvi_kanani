@@ -999,6 +999,115 @@ feat | fix | docs | refactor | chore | test
 
 ---
 
+# 🔐 Authentication Module
+
+The frontend implements a complete, production-grade authentication system with form validation, JWT session management, Redux state integration, route protection, and session persistence.
+
+## 🖥️ Auth Pages
+
+### Login Page (`src/pages/Login/Login.jsx`)
+- **Form Validation** via `react-hook-form`: email format, password minimum 6 chars
+- **Remember Me**: persists email in `localStorage` across sessions
+- **JWT Token Storage**: token stored to `localStorage` on successful login
+- **Redux Integration**: dispatches `setUser`, `setLoading`, `setError`
+- **Toast Notifications**: success/error pop-ups via `react-hot-toast`
+- **Auto-redirect**: navigates to `/dashboard` on login
+
+### Register Page (`src/pages/Register/Register.jsx`)
+- **Form Validation** via `react-hook-form`: name required, email format, password min 6, confirm password must match
+- **Auto-login**: user is logged in immediately after successful registration
+- **Redux Integration**: dispatches `setUser`, `setLoading`, `setError`
+- **Toast Notifications**: success/error pop-ups via `react-hot-toast`
+- **Auto-redirect**: navigates to `/dashboard` on account creation
+
+---
+
+## 🔄 Authentication Flow
+
+### Login Flow
+```
+User enters email + password
+     ↓
+react-hook-form validation
+     ↓
+authService.login() → POST /api/v1/auth/login
+     ↓
+Receives { user, token } from API
+     ↓
+Stores token in localStorage
+     ↓
+Dispatches setUser({ user, token }) to Redux
+     ↓
+Shows success toast → Redirects to /dashboard
+```
+
+### Register Flow
+```
+User enters name, email, password, confirm password
+     ↓
+react-hook-form validation + password match check
+     ↓
+authService.register() → POST /api/v1/auth/register
+     ↓
+Receives { user, token } from API
+     ↓
+Stores token in localStorage
+     ↓
+Dispatches setUser({ user, token }) to Redux
+     ↓
+Shows success toast → Redirects to /dashboard
+```
+
+### Logout Flow
+```
+User clicks Logout
+     ↓
+authService.logout() → POST /api/v1/auth/logout
+     ↓
+localStorage.removeItem('token')
+     ↓
+Dispatches logout() to Redux
+     ↓
+Shows success toast → Redirects to /login
+```
+
+---
+
+## 🔁 Session Restoration (on Page Refresh)
+
+```
+App mounts (App.jsx useEffect)
+     ↓
+Checks localStorage for 'token'
+     ↓
+If found → authService.getProfile() → GET /api/v1/auth/profile
+     ↓
+Valid → dispatches setUser({ user, token }) to Redux
+     ↓
+Expired/Invalid → removes token, dispatches logout()
+```
+
+---
+
+## 🛡️ Protected & Public Routes
+
+| Wrapper | Behaviour |
+| --- | --- |
+| `ProtectedRoute` | Redirects unauthenticated users to `/login`; shows spinner during session restore |
+| `PublicRoute` | Redirects already-authenticated users to `/dashboard` |
+
+---
+
+## 🎨 Auth UI Design
+
+- **Split-screen layout**: branding/stats visual panel (left) + glassmorphism form card (right)
+- **Responsive**: visual panel hidden on tablet/mobile; form fills full width
+- **Dark theme**: consistent with `--bg-primary: #0b0f19` colour palette
+- **Input states**: indigo glow on focus, red border on validation errors
+- **Animations**: `fadeInUp` keyframe on card mount, spinner during loading
+
+---
+
 # 🔌 Frontend API Architecture
 
 The frontend communicates with the backend APIs via a modular, scalable, and service-based architecture.
