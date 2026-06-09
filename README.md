@@ -564,6 +564,27 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 ---
 
+# 🏛️ Dashboard Layout System
+
+The application features a responsive, premium, themeable dashboard layout system implemented entirely via vanilla CSS.
+
+## 🎨 Theme Tokens & Custom Properties
+Colors, backgrounds, cards, and input controls adapt automatically when a user switches between light and dark modes. The layout defines distinct variables under target states:
+* `[data-theme='dark']` / `:root`: Configures rich, deep-slate backgrounds, transparent glassmorphism boundaries, active glows, and light typography.
+* `[data-theme='light']`: Adapts components to standard white card backgrounds, soft borders, and dark typography.
+
+## 🧩 Key Structure Elements
+The layout system divides responsibilities into key modules:
+1. **[MainLayout.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/layouts/MainLayout.jsx)**: Wires together the layout components and synchronizes the active theme. It listens to the Redux `ui.theme` state and updates the `data-theme` attribute on the root HTML element.
+2. **[Sidebar.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/layout/Sidebar.jsx)**: Handles primary navigation links with active route highlighting. It collapses automatically on mobile screens, displaying a dimmed overlay when opened.
+3. **[Navbar.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/layout/Navbar.jsx)**: Displays the current page search bar, theme switcher toggle button, alert notifications bell, and user avatar dropdown menu (with Profile and Logout links).
+
+## 🗂️ Grid Layout & Page Shells
+* **Dashboard Shell**: Utilizes a highly flexible CSS grid (`.stats-grid`) to display 6 key stat cards (Market Overview, Top Gainers, Top Losers, Market Cap, Volume, Watchlist Summary) that adapt from 4 columns down to 2 columns on tablets, and 1 column on mobile. Features a two-column `.content-grid` for list leaderboards.
+* **Component Page Shells**: Sub-route shells (Coins, Analytics, Statistics, Watchlist, Profile) use card frameworks (`.shell-card`) with centered action states and descriptive graphics.
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
