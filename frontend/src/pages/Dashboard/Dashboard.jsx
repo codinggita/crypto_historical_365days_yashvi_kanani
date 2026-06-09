@@ -1,91 +1,159 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { logout } from '../../redux/slices/authSlice';
-import authService from '../../services/auth.service';
+import { useSelector } from 'react-redux';
+import {
+  FiTrendingUp,
+  FiTrendingDown,
+  FiDollarSign,
+  FiActivity,
+  FiBookmark,
+  FiArrowUpRight,
+  FiArrowDownRight,
+  FiPieChart,
+} from 'react-icons/fi';
 
 function Dashboard() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const displayName = user?.name || user?.email || 'User';
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-    } catch (_) {
-      // Continue logout even if API call fails
-    } finally {
-      localStorage.removeItem('token');
-      dispatch(logout());
-      toast.success('Logged out successfully.');
-      navigate('/login');
-    }
-  };
+  const stats = [
+    {
+      label: 'Market Overview',
+      value: '$2.41T',
+      change: '+3.45%',
+      isPositive: true,
+      icon: <FiActivity />,
+      iconClass: 'indigo',
+    },
+    {
+      label: 'Top Gainers',
+      value: 'Bitcoin SV',
+      change: '+28.4%',
+      isPositive: true,
+      icon: <FiTrendingUp />,
+      iconClass: 'green',
+    },
+    {
+      label: 'Top Losers',
+      value: 'Terra Classic',
+      change: '-14.2%',
+      isPositive: false,
+      icon: <FiTrendingDown />,
+      iconClass: 'red',
+    },
+    {
+      label: 'Market Cap',
+      value: '$1.12T',
+      change: '+1.20%',
+      isPositive: true,
+      icon: <FiDollarSign />,
+      iconClass: 'amber',
+    },
+    {
+      label: 'Volume',
+      value: '$84.3B',
+      change: '-8.52%',
+      isPositive: false,
+      icon: <FiPieChart />,
+      iconClass: 'blue',
+    },
+    {
+      label: 'Watchlist Summary',
+      value: '12 Coins',
+      change: '+4 added',
+      isPositive: true,
+      icon: <FiBookmark />,
+      iconClass: 'purple',
+    },
+  ];
+
+  const topGainers = [
+    { name: 'Bitcoin SV', symbol: 'BSV', change: '+28.4%' },
+    { name: 'Solana', symbol: 'SOL', change: '+12.5%' },
+    { name: 'Optimism', symbol: 'OP', change: '+9.8%' },
+    { name: 'Arbitrum', symbol: 'ARB', change: '+8.2%' },
+  ];
+
+  const topLosers = [
+    { name: 'Terra Classic', symbol: 'LUNC', change: '-14.2%' },
+    { name: 'Pepe', symbol: 'PEPE', change: '-9.5%' },
+    { name: 'Dogecoin', symbol: 'DOGE', change: '-6.8%' },
+    { name: 'Avalanche', symbol: 'AVAX', change: '-5.4%' },
+  ];
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        gap: '1.5rem',
-        padding: '2rem',
-        backgroundColor: '#0b0f19',
-        color: '#f3f4f6',
-        fontFamily: 'var(--font-sans)',
-      }}
-    >
-      <h1
-        style={{
-          fontSize: '2rem',
-          fontWeight: 800,
-          background: 'linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #6366f1 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}
-      >
-        Welcome to CryptoVerseX
-      </h1>
+    <div>
+      <div className="page-header">
+        <h1 className="page-title">Welcome back, {displayName}!</h1>
+        <p className="page-subtitle">Here is what is happening in the crypto markets today.</p>
+      </div>
 
-      {user && (
-        <p style={{ color: '#9ca3af', fontSize: '1rem' }}>
-          Logged in as <strong style={{ color: '#f3f4f6' }}>{user.name || user.email}</strong>
-        </p>
-      )}
+      {/* Stats Grid */}
+      <div className="stats-grid">
+        {stats.map((stat, i) => (
+          <div className="stat-card" key={i}>
+            <div className="stat-card-header">
+              <span className="stat-card-label">{stat.label}</span>
+              <div className={`stat-card-icon ${stat.iconClass}`}>{stat.icon}</div>
+            </div>
+            <div className="stat-card-value">{stat.value}</div>
+            <div className={`stat-card-change ${stat.isPositive ? 'positive' : 'negative'}`}>
+              {stat.isPositive ? <FiArrowUpRight /> : <FiArrowDownRight />}
+              <span>{stat.change}</span>
+            </div>
+          </div>
+        ))}
+      </div>
 
-      <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
-        Dashboard module is under active development.
-      </p>
+      {/* Content Grid */}
+      <div className="content-grid">
+        {/* Top Gainers */}
+        <div className="content-card">
+          <h2 className="content-card-title">
+            <FiTrendingUp style={{ color: 'var(--positive)' }} />
+            Top Gainers
+          </h2>
+          <div className="placeholder-list">
+            {topGainers.map((coin, i) => (
+              <div className="placeholder-row" key={i}>
+                <div className="placeholder-coin">
+                  <div className="placeholder-coin-dot">{coin.symbol.slice(0, 2)}</div>
+                  <div>
+                    <div className="placeholder-coin-name">{coin.name}</div>
+                    <div className="placeholder-coin-sym">{coin.symbol}</div>
+                  </div>
+                </div>
+                <span className="placeholder-badge positive">{coin.change}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <button
-        onClick={handleLogout}
-        style={{
-          padding: '0.75rem 2rem',
-          background: 'rgba(239, 68, 68, 0.15)',
-          border: '1px solid rgba(239, 68, 68, 0.3)',
-          borderRadius: '12px',
-          color: '#fca5a5',
-          fontSize: '0.9rem',
-          fontWeight: 600,
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)';
-          e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
-          e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-        }}
-      >
-        Log Out
-      </button>
+        {/* Top Losers */}
+        <div className="content-card">
+          <h2 className="content-card-title">
+            <FiTrendingDown style={{ color: 'var(--negative)' }} />
+            Top Losers
+          </h2>
+          <div className="placeholder-list">
+            {topLosers.map((coin, i) => (
+              <div className="placeholder-row" key={i}>
+                <div className="placeholder-coin">
+                  <div className="placeholder-coin-dot">{coin.symbol.slice(0, 2)}</div>
+                  <div>
+                    <div className="placeholder-coin-name">{coin.name}</div>
+                    <div className="placeholder-coin-sym">{coin.symbol}</div>
+                  </div>
+                </div>
+                <span className="placeholder-badge negative">{coin.change}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default Dashboard;
+
+
