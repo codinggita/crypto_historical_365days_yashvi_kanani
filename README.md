@@ -999,6 +999,49 @@ feat | fix | docs | refactor | chore | test
 
 ---
 
+# 🔌 Frontend API Architecture
+
+The frontend communicates with the backend APIs via a modular, scalable, and service-based architecture.
+
+## 📡 Axios Client Config (`src/api/apiClient.js`)
+A reusable Axios client is configured as the central point for HTTP communication:
+* **Base URL**: Dynamically resolved using Vite environment variables: `import.meta.env.VITE_API_BASE_URL`.
+* **Request Timeout**: Configured with a default timeout of `10000ms` (10 seconds) to handle slower network responses gracefully.
+
+## 🔒 Request Interceptor
+To secure communication, a request interceptor automatically:
+* Retrieves the authentication JWT token from `localStorage` under the key `'token'`.
+* Automatically attaches the authorization token to the outgoing request headers using the `Authorization: Bearer <token>` convention.
+
+## 🛡️ Response Interceptor & Centralized Error Handling
+The response interceptor standardizes the API error format:
+* Intercepts standard server error statuses including:
+  * `401 Unauthorized`: Triggers localized messages for session expirations.
+  * `403 Forbidden`: Handles access denial.
+  * `404 Not Found`: Alerts users when resources are missing.
+  * `500 Internal Server Error`: Reports unexpected server issues.
+* Gracefully intercepts non-response errors such as:
+  * **Network Errors**: Detects dropped connections or down servers.
+  * **Timeout Errors**: Detects slow network timeouts (rejections mapped with code `'TIMEOUT'`).
+* Formulates a unified JSON schema for all errors before resolving them as rejected promises.
+
+## 🗂️ Centralized Endpoint Management (`src/api/apiEndpoints.js`)
+All api route paths are grouped and structured constants:
+* **AUTH**: Register, Login, Logout, Profile details, Change Password, Reset/Forgot Password.
+* **COINS**: All coins queries, Detail pages, Trending, Top gainers/losers, search operations, historical datasets, and comparison methods.
+* **ANALYTICS**: Market summary overview, average/highest price reports, volume metrics, daily/cumulative returns, and high volatility assets.
+* **WATCHLIST**: User bookmark configurations (Fetch all, Add, Delete, Check status, and aggregate Analytics).
+* **STATS**: Main metrics totals (Market capitalization, Average price, and Average volume).
+
+## 🏢 Service Layer Design (`src/services/`)
+Separates API queries from pages and components logic. Individual services handle queries:
+1. **[authService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/auth.service.js)**: Manages registrations, credentials verification, session closures, and user profiles.
+2. **[coinService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/coin.service.js)**: Collects all coin indices, detail lists, historical records, and multi-asset comparisons.
+3. **[analyticsService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/analytics.service.js)**: Aggregates analytics reporting.
+4. **[watchlistService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/watchlist.service.js)**: Accesses user-defined bookmarks lists and performs preference analytical checks.
+
+---
+
 # 📄 License
 
 This project is licensed under the MIT License.
