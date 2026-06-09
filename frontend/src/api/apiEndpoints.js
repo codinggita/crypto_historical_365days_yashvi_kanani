@@ -21,7 +21,11 @@ export const API_ENDPOINTS = {
     MARKET_SUMMARY: '/coins/market/summary',
     FILTER: '/coins',
     HISTORY: (coinId) => `/coins/history/${coinId}`,
+    PRICE: (coinId) => `/coins/price/${coinId}`,
+    MARKET_CAP: (coinId) => `/coins/market-cap/${coinId}`,
+    VOLUME: (coinId) => `/coins/volume/${coinId}`,
     PERFORMANCE: (coinId) => `/coins/performance/${coinId}`,
+    RETURNS: (coinId) => `/coins/returns/${coinId}`,
     VOLATILITY: (coinId) => `/coins/volatility/${coinId}`,
     COMPARE: (coin1, coin2, coin3) =>
       coin3 ? `/coins/compare/${coin1}/${coin2}/${coin3}` : `/coins/compare/${coin1}/${coin2}`,
