@@ -92,6 +92,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/statistics"
+          element={
+            <ProtectedRoute>
+              <Stats />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/watchlist"
           element={
             <ProtectedRoute>
