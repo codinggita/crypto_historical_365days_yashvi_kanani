@@ -2,59 +2,96 @@ import apiClient from '../api/apiClient';
 import { API_ENDPOINTS } from '../api/apiEndpoints';
 
 export const analyticsService = {
-  /**
-   * Fetch market summary analytics data
-   * @returns {Promise<Object>} API response data
-   */
-  getMarketSummary: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.MARKET_SUMMARY);
+  // Price analytics
+  getHighestPrice: async () => {
+    const response = await apiClient.get('/analytics/price/highest');
     return response.data;
   },
 
-  /**
-   * Fetch price analytics. If a coin ID is provided, fetches history for that coin.
-   * Otherwise, fetches general price statistics.
-   * @param {string} [coinId] - Optional coin ID to fetch price history
-   * @param {Object} [params] - Optional query parameters
-   * @returns {Promise<Object>} API response data
-   */
-  getPriceAnalytics: async (coinId = null, params = {}) => {
-    const url = coinId 
-      ? API_ENDPOINTS.ANALYTICS.PRICE_ANALYTICS(coinId) 
-      : '/analytics/price/average';
-    const response = await apiClient.get(url, { params });
+  getLowestPrice: async () => {
+    const response = await apiClient.get('/analytics/price/lowest');
     return response.data;
   },
 
-  /**
-   * Fetch trading volume analytics (e.g. highest traded coins)
-   * @param {Object} [params] - Optional query parameters
-   * @returns {Promise<Object>} API response data
-   */
-  getVolumeAnalytics: async (params = {}) => {
-    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.VOLUME_ANALYTICS, { params });
+  getAveragePrice: async () => {
+    const response = await apiClient.get('/analytics/price/average');
     return response.data;
   },
 
-  /**
-   * Fetch daily/cumulative return analytics
-   * @param {Object} [params] - Optional query parameters
-   * @returns {Promise<Object>} API response data
-   */
-  getReturnAnalytics: async (params = {}) => {
-    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.RETURN_ANALYTICS, { params });
+  getPriceTrend: async () => {
+    const response = await apiClient.get('/analytics/price/trend');
     return response.data;
   },
 
-  /**
-   * Fetch market volatility analytics (e.g. high volatility coins)
-   * @param {Object} [params] - Optional query parameters
-   * @returns {Promise<Object>} API response data
-   */
-  getVolatilityAnalytics: async (params = {}) => {
-    const response = await apiClient.get(API_ENDPOINTS.ANALYTICS.VOLATILITY_ANALYTICS, { params });
+  getPriceGrowth: async () => {
+    const response = await apiClient.get('/analytics/price/growth');
+    return response.data;
+  },
+
+  getPriceDrop: async () => {
+    const response = await apiClient.get('/analytics/price/drop');
+    return response.data;
+  },
+
+  // Volume analytics
+  getHighestVolume: async () => {
+    const response = await apiClient.get('/analytics/volume/highest');
+    return response.data;
+  },
+
+  getLowestVolume: async () => {
+    const response = await apiClient.get('/analytics/volume/lowest');
+    return response.data;
+  },
+
+  getAverageVolume: async () => {
+    const response = await apiClient.get('/analytics/volume/average');
+    return response.data;
+  },
+
+  getVolumeSpike: async () => {
+    const response = await apiClient.get('/analytics/volume/spike');
+    return response.data;
+  },
+
+  // Returns analytics
+  getTopReturns: async () => {
+    const response = await apiClient.get('/analytics/returns/top');
+    return response.data;
+  },
+
+  getNegativeReturns: async () => {
+    const response = await apiClient.get('/analytics/returns/negative');
+    return response.data;
+  },
+
+  getCumulativeReturns: async () => {
+    const response = await apiClient.get('/analytics/returns/cumulative');
+    return response.data;
+  },
+
+  // Volatility analytics
+  getHighVolatility: async () => {
+    const response = await apiClient.get('/analytics/volatility/high');
+    return response.data;
+  },
+
+  // Stats endpoints
+  getStatsMarketSummary: async () => {
+    const response = await apiClient.get('/stats/market-summary');
+    return response.data;
+  },
+
+  getStatsTopGainers: async (params = {}) => {
+    const response = await apiClient.get('/stats/top-gainers', { params });
+    return response.data;
+  },
+
+  getStatsTopLosers: async (params = {}) => {
+    const response = await apiClient.get('/stats/top-losers', { params });
     return response.data;
   },
 };
 
 export default analyticsService;
+
