@@ -535,11 +535,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   ```json
   {
     "analyticsData": null,
+    "marketSummary": null,
+    "topGainers": [],
+    "topLosers": [],
     "loading": false,
-    "error": null
+    "error": null,
+    "selectedRange": "30"
   }
   ```
-* **Actions:** `setAnalyticsData`, `setLoading`, `setError`
+* **Actions:** `fetchStart`, `fetchSuccess`, `fetchFailure`, `setSelectedRange`, `resetAnalyticsState`
 
 ### 4. Watchlist (`watchlist`)
 * **State Structure:**
@@ -660,6 +664,56 @@ state: {
 
 ## 🎨 Styles & Glassmorphism Design
 All layout structures are written in **[coinDetails.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/coinDetails.css)**. It leverages glassmorphic panels (`backdrop-filter: blur(16px)`), CSS grid responsive columns (`.performance-grid`), hover states, and transitions.
+
+---
+
+# 📈 Analytics Dashboard Module
+
+The **Analytics Dashboard Module** (accessible via `/analytics`) serves as a premium, feature-rich showcase page. It aggregates comprehensive crypto market intelligence, performance trends, volatility, risk matrices, and smart insights into an interactive interface built with a glassmorphism dark theme.
+
+## 🧩 Component Breakdown
+1. **[Analytics.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/pages/Analytics/Analytics.jsx)**: The page shell and data coordinator. It manages time range filters (`7D`, `30D`, `90D`, `180D`, `365D`, `All`) and dispatches concurrent API queries resilience-checked via `Promise.allSettled`.
+2. **[AnalyticsOverview.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/AnalyticsOverview.jsx)**: A metric overview card grid displaying:
+   * Highest Price asset
+   * Lowest Price asset
+   * Average Market Price
+   * Highest Volume asset
+   * Highest Returns percentage
+   * Highest Volatility index
+3. **[MarketTrendChart.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/MarketTrendChart.jsx)**: An interactive charting interface utilizing **Recharts** supporting:
+   * Chart style formats: **Area**, **Line**, and **Bar** charts.
+   * Metric view toggles: **Price**, **Market Cap**, and **Volume**.
+   * Responsive dimensions with customized SVG styling, gradients, grid coordinates, and tooltips.
+4. **[VolumeAnalytics.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/VolumeAnalytics.jsx)**: Shows trading volume distributions, volume stats cards (highest, lowest, average), and a comparative volume spike bar chart.
+5. **[ReturnsAnalytics.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/ReturnsAnalytics.jsx)**: Highlights positive return leaders and assets experiencing negative returns, along with a cumulative return trajectory chart.
+6. **[VolatilityAnalytics.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/VolatilityAnalytics.jsx)**: A risk analysis dashboard compiling asset volatility rates into a graded risk leaderboard (High, Medium, Low Risk) utilizing animated progression indicators.
+7. **[MarketInsights.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/MarketInsights.jsx)**: Smart panels detailing programmatically-generated market descriptions, trends, alerts, and statistical anomalies based on live API variables.
+8. **[LeaderboardTables.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/LeaderboardTables.jsx)**: Display grid showcasing top 10 gainers and top 10 losers side-by-side with clickable asset references.
+9. **[AnalyticsSkeleton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/analytics/AnalyticsSkeleton.jsx)**: Skeleton layouts mapped to dashboard layouts utilizing shimmer keyframe animations.
+
+## 📡 API Integration & State Architecture
+The module integrates 17 distinct REST queries across backend services:
+* **Prices**: `GET /analytics/price/highest`, `/analytics/price/lowest`, `/analytics/price/average`, `/analytics/price/trend`, `/analytics/price/growth`, `/analytics/price/drop`
+* **Volumes**: `GET /analytics/volume/highest`, `/analytics/volume/lowest`, `/analytics/volume/average`, `/analytics/volume/spike`
+* **Returns**: `GET /analytics/returns/top`, `/analytics/returns/negative`, `/analytics/returns/cumulative`
+* **Volatility**: `GET /analytics/volatility/high`
+* **Global Stats**: `GET /stats/market-summary`, `/stats/top-gainers`, `/stats/top-losers`
+
+Global state updates are managed via `analyticsSlice.js`:
+```js
+state: {
+  analyticsData: null,
+  marketSummary: null,
+  topGainers: [],
+  topLosers: [],
+  loading: false,
+  error: null,
+  selectedRange: '30'
+}
+```
+
+## 🎨 Styles & Glassmorphism Design
+All styles are maintained inside **[analytics.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/analytics.css)**. It incorporates a premium glassmorphic visual system (`rgba(255, 255, 255, 0.03)` background and `backdrop-filter: blur(12px)`), responsive sub-layout flexboxes, indicator tags, risk thresholds, and customized chart colors.
 
 ---
 
@@ -1057,7 +1111,7 @@ npm run preview
 
 | Module                 | Preview     |
 | ---------------------- | ----------- |
-| 📊 Analytics Dashboard | Coming Soon |
+| 📊 Analytics Dashboard | Completed   |
 | 🪙 Coin Listing Page   | Coming Soon |
 | 📈 Market Trends       | Coming Soon |
 | 👨‍💼 Admin Dashboard  | Coming Soon |
