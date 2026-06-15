@@ -717,6 +717,46 @@ All styles are maintained inside **[analytics.css](file:///c:/Users/kanan/OneDri
 
 ---
 
+# 📊 Advanced Statistics Module
+
+The **Advanced Statistics Module** (accessible via `/stats` and `/statistics`) provides a comprehensive overview of global market aggregations, distributions, leaderboards, and periodic historical analyses. It showcases complex MongoDB aggregation pipeline outputs through premium glassmorphic cards, responsive interactive charts, tabular reports, and dynamic mathematical insights.
+
+## 🧩 Component Breakdown
+1. **[Stats.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/pages/Stats/Stats.jsx)**: Orchestrates data loading for 15 distinct backend aggregation queries in parallel using `Promise.allSettled`. Implements error recovery, state synchronization with Redux, and layouts.
+2. **[StatisticsOverview.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/StatisticsOverview.jsx)**: Renders critical KPIs like Total Market Cap, Avg Price/Volume, Total Listed Coins, Top Gainers/Losers, and record highs in a modern, responsive layout.
+3. **[DistributionChart.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/DistributionChart.jsx)**: Reusable rendering layer using Recharts to abstract SVG Pie, Bar, Area, and Line charts with glassmorphic tooltip components.
+4. **[StatisticsCharts.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/StatisticsCharts.jsx)**: Houses distributions for Rank Tiering, Coin Volatility groups, Price distributions, and Periodic Market Trends.
+5. **[StatisticsTable.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/StatisticsTable.jsx)**: Compiles tabbed lists of top volume leaders and dynamic gainers and losers.
+6. **[MonthlyReport.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/MonthlyReport.jsx)**: Identifies monthly performance peaks, average changes, and details trading volume patterns.
+7. **[YearlyReport.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/YearlyReport.jsx)**: Highlights annual performance grids, yearly market ranges, and averages.
+8. **[InsightsPanel.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/InsightsPanel.jsx)**: Computes and formats dynamic analytical insights on volatility distributions, gain-loss counts, and volume trends.
+9. **[ExportButtons.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/ExportButtons.jsx)**: Exposes actions to export aggregated statistical datasets to CSV and JSON formats.
+10. **[StatisticsSkeleton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/statistics/StatisticsSkeleton.jsx)**: Renders layout placeholders during concurrent load operations.
+
+## 📡 API Integration & State Architecture
+The module integrates 15 distinct endpoints on the `/stats` namespace:
+* **Market Aggregations**: `GET /stats/market-cap`, `/stats/average-price`, `/stats/average-volume`, `/stats/highest-market-cap`, `/stats/highest-volume`, `/stats/coin-count`, `/stats/market-summary`
+* **Performance Leaderboards**: `GET /stats/top-gainers`, `/stats/top-losers`
+* **Stat Distributions**: `GET /stats/rank-distribution`, `/stats/price-distribution`, `/stats/volatility-distribution`
+* **Periodic Reports**: `GET /stats/monthly-analysis`, `/stats/daily-analysis`, `/stats/yearly-analysis`
+
+Global stats state is synchronized via `statisticsSlice.js`:
+```js
+state: {
+  marketStats: null,
+  monthlyStats: null,
+  yearlyStats: null,
+  distributionStats: null,
+  loading: false,
+  error: null
+}
+```
+
+## 🎨 Styles & Glassmorphism Design
+All visual styling is maintained in **[statistics.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/statistics.css)**. It defines dark glass boundaries (`backdrop-filter: blur(12px)`), responsive sub-layout grid structures, table padding, colored badges indicating gainer/loser percentages, custom dashboard cards, and tooltip layouts.
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
