@@ -54,7 +54,7 @@
 
 # 📖 About The Project
 
-## 💡 Overview
+# Project Overview
 
 **CryptoVerseX** is a complete full-stack cryptocurrency analytics ecosystem built using the **MERN Stack (MongoDB, Express.js, React.js, Node.js)**.
 
@@ -148,7 +148,7 @@ The dataset contains:
 
 ---
 
-# 🛠 Tech Stack
+# Tech Stack
 
 # ⚙️ Backend Technologies
 
@@ -198,7 +198,7 @@ The dataset contains:
 
 ---
 
-# ✨ Major Features
+# Features
 
 # 👤 User Features
 
@@ -249,6 +249,20 @@ The dataset contains:
 * 📦 Bulk CRUD Operations
 * 📈 Real-Time Market Analytics
 * 💾 Database Seeding Scripts
+
+---
+
+
+# API Integration
+
+The frontend app integrates with the backend through service modules using Axios clients with interceptors.
+
+- **Axios Client**: Defined in `frontend/src/api/apiClient.js` with automatic JWT token attachment in requests, and global status intercepts (e.g. 401 triggers logout) in responses.
+- **Service Layer**: Decoupled backend fetch logic located in `frontend/src/services/`:
+  - `auth.service.js` (Authentication & Profile)
+  - `coin.service.js` (Live Coins, Details, History, Analytics)
+  - `watchlist.service.js` (Bookmarked Coins management)
+  - `portfolio.service.js` (Virtual portfolios & Simulator calculator)
 
 ---
 
@@ -304,7 +318,7 @@ The dataset contains:
 
 ---
 
-# 🏗 System Architecture
+# Project Architecture
 
 ```bash
                     ┌──────────────────────┐
@@ -329,7 +343,9 @@ The dataset contains:
 
 ---
 
-# 🧱 Backend Folder Structure
+# Folder Structure
+
+## Backend Folder Structure
 
 ```bash
 backend/
@@ -353,7 +369,7 @@ backend/
 
 ---
 
-# 🎨 Frontend Folder Structure
+## Frontend Folder Structure
 
 ```bash
 frontend/
@@ -1054,7 +1070,7 @@ const topCoins = await Coin.aggregate([
 
 ---
 
-# 🚀 Getting Started
+# Installation Guide
 
 ## 📥 Clone Repository
 
@@ -1064,6 +1080,29 @@ git clone https://github.com/your-username/cryptoversex.git
 
 ```bash
 cd cryptoversex
+```
+
+---
+
+# Environment Variables
+
+# Environment Variables
+
+### Backend Environment Variables
+Create a `.env` file in the `backend/` directory:
+```env
+PORT=5000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/cryptoversex?retryWrites=true&w=majority
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=7d
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+```
+
+### Frontend Environment Variables
+Create a `.env` file in the `frontend/` directory:
+```env
+VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
 ---
@@ -1178,7 +1217,7 @@ vercel --prod
 
 ---
 
-# ⚡ Performance Optimizations
+# Performance Optimizations
 
 * MongoDB Indexing
 * Optimized Queries
@@ -1234,7 +1273,7 @@ npm run preview
 
 ---
 
-# 📸 Screenshots
+# Screenshots
 
 | Module                 | Preview     |
 | ---------------------- | ----------- |
@@ -1247,7 +1286,7 @@ npm run preview
 
 ---
 
-# 🛣 Future Roadmap
+# Future Enhancements
 
 * AI-Based Market Prediction
 * Real-Time WebSocket Prices
@@ -1428,6 +1467,15 @@ Separates API queries from pages and components logic. Individual services handl
 2. **[coinService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/coin.service.js)**: Collects all coin indices, detail lists, historical records, and multi-asset comparisons.
 3. **[analyticsService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/analytics.service.js)**: Aggregates analytics reporting.
 4. **[watchlistService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/watchlist.service.js)**: Accesses user-defined bookmarks lists and performs preference analytical checks.
+
+---
+
+
+# Contributors
+
+- **Yashvi Kanani** (Lead Full-Stack Developer) - [GitHub](https://github.com/kananiyashvi180-svg)
+- **Contributors & GSSoC Maintainers**
+
 
 ---
 
