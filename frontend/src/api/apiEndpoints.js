@@ -29,6 +29,8 @@ export const API_ENDPOINTS = {
     VOLATILITY: (coinId) => `/coins/volatility/${coinId}`,
     COMPARE: (coin1, coin2, coin3) =>
       coin3 ? `/coins/compare/${coin1}/${coin2}/${coin3}` : `/coins/compare/${coin1}/${coin2}`,
+    RECOMMENDATIONS: '/coins/recommendations',
+    SIMULATE: '/coins/portfolio/simulate',
   },
   ANALYTICS: {
     MARKET_SUMMARY: '/analytics/market/summary',
@@ -60,6 +62,17 @@ export const API_ENDPOINTS = {
     MARKET_SUMMARY: '/stats/market-summary',
     DAILY_ANALYSIS: '/stats/daily-analysis',
     YEARLY_ANALYSIS: '/stats/yearly-analysis',
+  },
+  PORTFOLIO: {
+    GET_ALL: '/portfolio',
+    ADD: '/portfolio',
+    GET_BY_ID: (id) => `/portfolio/${id}`,
+    UPDATE: (id) => `/portfolio/${id}`,
+    DELETE: (id) => `/portfolio/${id}`,
+    OVERVIEW: '/portfolio/dashboard/overview',
+    ANALYTICS_SUMMARY: '/portfolio/analytics/summary',
+    ANALYTICS_DISTRIBUTION: '/portfolio/analytics/distribution',
+    ANALYTICS_HISTORY: '/portfolio/analytics/history',
   },
 };
 

@@ -13,6 +13,7 @@ import CoinDetails from '../pages/CoinDetails/CoinDetails';
 import Analytics from '../pages/Analytics/Analytics';
 import Stats from '../pages/Stats/Stats';
 import Watchlist from '../pages/Watchlist/Watchlist';
+import Portfolio from '../pages/Portfolio/Portfolio';
 import Login from '../pages/Login/Login';
 import Register from '../pages/Register/Register';
 import Profile from '../pages/Profile/Profile';
@@ -104,6 +105,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Watchlist />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portfolio"
+          element={
+            <ProtectedRoute>
+              <Portfolio />
             </ProtectedRoute>
           }
         />
