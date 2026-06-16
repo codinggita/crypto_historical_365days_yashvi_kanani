@@ -48,6 +48,18 @@ export const API_ENDPOINTS = {
     MARKET_CAP: '/stats/market-cap',
     AVERAGE_PRICE: '/stats/average-price',
     AVERAGE_VOLUME: '/stats/average-volume',
+    HIGHEST_MARKET_CAP: '/stats/highest-market-cap',
+    HIGHEST_VOLUME: '/stats/highest-volume',
+    TOP_GAINERS: '/stats/top-gainers',
+    TOP_LOSERS: '/stats/top-losers',
+    MONTHLY_ANALYSIS: '/stats/monthly-analysis',
+    COIN_COUNT: '/stats/coin-count',
+    RANK_DISTRIBUTION: '/stats/rank-distribution',
+    PRICE_DISTRIBUTION: '/stats/price-distribution',
+    VOLATILITY_DISTRIBUTION: '/stats/volatility-distribution',
+    MARKET_SUMMARY: '/stats/market-summary',
+    DAILY_ANALYSIS: '/stats/daily-analysis',
+    YEARLY_ANALYSIS: '/stats/yearly-analysis',
   },
 };
 
