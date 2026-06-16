@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import { FiBriefcase, FiRefreshCw, FiX } from 'react-icons/fi';
@@ -38,7 +38,7 @@ export function Portfolio() {
   const [quantity, setQuantity] = useState('');
   const [buyPrice, setBuyPrice] = useState('');
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     dispatch(fetchStart());
     try {
       const [
@@ -79,14 +79,14 @@ export function Portfolio() {
       console.error(err);
       dispatch(fetchFailure('Failed to load portfolio details.'));
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     loadData();
     return () => {
       dispatch(resetPortfolioState());
     };
-  }, [dispatch]);
+  }, [loadData, dispatch]);
 
   const handleAddHolding = async (data) => {
     try {
