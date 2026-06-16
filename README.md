@@ -54,7 +54,7 @@
 
 # 📖 About The Project
 
-## 💡 Overview
+# Project Overview
 
 **CryptoVerseX** is a complete full-stack cryptocurrency analytics ecosystem built using the **MERN Stack (MongoDB, Express.js, React.js, Node.js)**.
 
@@ -148,7 +148,7 @@ The dataset contains:
 
 ---
 
-# 🛠 Tech Stack
+# Tech Stack
 
 # ⚙️ Backend Technologies
 
@@ -198,7 +198,7 @@ The dataset contains:
 
 ---
 
-# ✨ Major Features
+# Features
 
 # 👤 User Features
 
@@ -249,6 +249,20 @@ The dataset contains:
 * 📦 Bulk CRUD Operations
 * 📈 Real-Time Market Analytics
 * 💾 Database Seeding Scripts
+
+---
+
+
+# API Integration
+
+The frontend app integrates with the backend through service modules using Axios clients with interceptors.
+
+- **Axios Client**: Defined in `frontend/src/api/apiClient.js` with automatic JWT token attachment in requests, and global status intercepts (e.g. 401 triggers logout) in responses.
+- **Service Layer**: Decoupled backend fetch logic located in `frontend/src/services/`:
+  - `auth.service.js` (Authentication & Profile)
+  - `coin.service.js` (Live Coins, Details, History, Analytics)
+  - `watchlist.service.js` (Bookmarked Coins management)
+  - `portfolio.service.js` (Virtual portfolios & Simulator calculator)
 
 ---
 
@@ -304,7 +318,7 @@ The dataset contains:
 
 ---
 
-# 🏗 System Architecture
+# Project Architecture
 
 ```bash
                     ┌──────────────────────┐
@@ -329,7 +343,9 @@ The dataset contains:
 
 ---
 
-# 🧱 Backend Folder Structure
+# Folder Structure
+
+## Backend Folder Structure
 
 ```bash
 backend/
@@ -353,7 +369,7 @@ backend/
 
 ---
 
-# 🎨 Frontend Folder Structure
+## Frontend Folder Structure
 
 ```bash
 frontend/
@@ -795,6 +811,55 @@ All visual styling is maintained in **[portfolio.css](file:///c:/Users/kanan/One
 
 ---
 
+# 📌 Watchlist & Bookmark Management Module
+
+The **Watchlist & Bookmark Management Module** (accessible via `/watchlist`) provides a complete user-centric asset tracking system. Users can save, categorize, annotate, and monitor bookmarked cryptocurrencies with real-time price comparison, global trending insights, and personal portfolio analytics.
+
+## 🧩 Component Breakdown
+1. **[Watchlist.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/pages/Watchlist/Watchlist.jsx)**: Page orchestrator that fetches bookmarks, analytics, and trending data in parallel using `Promise.allSettled`. Manages filter overlays, modal triggers, optimistic deletes, and empty state UI.
+2. **[BookmarkButton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/BookmarkButton.jsx)**: Reusable heart-shaped toggle icon supporting optimistic state updates (instant UI feedback before API confirmation) and error rollback. Integrated into the Coin Details header.
+3. **[BookmarkModal.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/BookmarkModal.jsx)**: Modal form for assigning/updating a bookmark's category (Long Term, Short Term, Research, High Risk, Favorites, or Custom) and personal notes. Uses optimistic Redux dispatch on save.
+4. **[WatchlistFilters.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistFilters.jsx)**: Filter control bar featuring debounced search (300ms), category dropdown, sort field/order selectors, and a grid/table view toggle.
+5. **[WatchlistTable.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistTable.jsx)**: Full tabular display with columns for Coin, Symbol, Added Price, Current Price, Return %, Category badge, Notes, Date Added, and quick Edit/Delete actions.
+6. **[WatchlistCard.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistCard.jsx)**: Grid card view for bookmarked coins, showing identity, price comparison, profit/loss indicator, notes, and footer actions.
+7. **[AnalyticsCards.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/AnalyticsCards.jsx)**: Overview metrics grid displaying Total Bookmarked Coins, Highest Market Cap asset, Highest Profit Potential coin, Most Recent Bookmark, and Global Top Saved coin.
+8. **[TrendingBookmarks.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/TrendingBookmarks.jsx)**: Leaderboard of the top 10 globally most-bookmarked coins across all users, with per-coin watch counts and live price data.
+9. **[WatchlistSkeleton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistSkeleton.jsx)**: Shimmer skeleton layouts matching the analytics cards, filter bar, and main content areas.
+
+## 📡 API Integration & State Architecture
+The module integrates 8 backend bookmark REST endpoints:
+* **Bookmark CRUD**: `POST /bookmarks/:coinId`, `GET /bookmarks`, `GET /bookmarks/:id`, `PATCH /bookmarks/:id`, `DELETE /bookmarks/:id`
+* **Status Check**: `GET /bookmarks/check/:coinId`
+* **Analytics**: `GET /bookmarks/analytics/summary`
+* **Trending**: `GET /bookmarks/trending`
+
+Global watchlist state is managed via `watchlistSlice.js`:
+```js
+state: {
+  bookmarks: [],
+  bookmarkAnalytics: null,
+  trendingBookmarks: [],
+  loading: false,
+  error: null,
+  viewMode: 'table',
+  filters: {
+    category: '',
+    search: '',
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    minPrice: '',
+    maxPrice: '',
+    symbol: ''
+  },
+  pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
+}
+```
+
+## 🎨 Styles & Glassmorphism Design
+All visual styling is defined in **[watchlist.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/watchlist.css)**. Features include: analytics card grids with hover elevation, responsive filter bars, table/card dual-view layouts, animated category badges per type, heart-button pulse animations, a glassmorphic modal with slide-up entry, shimmer skeletons, and full mobile responsiveness.
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
@@ -1005,7 +1070,7 @@ const topCoins = await Coin.aggregate([
 
 ---
 
-# 🚀 Getting Started
+# Installation Guide
 
 ## 📥 Clone Repository
 
@@ -1015,6 +1080,29 @@ git clone https://github.com/your-username/cryptoversex.git
 
 ```bash
 cd cryptoversex
+```
+
+---
+
+# Environment Variables
+
+# Environment Variables
+
+### Backend Environment Variables
+Create a `.env` file in the `backend/` directory:
+```env
+PORT=5000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/cryptoversex?retryWrites=true&w=majority
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=7d
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+```
+
+### Frontend Environment Variables
+Create a `.env` file in the `frontend/` directory:
+```env
+VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
 ---
@@ -1129,7 +1217,7 @@ vercel --prod
 
 ---
 
-# ⚡ Performance Optimizations
+# Performance Optimizations
 
 * MongoDB Indexing
 * Optimized Queries
@@ -1185,7 +1273,7 @@ npm run preview
 
 ---
 
-# 📸 Screenshots
+# Screenshots
 
 | Module                 | Preview     |
 | ---------------------- | ----------- |
@@ -1198,7 +1286,7 @@ npm run preview
 
 ---
 
-# 🛣 Future Roadmap
+# Future Enhancements
 
 * AI-Based Market Prediction
 * Real-Time WebSocket Prices
@@ -1379,6 +1467,15 @@ Separates API queries from pages and components logic. Individual services handl
 2. **[coinService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/coin.service.js)**: Collects all coin indices, detail lists, historical records, and multi-asset comparisons.
 3. **[analyticsService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/analytics.service.js)**: Aggregates analytics reporting.
 4. **[watchlistService](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/services/watchlist.service.js)**: Accesses user-defined bookmarks lists and performs preference analytical checks.
+
+---
+
+
+# Contributors
+
+- **Yashvi Kanani** (Lead Full-Stack Developer) - [GitHub](https://github.com/kananiyashvi180-svg)
+- **Contributors & GSSoC Maintainers**
+
 
 ---
 
