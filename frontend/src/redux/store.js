@@ -6,6 +6,7 @@ import analyticsReducer from './slices/analyticsSlice';
 import watchlistReducer from './slices/watchlistSlice';
 import statisticsReducer from './slices/statisticsSlice';
 import uiReducer from './slices/uiSlice';
+import portfolioReducer from './slices/portfolioSlice';
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     watchlist: watchlistReducer,
     statistics: statisticsReducer,
     ui: uiReducer,
+    portfolio: portfolioReducer,
   },
 });
 

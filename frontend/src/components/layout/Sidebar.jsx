@@ -11,6 +11,7 @@ import {
   FiUser,
   FiLogOut,
   FiLayers,
+  FiBriefcase,
 } from 'react-icons/fi';
 import { setSidebarOpen } from '../../redux/slices/uiSlice';
 import { logout } from '../../redux/slices/authSlice';
@@ -22,6 +23,7 @@ const NAV_LINKS = [
   { to: '/analytics',  label: 'Analytics',   icon: <FiBarChart2 /> },
   { to: '/stats',      label: 'Statistics',  icon: <FiPieChart /> },
   { to: '/watchlist',  label: 'Watchlist',   icon: <FiBookmark /> },
+  { to: '/portfolio',  label: 'Portfolio',   icon: <FiBriefcase /> },
   { to: '/profile',    label: 'Profile',     icon: <FiUser /> },
 ];
 

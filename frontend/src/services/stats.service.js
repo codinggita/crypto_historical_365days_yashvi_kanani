@@ -1,78 +1,79 @@
 import apiClient from '../api/apiClient';
+import { API_ENDPOINTS } from '../api/apiEndpoints';
 
 export const statsService = {
   getTotalMarketCap: async () => {
-    const response = await apiClient.get('/stats/market-cap');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.MARKET_CAP);
     return response.data;
   },
 
   getAveragePrice: async () => {
-    const response = await apiClient.get('/stats/average-price');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.AVERAGE_PRICE);
     return response.data;
   },
 
   getAverageVolume: async () => {
-    const response = await apiClient.get('/stats/average-volume');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.AVERAGE_VOLUME);
     return response.data;
   },
 
   getHighestMarketCap: async () => {
-    const response = await apiClient.get('/stats/highest-market-cap');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.HIGHEST_MARKET_CAP);
     return response.data;
   },
 
   getHighestVolume: async () => {
-    const response = await apiClient.get('/stats/highest-volume');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.HIGHEST_VOLUME);
     return response.data;
   },
 
   getTopGainers: async (params = {}) => {
-    const response = await apiClient.get('/stats/top-gainers', { params });
+    const response = await apiClient.get(API_ENDPOINTS.STATS.TOP_GAINERS, { params });
     return response.data;
   },
 
   getTopLosers: async (params = {}) => {
-    const response = await apiClient.get('/stats/top-losers', { params });
+    const response = await apiClient.get(API_ENDPOINTS.STATS.TOP_LOSERS, { params });
     return response.data;
   },
 
   getMonthlyAnalysis: async () => {
-    const response = await apiClient.get('/stats/monthly-analysis');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.MONTHLY_ANALYSIS);
     return response.data;
   },
 
   getCoinCount: async () => {
-    const response = await apiClient.get('/stats/coin-count');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.COIN_COUNT);
     return response.data;
   },
 
   getRankDistribution: async () => {
-    const response = await apiClient.get('/stats/rank-distribution');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.RANK_DISTRIBUTION);
     return response.data;
   },
 
   getPriceDistribution: async () => {
-    const response = await apiClient.get('/stats/price-distribution');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.PRICE_DISTRIBUTION);
     return response.data;
   },
 
   getVolatilityDistribution: async () => {
-    const response = await apiClient.get('/stats/volatility-distribution');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.VOLATILITY_DISTRIBUTION);
     return response.data;
   },
 
   getMarketSummary: async () => {
-    const response = await apiClient.get('/stats/market-summary');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.MARKET_SUMMARY);
     return response.data;
   },
 
   getDailyAnalysis: async () => {
-    const response = await apiClient.get('/stats/daily-analysis');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.DAILY_ANALYSIS);
     return response.data;
   },
 
   getYearlyAnalysis: async () => {
-    const response = await apiClient.get('/stats/yearly-analysis');
+    const response = await apiClient.get(API_ENDPOINTS.STATS.YEARLY_ANALYSIS);
     return response.data;
   },
 };

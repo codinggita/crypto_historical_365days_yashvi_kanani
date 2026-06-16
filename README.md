@@ -755,6 +755,44 @@ state: {
 ## 🎨 Styles & Glassmorphism Design
 All visual styling is maintained in **[statistics.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/statistics.css)**. It defines dark glass boundaries (`backdrop-filter: blur(12px)`), responsive sub-layout grid structures, table padding, colored badges indicating gainer/loser percentages, custom dashboard cards, and tooltip layouts.
 
+
+---
+
+# 💼 Portfolio Simulator & Investment Analytics Module
+
+The **Portfolio Simulator Module** (accessible via `/portfolio`) provides a complete, feature-rich interface to track cryptocurrency assets, analyze allocations, and simulate historical investment returns. It replicates the functionality of popular platforms like CoinMarketCap and Binance Portfolio.
+
+## 🧩 Component Breakdown
+1. **[Portfolio.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/pages/Portfolio/Portfolio.jsx)**: Page orchestrator coordinates data fetches across 6 parallel endpoints using `Promise.allSettled` and manages add/edit/delete actions.
+2. **[PortfolioOverview.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/portfolio/PortfolioOverview.jsx)**: Highlights key metrics (Total Investment, Current Value, Profit/Loss, ROI, Best/Worst performing assets).
+3. **[PortfolioTable.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/portfolio/PortfolioTable.jsx)**: Lists user transactions with actions to add, edit holdings, and remove coins, with integrated modal forms.
+4. **[PortfolioAllocation.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/portfolio/PortfolioAllocation.jsx)**: Renders a Recharts Pie Chart representing asset distributions.
+5. **[PortfolioCharts.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/portfolio/PortfolioCharts.jsx)**: Displays portfolio growth timeline and monthly net profit/loss trends.
+6. **[InvestmentCalculator.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/portfolio/InvestmentCalculator.jsx)**: Simulates past purchases by looking up historical database prices to output tokens bought, ROI, and growth rate.
+7. **[PortfolioSimulator.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/portfolio/PortfolioSimulator.jsx)**: Simulates hypothetical multi-asset performance using the backend simulation endpoints.
+8. **[RecommendationsPanel.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/portfolio/RecommendationsPanel.jsx)**: Highlights suggested assets with risk indicators and expected growth prospects.
+
+## 📡 API Integration & State Architecture
+The module integrates 6 endpoints from the coin and portfolio namespaces:
+* **Holdings**: `GET /portfolio`, `POST /portfolio`, `PATCH /portfolio/:id`, `DELETE /portfolio/:id`
+* **Analytics**: `GET /portfolio/dashboard/overview`, `GET /portfolio/analytics/summary`, `GET /portfolio/analytics/distribution`, `GET /portfolio/analytics/history`
+* **External Engines**: `GET /coins/recommendations`, `GET /coins/portfolio/simulate`
+
+Global state is synchronized via `portfolioSlice.js`:
+```js
+state: {
+  portfolio: null,
+  holdings: [],
+  simulationResults: null,
+  recommendations: [],
+  loading: false,
+  error: null
+}
+```
+
+## 🎨 Styles & Glassmorphism Design
+All visual styling is maintained in **[portfolio.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/portfolio.css)**. It features deep-dark glassmorphism, responsive flex/grid layouts, interactive charts, colored trend indicators, and full-screen overlays.
+
 ---
 
 # 📌 Watchlist & Bookmark Management Module
