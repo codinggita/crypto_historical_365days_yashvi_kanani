@@ -42,9 +42,12 @@ export const API_ENDPOINTS = {
   WATCHLIST: {
     GET_ALL: '/bookmarks',
     ADD: (coinId) => `/bookmarks/${coinId}`,
+    GET_BY_ID: (id) => `/bookmarks/${id}`,
+    UPDATE: (id) => `/bookmarks/${id}`,
     DELETE: (id) => `/bookmarks/${id}`,
     CHECK: (coinId) => `/bookmarks/check/${coinId}`,
     ANALYTICS: '/bookmarks/analytics/summary',
+    TRENDING: '/bookmarks/trending',
   },
   STATS: {
     MARKET_CAP: '/stats/market-cap',

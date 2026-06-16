@@ -795,6 +795,55 @@ All visual styling is maintained in **[portfolio.css](file:///c:/Users/kanan/One
 
 ---
 
+# 📌 Watchlist & Bookmark Management Module
+
+The **Watchlist & Bookmark Management Module** (accessible via `/watchlist`) provides a complete user-centric asset tracking system. Users can save, categorize, annotate, and monitor bookmarked cryptocurrencies with real-time price comparison, global trending insights, and personal portfolio analytics.
+
+## 🧩 Component Breakdown
+1. **[Watchlist.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/pages/Watchlist/Watchlist.jsx)**: Page orchestrator that fetches bookmarks, analytics, and trending data in parallel using `Promise.allSettled`. Manages filter overlays, modal triggers, optimistic deletes, and empty state UI.
+2. **[BookmarkButton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/BookmarkButton.jsx)**: Reusable heart-shaped toggle icon supporting optimistic state updates (instant UI feedback before API confirmation) and error rollback. Integrated into the Coin Details header.
+3. **[BookmarkModal.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/BookmarkModal.jsx)**: Modal form for assigning/updating a bookmark's category (Long Term, Short Term, Research, High Risk, Favorites, or Custom) and personal notes. Uses optimistic Redux dispatch on save.
+4. **[WatchlistFilters.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistFilters.jsx)**: Filter control bar featuring debounced search (300ms), category dropdown, sort field/order selectors, and a grid/table view toggle.
+5. **[WatchlistTable.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistTable.jsx)**: Full tabular display with columns for Coin, Symbol, Added Price, Current Price, Return %, Category badge, Notes, Date Added, and quick Edit/Delete actions.
+6. **[WatchlistCard.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistCard.jsx)**: Grid card view for bookmarked coins, showing identity, price comparison, profit/loss indicator, notes, and footer actions.
+7. **[AnalyticsCards.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/AnalyticsCards.jsx)**: Overview metrics grid displaying Total Bookmarked Coins, Highest Market Cap asset, Highest Profit Potential coin, Most Recent Bookmark, and Global Top Saved coin.
+8. **[TrendingBookmarks.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/TrendingBookmarks.jsx)**: Leaderboard of the top 10 globally most-bookmarked coins across all users, with per-coin watch counts and live price data.
+9. **[WatchlistSkeleton.jsx](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/components/watchlist/WatchlistSkeleton.jsx)**: Shimmer skeleton layouts matching the analytics cards, filter bar, and main content areas.
+
+## 📡 API Integration & State Architecture
+The module integrates 8 backend bookmark REST endpoints:
+* **Bookmark CRUD**: `POST /bookmarks/:coinId`, `GET /bookmarks`, `GET /bookmarks/:id`, `PATCH /bookmarks/:id`, `DELETE /bookmarks/:id`
+* **Status Check**: `GET /bookmarks/check/:coinId`
+* **Analytics**: `GET /bookmarks/analytics/summary`
+* **Trending**: `GET /bookmarks/trending`
+
+Global watchlist state is managed via `watchlistSlice.js`:
+```js
+state: {
+  bookmarks: [],
+  bookmarkAnalytics: null,
+  trendingBookmarks: [],
+  loading: false,
+  error: null,
+  viewMode: 'table',
+  filters: {
+    category: '',
+    search: '',
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    minPrice: '',
+    maxPrice: '',
+    symbol: ''
+  },
+  pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
+}
+```
+
+## 🎨 Styles & Glassmorphism Design
+All visual styling is defined in **[watchlist.css](file:///c:/Users/kanan/OneDrive/Desktop/Crypto-final/crypto_historical_365days_yashvi_kanani/frontend/src/styles/watchlist.css)**. Features include: analytics card grids with hover elevation, responsive filter bars, table/card dual-view layouts, animated category badges per type, heart-button pulse animations, a glassmorphic modal with slide-up entry, shimmer skeletons, and full mobile responsiveness.
+
+---
+
 # 🗄 MongoDB Schema Design
 
 ## 🪙 Coin Schema
