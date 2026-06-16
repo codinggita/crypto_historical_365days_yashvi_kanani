@@ -4,6 +4,13 @@
 
 # 🚀 CryptoVerseX
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
+[![React](https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react)](https://react.dev/)
+[![Redux Toolkit](https://img.shields.io/badge/Redux-Toolkit-purple?style=flat-square&logo=redux)](https://redux-toolkit.js.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
+
+
 ### *Advanced Cryptocurrency Market Intelligence Platform*
 
 **Enterprise-Grade MERN Stack Crypto Analytics Dashboard** — Real-time cryptocurrency tracking, analytics, portfolio simulation, market intelligence, and historical data insights powered by MongoDB aggregation pipelines.
@@ -319,6 +326,9 @@ The frontend app integrates with the backend through service modules using Axios
 ---
 
 # Project Architecture
+
+For an in-depth breakdown of system components, state flows, and API lifecycles, see the detailed [System Architecture & Workflows](docs/architecture.md) documentation.
+
 
 ```bash
                     ┌──────────────────────┐

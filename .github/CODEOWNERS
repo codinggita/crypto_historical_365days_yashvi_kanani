@@ -1,0 +1,13 @@
+# Global Owners
+# By default, @kananiyashvi180-svg owns all files in the repository.
+*       @kananiyashvi180-svg
+
+# Backend-Specific Owners
+/backend/       @kananiyashvi180-svg
+
+# Frontend-Specific Owners
+/frontend/      @kananiyashvi180-svg
+
+# Documentation Owners
+/docs/          @kananiyashvi180-svg
+*.md            @kananiyashvi180-svg
