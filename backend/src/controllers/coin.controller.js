@@ -8,7 +8,17 @@ import ApiResponse from "../utils/ApiResponse.js";
 export const getAllCoins = asyncHandler(async (req, res) => {
   const { coins, meta } = await coinService.getAllCoins(req.query);
   return res.status(200).json(
-    new ApiResponse(200, coins, "Coins fetched successfully", meta)
+    new ApiResponse(200, {
+      coins,
+      pagination: {
+        page:        meta.page,
+        limit:       meta.limit,
+        totalItems:  meta.total,
+        totalPages:  meta.totalPages,
+        hasNextPage: meta.hasNextPage,
+        hasPrevPage: meta.hasPrevPage,
+      },
+    }, "Coins fetched successfully", meta)
   );
 });
 

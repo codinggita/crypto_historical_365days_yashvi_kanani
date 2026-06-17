@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiRefreshCw, FiList, FiGrid, FiTrendingUp } from 'react-icons/fi';
 
@@ -11,7 +11,7 @@ import {
   resetFilters,
   setViewMode,
   setPage,
-  setPagination,
+  setLimit,
   setMarketSummary,
   setMarketSummaryLoading,
   setMarketSummaryError,
@@ -55,11 +55,10 @@ function Coins() {
     viewMode,
     marketSummary,
     marketSummaryLoading,
-    marketSummaryError,
   } = useSelector((state) => state.coins);
 
-  const debouncedSearch  = useDebounce(filters.search, 450);
-  const debouncedSymbol  = useDebounce(filters.symbol, 450);
+  const debouncedSearch   = useDebounce(filters.search,   450);
+  const debouncedSymbol   = useDebounce(filters.symbol,   450);
   const debouncedMinPrice = useDebounce(filters.minPrice, 500);
   const debouncedMaxPrice = useDebounce(filters.maxPrice, 500);
 
@@ -79,41 +78,65 @@ function Coins() {
     dispatch(setLoading(true));
     try {
       const params = {
-        page: pagination.page,
-        limit: pagination.limit,
-        sortBy: filters.sortBy,
+        page:      pagination.page,
+        limit:     pagination.limit,
+        sortBy:    filters.sortBy,
         sortOrder: filters.sortOrder,
-        ...(debouncedSearch  && { search: debouncedSearch }),
-        ...(debouncedSymbol  && { symbol: debouncedSymbol }),
-        ...(debouncedMinPrice && { minPrice: debouncedMinPrice }),
-        ...(debouncedMaxPrice && { maxPrice: debouncedMaxPrice }),
-        ...(filters.minVolume    && { minVolume: filters.minVolume }),
-        ...(filters.maxVolume    && { maxVolume: filters.maxVolume }),
+        ...(debouncedSearch   && { search:      debouncedSearch }),
+        ...(debouncedSymbol   && { symbol:      debouncedSymbol }),
+        ...(debouncedMinPrice && { minPrice:    debouncedMinPrice }),
+        ...(debouncedMaxPrice && { maxPrice:    debouncedMaxPrice }),
+        ...(filters.minVolume    && { minVolume:    filters.minVolume }),
+        ...(filters.maxVolume    && { maxVolume:    filters.maxVolume }),
         ...(filters.minMarketCap && { minMarketCap: filters.minMarketCap }),
         ...(filters.maxMarketCap && { maxMarketCap: filters.maxMarketCap }),
-        ...(filters.month        && { month: filters.month }),
+        ...(filters.month        && { month:        filters.month }),
       };
 
       const response = await coinService.getCoins(params);
+      // Server returns: { success, data: { coins, pagination }, meta }
       const raw = response?.data || response;
 
-      // Support both paginated { coins, total, page, totalPages } and plain array
       if (Array.isArray(raw)) {
-        dispatch(setCoins({ data: raw, pagination: { total: raw.length, totalPages: 1 } }));
-      } else {
-        const coinArray = raw?.coins || raw?.data || [];
-        dispatch(
-          setCoins({
-            data: coinArray,
-            pagination: {
-              total: raw?.total ?? coinArray.length,
-              totalPages: raw?.totalPages ?? Math.ceil((raw?.total ?? coinArray.length) / pagination.limit),
-              page: raw?.page ?? pagination.page,
-              limit: raw?.limit ?? pagination.limit,
-            },
-          })
-        );
+        // Fallback: bare array — no server-side pagination
+        dispatch(setCoins({
+          data: raw,
+          pagination: {
+            page:        1,
+            limit:       pagination.limit,
+            total:       raw.length,
+            totalPages:  1,
+            hasNextPage: false,
+            hasPrevPage: false,
+          },
+        }));
+        return;
       }
+
+      // New API shape: data.coins + data.pagination
+      const coinArray     = raw?.coins ?? raw?.data?.coins ?? [];
+      const paginationObj = raw?.pagination ?? raw?.data?.pagination;
+
+      const pageMeta = paginationObj
+        ? {
+            page:        paginationObj.page        ?? pagination.page,
+            limit:       paginationObj.limit        ?? pagination.limit,
+            total:       paginationObj.totalItems   ?? paginationObj.total ?? coinArray.length,
+            totalPages:  paginationObj.totalPages   ?? 1,
+            hasNextPage: paginationObj.hasNextPage  ?? false,
+            hasPrevPage: paginationObj.hasPrevPage  ?? false,
+          }
+        : {
+            // Legacy shape: flat fields at root
+            page:        raw?.page        ?? pagination.page,
+            limit:       raw?.limit       ?? pagination.limit,
+            total:       raw?.total       ?? raw?.totalCoins ?? coinArray.length,
+            totalPages:  raw?.totalPages  ?? Math.ceil((raw?.total ?? coinArray.length) / pagination.limit),
+            hasNextPage: false,
+            hasPrevPage: false,
+          };
+
+      dispatch(setCoins({ data: coinArray, pagination: pageMeta }));
     } catch (err) {
       dispatch(setError(err?.response?.data?.message || err.message || 'Failed to load coins'));
     }
@@ -134,38 +157,38 @@ function Coins() {
     filters.month,
   ]);
 
-  /* ── Initial load ── */
-  useEffect(() => {
-    fetchMarketSummary();
-  }, [fetchMarketSummary]);
-
-  useEffect(() => {
-    fetchCoins();
-  }, [fetchCoins]);
+  /* ── Mount effects ── */
+  useEffect(() => { fetchMarketSummary(); }, [fetchMarketSummary]);
+  useEffect(() => { fetchCoins();         }, [fetchCoins]);
 
   /* ── Handlers ── */
-  const handleFilterChange = (updates) => dispatch(setFilters(updates));
+  const handleFilterChange = (updates) => {
+    if ('limit' in updates) {
+      // Limit changes must reset page to 1 via setLimit (not setFilters)
+      dispatch(setLimit(Number(updates.limit)));
+    } else {
+      dispatch(setFilters(updates));
+    }
+  };
+
   const handleResetFilters = () => dispatch(resetFilters());
   const handlePageChange   = (p) => dispatch(setPage(p));
   const handleViewMode     = (mode) => dispatch(setViewMode(mode));
-
-  const handleSort = (key, order) => {
-    dispatch(setFilters({ sortBy: key, sortOrder: order }));
-  };
-
-  const handleRefresh = () => {
-    fetchMarketSummary();
-    fetchCoins();
-  };
+  const handleSort         = (key, order) => dispatch(setFilters({ sortBy: key, sortOrder: order }));
+  const handleRefresh      = () => { fetchMarketSummary(); fetchCoins(); };
 
   /* ── Derived state ── */
   const hasActiveFilters =
-    filters.search || filters.symbol || filters.minPrice || filters.maxPrice ||
-    filters.minVolume || filters.maxVolume || filters.month ||
+    filters.search || filters.symbol ||
+    filters.minPrice || filters.maxPrice ||
+    filters.minVolume || filters.maxVolume ||
+    filters.month ||
     filters.sortBy !== 'rank' || filters.sortOrder !== 'asc';
 
   const totalPages  = pagination.totalPages || 1;
-  const totalCoins  = pagination.total || coins.length;
+  const totalCoins  = pagination.total      || coins.length;
+  const startRecord = totalCoins === 0 ? 0 : (pagination.page - 1) * pagination.limit + 1;
+  const endRecord   = Math.min(pagination.page * pagination.limit, totalCoins);
 
   return (
     <div className="coins-page">
@@ -186,12 +209,12 @@ function Coins() {
             className="btn-reset-filter"
             onClick={handleRefresh}
             style={{
-              background: 'rgba(99,102,241,0.08)',
+              background:  'rgba(99,102,241,0.08)',
               borderColor: 'rgba(99,102,241,0.2)',
-              color: '#a5b4fc',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
+              color:       '#a5b4fc',
+              display:     'flex',
+              alignItems:  'center',
+              gap:         '0.4rem',
             }}
           >
             <FiRefreshCw style={{ fontSize: '0.85rem' }} />
@@ -201,11 +224,10 @@ function Coins() {
       </div>
 
       {/* ── Market Summary ── */}
-      {marketSummaryLoading ? (
-        <MarketSummarySkeleton />
-      ) : (
-        <MarketSummaryCards summary={marketSummary} />
-      )}
+      {marketSummaryLoading
+        ? <MarketSummarySkeleton />
+        : <MarketSummaryCards summary={marketSummary} />
+      }
 
       {/* ── Filters ── */}
       <CoinFilters
@@ -219,11 +241,14 @@ function Coins() {
         <div className="coins-count-label">
           {loading ? (
             'Loading…'
-          ) : (
+          ) : totalCoins > 0 ? (
             <>
-              Showing <strong>{coins.length}</strong> of <strong>{totalCoins.toLocaleString()}</strong> coins
+              Showing <strong>{startRecord}–{endRecord}</strong> of{' '}
+              <strong>{totalCoins.toLocaleString()}</strong> records
               {hasActiveFilters && ' (filtered)'}
             </>
+          ) : (
+            'No records found'
           )}
         </div>
         <div className="view-toggle">
@@ -269,11 +294,14 @@ function Coins() {
       )}
 
       {/* ── Pagination ── */}
-      {!loading && !error && coins.length > 0 && (
+      {!loading && !error && totalCoins > 0 && (
         <Pagination
           page={pagination.page}
           totalPages={totalPages}
+          totalItems={totalCoins}
+          limit={pagination.limit}
           onPageChange={handlePageChange}
+          onLimitChange={(val) => handleFilterChange({ limit: val })}
         />
       )}
     </div>

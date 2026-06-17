@@ -21,6 +21,7 @@ const Login = lazy(() => import('../pages/Login/Login'));
 const Register = lazy(() => import('../pages/Register/Register'));
 const Profile = lazy(() => import('../pages/Profile/Profile'));
 const NotFound = lazy(() => import('../pages/NotFound/NotFound'));
+const Admin = lazy(() => import('../pages/Admin/Admin'));
 
 // Route Wrappers
 import ProtectedRoute from './ProtectedRoute';
@@ -125,6 +126,16 @@ function AppRoutes() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin-only route */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Admin />
               </ProtectedRoute>
             }
           />

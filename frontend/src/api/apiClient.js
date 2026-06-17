@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Retrieve base URL from Vite environment variables
-const baseURL = import.meta.env.VITE_API_BASE_URL || '';
+const baseURL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
 
 // Create a reusable Axios instance
 const apiClient = axios.create({
@@ -45,7 +45,22 @@ apiClient.interceptors.response.use(
       const { status, data } = error.response;
       standardizedError.status = status;
       standardizedError.data = data;
-      standardizedError.message = data?.message || data?.error || `Error: ${status}`;
+      
+      if (data?.errors && Array.isArray(data.errors)) {
+        // Check if elements are objects (old format) or strings (new format)
+        const msgs = data.errors.map(err => {
+          if (typeof err === 'object') {
+            return Object.values(err).join(', ');
+          }
+          return err;
+        });
+        standardizedError.message = `${data.message || 'Validation failed'}: ${msgs.join('; ')}`;
+      } else if (data?.errors && typeof data.errors === 'object') {
+        const msgs = Object.values(data.errors);
+        standardizedError.message = `${data.message || 'Validation failed'}: ${msgs.join('; ')}`;
+      } else {
+        standardizedError.message = data?.message || data?.error || `Error: ${status}`;
+      }
 
       switch (status) {
         case 401:

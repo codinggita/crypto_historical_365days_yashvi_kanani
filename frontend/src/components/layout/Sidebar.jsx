@@ -12,6 +12,7 @@ import {
   FiLogOut,
   FiLayers,
   FiBriefcase,
+  FiShield,
 } from 'react-icons/fi';
 import { setSidebarOpen } from '../../redux/slices/uiSlice';
 import { logout } from '../../redux/slices/authSlice';
@@ -31,6 +32,7 @@ function Sidebar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const sidebarOpen = useSelector((state) => state.ui.sidebarOpen);
+  const user = useSelector((state) => state.auth.user);
 
   const closeSidebar = () => dispatch(setSidebarOpen(false));
 
@@ -83,6 +85,24 @@ function Sidebar() {
               {label}
             </NavLink>
           ))}
+
+          {/* Admin link — visible only to admins */}
+          {user?.role === 'admin' && (
+            <>
+              <span className="sidebar-section-label" style={{ marginTop: '1rem' }}>Admin</span>
+              <NavLink
+                to="/admin"
+                onClick={closeSidebar}
+                className={({ isActive }) =>
+                  `sidebar-link sidebar-link--admin${isActive ? ' active' : ''}`
+                }
+                aria-label="Admin Panel"
+              >
+                <span className="sidebar-link-icon" aria-hidden="true"><FiShield /></span>
+                Admin Panel
+              </NavLink>
+            </>
+          )}
         </nav>
 
         {/* Logout */}

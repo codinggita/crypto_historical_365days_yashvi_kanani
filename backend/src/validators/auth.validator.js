@@ -20,8 +20,8 @@ export const registerValidator = () => {
       .trim()
       .notEmpty()
       .withMessage("Password is required")
-      .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters long"),
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters long"),
     validate,
   ];
 };
@@ -73,8 +73,8 @@ export const changePasswordValidator = () => {
       .trim()
       .notEmpty()
       .withMessage("New password is required")
-      .isLength({ min: 8 })
-      .withMessage("New password must be at least 8 characters long"),
+      .isLength({ min: 6 })
+      .withMessage("New password must be at least 6 characters long"),
     validate,
   ];
 };

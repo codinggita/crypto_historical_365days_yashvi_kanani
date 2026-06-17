@@ -6,6 +6,11 @@ import {
   updateUserStatus,
   deleteUser,
   getStatsOverview,
+  getAuditLogs,
+  getWatchlistAnalytics,
+  getPortfolioAnalytics,
+  getSearchAnalytics,
+  getAdminHealth,
 } from "../../controllers/admin.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 import authorizeRoles from "../../middlewares/role.middleware.js";
@@ -28,6 +33,17 @@ router.use(authorizeRoles("admin"));
 
 // Dashboard stats — defined before /:id to avoid collision
 router.route("/stats").get(getStatsOverview);
+
+// Log viewer
+router.route("/logs").get(getAuditLogs);
+
+// Analytics endpoints
+router.route("/analytics/watchlist").get(getWatchlistAnalytics);
+router.route("/analytics/portfolio").get(getPortfolioAnalytics);
+router.route("/analytics/search").get(getSearchAnalytics);
+
+// Health monitoring
+router.route("/health").get(getAdminHealth);
 
 // User listing and creation
 router.route("/users").get(getAllUsers);

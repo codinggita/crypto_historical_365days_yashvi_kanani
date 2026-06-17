@@ -11,7 +11,7 @@ const findCoinByFlexibleId = async (id) => {
   if (mongoose.Types.ObjectId.isValid(id)) {
     coin = await Coin.findById(id);
   } else {
-    coin = await Coin.findOne({ coinId: id.toLowerCase() });
+    coin = await Coin.findOne({ coinId: id.toLowerCase() }).sort({ timestamp: -1 });
   }
   return coin;
 };
@@ -94,12 +94,49 @@ export const getAllCoins = async (queryParams) => {
     projection = queryParams.fields.split(",").join(" ");
   }
 
-  const totalItems = await Coin.countDocuments(query);
-  const coins = await Coin.find(query)
-    .select(projection)
-    .sort(sort)
-    .skip(skip)
-    .limit(limit);
+  const pipeline = [
+    { $sort: { timestamp: -1 } },
+    {
+      $group: {
+        _id: "$coinId",
+        doc: { $first: "$$ROOT" }
+      }
+    },
+    { $replaceRoot: { newRoot: "$doc" } }
+  ];
+
+  if (Object.keys(query).length > 0) {
+    pipeline.push({ $match: query });
+  }
+
+  const dataPipeline = [
+    { $sort: sort },
+    { $skip: skip },
+    { $limit: limit }
+  ];
+
+  if (projection) {
+    const projectStage = {};
+    projection.split(" ").forEach(field => {
+      if (field.startsWith("-")) {
+        projectStage[field.substring(1)] = 0;
+      } else {
+        projectStage[field] = 1;
+      }
+    });
+    dataPipeline.push({ $project: projectStage });
+  }
+
+  pipeline.push({
+    $facet: {
+      metadata: [{ $count: "total" }],
+      data: dataPipeline
+    }
+  });
+
+  const aggregationResult = await Coin.aggregate(pipeline);
+  const totalItems = aggregationResult[0]?.metadata[0]?.total || 0;
+  const coins = aggregationResult[0]?.data || [];
 
   const meta = getPaginationMeta(totalItems, page, limit);
 
@@ -243,9 +280,13 @@ export const deleteCoin = async (id) => {
  */
 export const getTrendingCoins = async (limitParam = 5) => {
   const limit = parseInt(limitParam, 10) || 5;
-  return await Coin.find({})
-    .sort({ dailyReturn: -1, volume: -1 })
-    .limit(limit);
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $sort: { dailyReturn: -1, volume: -1 } },
+    { $limit: limit }
+  ]);
 };
 
 /**
@@ -253,9 +294,13 @@ export const getTrendingCoins = async (limitParam = 5) => {
  */
 export const getTopGainers = async (limitParam = 5) => {
   const limit = parseInt(limitParam, 10) || 5;
-  return await Coin.find({})
-    .sort({ dailyReturn: -1 })
-    .limit(limit);
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $sort: { dailyReturn: -1 } },
+    { $limit: limit }
+  ]);
 };
 
 /**
@@ -263,9 +308,13 @@ export const getTopGainers = async (limitParam = 5) => {
  */
 export const getTopLosers = async (limitParam = 5) => {
   const limit = parseInt(limitParam, 10) || 5;
-  return await Coin.find({})
-    .sort({ dailyReturn: 1 })
-    .limit(limit);
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $sort: { dailyReturn: 1 } },
+    { $limit: limit }
+  ]);
 };
 
 /**
@@ -273,17 +322,26 @@ export const getTopLosers = async (limitParam = 5) => {
  */
 export const getRecentCoins = async (limitParam = 10) => {
   const limit = parseInt(limitParam, 10) || 10;
-  return await Coin.find({})
-    .sort({ createdAt: -1 })
-    .limit(limit);
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $sort: { createdAt: -1 } },
+    { $limit: limit }
+  ]);
 };
 
 /**
  * Get a single random coin using MongoDB $sample aggregation
  */
 export const getRandomCoin = async () => {
-  const result = await Coin.aggregate([{ $sample: { size: 1 } }]);
-  return result[0] || null;
+  const latestCoins = await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $sample: { size: 1 } }
+  ]);
+  return latestCoins[0] || null;
 };
 
 /**
@@ -291,35 +349,54 @@ export const getRandomCoin = async () => {
  */
 export const getMarketSummary = async () => {
   const result = await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
     {
-      $facet: {
-        summary: [
-          {
-            $group: {
-              _id: null,
-              totalMarketCap: { $sum: "$marketCap" },
-              averagePrice: { $avg: "$price" },
-              averageVolatility: { $avg: "$volatility" },
-              totalVolume: { $sum: "$volume" },
-              totalCoins: { $sum: 1 },
-            },
-          },
-        ],
-      },
+      $group: {
+        _id: null,
+        totalMarketCap: { $sum: "$marketCap" },
+        averagePrice: { $avg: "$price" },
+        averageVolatility: { $avg: "$volatility" },
+        totalVolume: { $sum: "$volume" },
+        totalCoins: { $sum: 1 },
+        btcMarketCap: {
+          $sum: {
+            $cond: [
+              { $eq: ["$coinId", "bitcoin"] },
+              "$marketCap",
+              0
+            ]
+          }
+        }
+      }
     },
     {
       $project: {
-        summary: { $arrayElemAt: ["$summary", 0] },
-      },
-    },
+        _id: 0,
+        totalMarketCap: 1,
+        averagePrice: 1,
+        averageVolatility: 1,
+        totalVolume: 1,
+        totalCoins: 1,
+        btcDominance: {
+          $cond: [
+            { $gt: ["$totalMarketCap", 0] },
+            { $multiply: [{ $divide: ["$btcMarketCap", "$totalMarketCap"] }, 100] },
+            0
+          ]
+        }
+      }
+    }
   ]);
 
-  return result[0]?.summary || {
+  return result[0] || {
     totalMarketCap: 0,
     averagePrice: 0,
     averageVolatility: 0,
     totalVolume: 0,
     totalCoins: 0,
+    btcDominance: 0,
   };
 };
 
@@ -348,8 +425,27 @@ export const getGlobalSearch = async (queryParams) => {
 
   const { page, limit, skip } = getPaginationOptions(sanitizedQuery);
 
-  const totalItems = await Coin.countDocuments(query);
-  const coins = await Coin.find(query).skip(skip).limit(limit);
+  const pipeline = [
+    { $sort: { timestamp: -1 } },
+    {
+      $group: {
+        _id: "$coinId",
+        doc: { $first: "$$ROOT" }
+      }
+    },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $match: query },
+    {
+      $facet: {
+        metadata: [{ $count: "total" }],
+        data: [{ $skip: skip }, { $limit: limit }]
+      }
+    }
+  ];
+
+  const aggregationResult = await Coin.aggregate(pipeline);
+  const totalItems = aggregationResult[0]?.metadata[0]?.total || 0;
+  const coins = aggregationResult[0]?.data || [];
   const meta = getPaginationMeta(totalItems, page, limit);
 
   return { coins, meta };
@@ -430,7 +526,7 @@ export const bulkDeleteCoins = async (idsArray) => {
  * Fetch coin details using coin name (case-insensitive)
  */
 export const getCoinByName = async (coinName) => {
-  const coin = await Coin.findOne({ name: { $regex: new RegExp(`^${coinName}$`, "i") } });
+  const coin = await Coin.findOne({ name: { $regex: new RegExp(`^${coinName}$`, "i") } }).sort({ timestamp: -1 });
   if (!coin) {
     throw new ApiError(404, `Coin with name '${coinName}' not found`);
   }
@@ -441,7 +537,7 @@ export const getCoinByName = async (coinName) => {
  * Fetch coin details using trading symbol
  */
 export const getCoinBySymbol = async (symbol) => {
-  const coin = await Coin.findOne({ symbol: symbol.toUpperCase() });
+  const coin = await Coin.findOne({ symbol: symbol.toUpperCase() }).sort({ timestamp: -1 });
   if (!coin) {
     throw new ApiError(404, `Coin with symbol '${symbol}' not found`);
   }
@@ -452,8 +548,12 @@ export const getCoinBySymbol = async (symbol) => {
  * Fetch coins by market cap rank
  */
 export const getCoinsByRank = async (rank) => {
-  const coins = await Coin.find({ rank: parseInt(rank, 10) });
-  return coins;
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $match: { rank: parseInt(rank, 10) } }
+  ]);
 };
 
 /**
@@ -503,8 +603,28 @@ export const getCoinsByDate = async (dateStr) => {
  */
 export const getLatestCoins = async (queryParams = {}) => {
   const { page, limit, skip } = getPaginationOptions(queryParams);
-  const totalItems = await Coin.countDocuments({});
-  const coins = await Coin.find({}).sort({ timestamp: -1, createdAt: -1 }).skip(skip).limit(limit);
+  
+  const pipeline = [
+    { $sort: { timestamp: -1 } },
+    {
+      $group: {
+        _id: "$coinId",
+        doc: { $first: "$$ROOT" }
+      }
+    },
+    { $replaceRoot: { newRoot: "$doc" } }
+  ];
+
+  const totalItemsResult = await Coin.aggregate([...pipeline, { $count: "total" }]);
+  const totalItems = totalItemsResult[0]?.total || 0;
+
+  const coins = await Coin.aggregate([
+    ...pipeline,
+    { $sort: { timestamp: -1, createdAt: -1 } },
+    { $skip: skip },
+    { $limit: limit }
+  ]);
+
   const meta = getPaginationMeta(totalItems, page, limit);
   return { coins, meta };
 };
@@ -551,8 +671,28 @@ export const getCoinHistoryByMonth = async (id, monthStr) => {
  */
 export const getTopMarketCapCoins = async (queryParams = {}) => {
   const { page, limit, skip } = getPaginationOptions(queryParams);
-  const totalItems = await Coin.countDocuments({});
-  const coins = await Coin.find({}).sort({ marketCap: -1 }).skip(skip).limit(limit);
+
+  const pipeline = [
+    { $sort: { timestamp: -1 } },
+    {
+      $group: {
+        _id: "$coinId",
+        doc: { $first: "$$ROOT" }
+      }
+    },
+    { $replaceRoot: { newRoot: "$doc" } }
+  ];
+
+  const totalItemsResult = await Coin.aggregate([...pipeline, { $count: "total" }]);
+  const totalItems = totalItemsResult[0]?.total || 0;
+
+  const coins = await Coin.aggregate([
+    ...pipeline,
+    { $sort: { marketCap: -1 } },
+    { $skip: skip },
+    { $limit: limit }
+  ]);
+
   const meta = getPaginationMeta(totalItems, page, limit);
   return { coins, meta };
 };
@@ -562,8 +702,28 @@ export const getTopMarketCapCoins = async (queryParams = {}) => {
  */
 export const getTopVolumeCoins = async (queryParams = {}) => {
   const { page, limit, skip } = getPaginationOptions(queryParams);
-  const totalItems = await Coin.countDocuments({});
-  const coins = await Coin.find({}).sort({ volume: -1 }).skip(skip).limit(limit);
+
+  const pipeline = [
+    { $sort: { timestamp: -1 } },
+    {
+      $group: {
+        _id: "$coinId",
+        doc: { $first: "$$ROOT" }
+      }
+    },
+    { $replaceRoot: { newRoot: "$doc" } }
+  ];
+
+  const totalItemsResult = await Coin.aggregate([...pipeline, { $count: "total" }]);
+  const totalItems = totalItemsResult[0]?.total || 0;
+
+  const coins = await Coin.aggregate([
+    ...pipeline,
+    { $sort: { volume: -1 } },
+    { $skip: skip },
+    { $limit: limit }
+  ]);
+
   const meta = getPaginationMeta(totalItems, page, limit);
   return { coins, meta };
 };
@@ -759,14 +919,26 @@ export const filterCoinsByCriteria = async (criteria) => {
  * Advanced recommendations
  */
 export const getRecommendations = async () => {
-  return await Coin.find({ dailyReturn: { $gt: 0 }, volatility: { $lt: 3.5 } }).sort({ dailyReturn: -1 }).limit(5);
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $match: { dailyReturn: { $gt: 0 }, volatility: { $lt: 3.5 } } },
+    { $sort: { dailyReturn: -1 } },
+    { $limit: 5 }
+  ]);
 };
 
 /**
  * Advanced predictions
  */
 export const getPredictions = async () => {
-  const coins = await Coin.find({}).limit(10);
+  const coins = await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $limit: 10 }
+  ]);
   return coins.map((coin) => ({
     coinId: coin.coinId,
     name: coin.name,
@@ -780,7 +952,11 @@ export const getPredictions = async () => {
  * Heatmap data
  */
 export const getHeatmapData = async () => {
-  const coins = await Coin.find({});
+  const coins = await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } }
+  ]);
   return coins.map((coin) => ({
     coinId: coin.coinId,
     symbol: coin.symbol,
@@ -794,7 +970,11 @@ export const getHeatmapData = async () => {
  * Market status
  */
 export const getMarketStatusDetails = async () => {
-  const coins = await Coin.find({});
+  const coins = await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } }
+  ]);
   const totalMarketCap = coins.reduce((acc, c) => acc + (c.marketCap || 0), 0);
   const totalVolume = coins.reduce((acc, c) => acc + (c.volume || 0), 0);
   const activeCoins = coins.filter(c => c.marketStatus === "active").length;
@@ -812,27 +992,53 @@ export const getMarketStatusDetails = async () => {
  * Top monthly performers
  */
 export const getTopMonthlyPerformers = async () => {
-  return await Coin.find({ dailyReturn: { $gt: 0 } }).sort({ dailyReturn: -1 }).limit(5);
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $match: { dailyReturn: { $gt: 0 } } },
+    { $sort: { dailyReturn: -1 } },
+    { $limit: 5 }
+  ]);
 };
 
 /**
  * Top yearly performers
  */
 export const getTopYearlyPerformers = async () => {
-  return await Coin.find({ dailyReturn: { $gt: 0 } }).sort({ dailyReturn: -1 }).limit(5);
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $match: { dailyReturn: { $gt: 0 } } },
+    { $sort: { dailyReturn: -1 } },
+    { $limit: 5 }
+  ]);
 };
 
 /**
  * Volatility alerts
  */
 export const getVolatilityAlerts = async () => {
-  return await Coin.find({ volatility: { $gte: 4.0 } }).sort({ volatility: -1 });
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $match: { volatility: { $gte: 4.0 } } },
+    { $sort: { volatility: -1 } }
+  ]);
 };
 
 /**
  * Market drop alerts
  */
 export const getMarketDropAlerts = async () => {
-  return await Coin.find({ dailyReturn: { $lte: -5.0 } }).sort({ dailyReturn: 1 });
+  return await Coin.aggregate([
+    { $sort: { timestamp: -1 } },
+    { $group: { _id: "$coinId", doc: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$doc" } },
+    { $match: { dailyReturn: { $lte: -5.0 } } },
+    { $sort: { dailyReturn: 1 } }
+  ]);
 };
 

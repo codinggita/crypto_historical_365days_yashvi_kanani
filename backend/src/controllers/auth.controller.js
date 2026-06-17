@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
+  console.log("Register User request body:", req.body);
   const result = await authService.registerUser(req.body);
   return res.status(201).json(
     new ApiResponse(201, result, "User registered successfully")

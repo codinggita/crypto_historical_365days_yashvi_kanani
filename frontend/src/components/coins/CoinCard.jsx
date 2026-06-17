@@ -24,7 +24,20 @@ function CoinCard({ coin, index }) {
     <div className="coin-card">
       <div className="coin-card-header">
         <div className="coin-card-identity">
-          <div className="coin-card-logo">{initials}</div>
+          {coin.image ? (
+            <img
+              src={coin.image}
+              alt={coin.name}
+              className="coin-card-logo-img"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div className="coin-card-logo" style={coin.image ? { display: 'none' } : {}}>
+            {initials}
+          </div>
           <div>
             <div className="coin-card-name">{coin.name || '—'}</div>
             <div className="coin-card-symbol">{coin.symbol || '—'}</div>

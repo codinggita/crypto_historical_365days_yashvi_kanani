@@ -571,13 +571,41 @@
   color: #c7d2fe;
 }
 
-/* ── Pagination ── */
+/* ── Pagination Wrapper ── */
+.coins-pagination-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.pagination-info {
+  font-size: 0.82rem;
+  color: var(--text-muted-layout);
+  white-space: nowrap;
+}
+
+.pagination-info strong {
+  color: var(--text-heading);
+}
+
+.pagination-limit {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pagination-limit .filter-label {
+  white-space: nowrap;
+}
+
+/* ── Pagination Nav ── */
 .coins-pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
+  gap: 0.35rem;
 }
 
 .page-btn {
@@ -609,10 +637,11 @@
   background: rgba(99, 102, 241, 0.18);
   border-color: rgba(99, 102, 241, 0.4);
   color: #a5b4fc;
+  pointer-events: none;
 }
 
 .page-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
@@ -620,7 +649,9 @@
   font-size: 0.85rem;
   color: var(--text-muted-layout);
   padding: 0 0.25rem;
+  line-height: 2.25rem;
 }
+
 
 /* ── Skeleton Loader ── */
 .skeleton-shimmer {
@@ -813,9 +844,30 @@
   .filter-search-wrap { min-width: 100%; }
   .coin-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
   .coins-content-header { flex-direction: column; align-items: flex-start; }
+  .coins-pagination-wrap { flex-direction: column; align-items: center; }
 }
 
 @media (max-width: 480px) {
   .market-summary-grid { grid-template-columns: 1fr 1fr; }
   .coin-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Coin Logo Images ── */
+.coin-logo-img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  object-fit: contain;
+  background-color: transparent;
+  flex-shrink: 0;
+}
+
+.coin-card-logo-img {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: contain;
+  background-color: transparent;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
 }
