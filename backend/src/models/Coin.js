@@ -7,7 +7,7 @@ const coinSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
-      unique: true,
+      // NOTE: NOT unique — allows multiple historical records (one per day) per coin
       index: true,
     },
     name: {
@@ -95,8 +95,12 @@ const coinSchema = new mongoose.Schema(
   }
 );
 
-// Compound text index for global search across name, symbol, and tags
+// Compound index: one record per (coinId, timestamp) pair = one snapshot per coin per day
+coinSchema.index({ coinId: 1, timestamp: 1 });
+
+// Text index for global search across name, symbol, and tags
 coinSchema.index({ name: "text", symbol: "text", tags: "text" });
+
 // Index for fetching recently added coins efficiently
 coinSchema.index({ createdAt: -1 });
 

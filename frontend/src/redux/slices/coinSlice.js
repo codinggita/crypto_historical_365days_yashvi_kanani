@@ -9,9 +9,11 @@ const initialState = {
   // Pagination
   pagination: {
     page: 1,
-    limit: 20,
+    limit: 10,
     total: 0,
     totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
   },
 
   // Filters
@@ -49,7 +51,17 @@ const coinSlice = createSlice({
     setCoins: (state, action) => {
       const { data, pagination } = action.payload;
       state.coins = data || action.payload;
-      if (pagination) state.pagination = { ...state.pagination, ...pagination };
+      if (pagination) {
+        state.pagination = {
+          ...state.pagination,
+          page:        pagination.page        ?? state.pagination.page,
+          limit:       pagination.limit       ?? state.pagination.limit,
+          total:       pagination.total       ?? pagination.totalItems ?? 0,
+          totalPages:  pagination.totalPages  ?? 0,
+          hasNextPage: pagination.hasNextPage ?? false,
+          hasPrevPage: pagination.hasPrevPage ?? false,
+        };
+      }
       state.loading = false;
       state.error = null;
     },
@@ -71,9 +83,23 @@ const coinSlice = createSlice({
     setPage: (state, action) => {
       state.pagination.page = action.payload;
     },
+    // KEY FIX: setLimit resets page to 1 AND updates pagination.limit
+    setLimit: (state, action) => {
+      state.pagination.limit = action.payload;
+      state.pagination.page  = 1;
+    },
     setFilters: (state, action) => {
-      state.filters = { ...state.filters, ...action.payload };
-      state.pagination.page = 1; // reset to page 1 on filter change
+      // If limit is in the payload route it to pagination, not filters
+      const { limit, ...rest } = action.payload;
+      if (limit !== undefined) {
+        state.pagination.limit = Number(limit);
+        state.pagination.page  = 1;
+      }
+      state.filters = { ...state.filters, ...rest };
+      // Any other filter change also resets to page 1
+      if (Object.keys(rest).length > 0) {
+        state.pagination.page = 1;
+      }
     },
     resetFilters: (state) => {
       state.filters = initialState.filters;
@@ -110,6 +136,7 @@ export const {
   setError,
   setPagination,
   setPage,
+  setLimit,
   setFilters,
   resetFilters,
   setViewMode,

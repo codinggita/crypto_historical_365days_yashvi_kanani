@@ -5,10 +5,10 @@ import { useSelector } from 'react-redux';
 /**
  * ProtectedRoute Wrapper
  * Validates authentication state from Redux.
- * Redirects unauthenticated users to `/login`.
+ * Supports adminOnly prop to further restrict access to admins.
  */
-function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+function ProtectedRoute({ children, adminOnly = false }) {
+  const { isAuthenticated, loading, user } = useSelector((state) => state.auth);
 
   if (loading) {
     return (
@@ -34,6 +34,10 @@ function ProtectedRoute({ children }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (adminOnly && user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

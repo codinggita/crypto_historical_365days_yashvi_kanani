@@ -31,12 +31,14 @@ function Register() {
   const onSubmit = async (data) => {
     dispatch(setLoading(true));
     dispatch(setError(null));
+    const payload = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
+    console.log("Register Payload", payload);
     try {
-      const response = await authService.register({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      });
+      const response = await authService.register(payload);
 
       // The API response is wrapped in ApiResponse: { success: true, data: { user, token } }
       const { user, token } = response.data;

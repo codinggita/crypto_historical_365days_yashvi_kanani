@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import User from "../models/User.js";
 import AuditLog from "../models/AuditLog.js";
+import Bookmark from "../models/Bookmark.js";
+import Portfolio from "../models/Portfolio.js";
+import SearchLog from "../models/SearchLog.js";
+import Coin from "../models/Coin.js";
 import ApiError from "../utils/ApiError.js";
 
 /**
@@ -213,12 +217,24 @@ export const getStatsOverview = async () => {
     .sort({ createdAt: -1 })
     .limit(5);
 
+  const totalWatchlists = await Bookmark.countDocuments({});
+  const totalPortfolioEntries = await Portfolio.countDocuments({});
+  const totalSearches = await SearchLog.countDocuments({});
+  const totalAPIRequests = await AuditLog.countDocuments({});
+  const coinsArray = await Coin.distinct("coinId");
+  const totalCoins = coinsArray.length;
+
   return {
     totalUsers,
     activeUsers,
     inactiveUsers,
     adminsCount,
     normalUsersCount,
-    latestRegisteredUsers
+    latestRegisteredUsers,
+    totalWatchlists,
+    totalPortfolioEntries,
+    totalSearches,
+    totalAPIRequests,
+    totalCoins
   };
 };

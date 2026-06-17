@@ -26,11 +26,11 @@ const COLUMNS = [
   { key: 'rank',       label: '#',           sortable: true,  width: 50  },
   { key: 'name',       label: 'Coin',         sortable: true,  width: 200 },
   { key: 'price',      label: 'Price',        sortable: true,  width: 130 },
-  { key: 'change_24h', label: '24h Change',   sortable: true,  width: 110 },
-  { key: 'market_cap', label: 'Market Cap',   sortable: true,  width: 140 },
-  { key: 'volume_24h', label: '24h Volume',   sortable: true,  width: 140 },
-  { key: 'high_24h',   label: '24h High',     sortable: false, width: 120 },
-  { key: 'low_24h',    label: '24h Low',      sortable: false, width: 120 },
+  { key: 'dailyReturn',label: '24h Change',   sortable: true,  width: 110 },
+  { key: 'marketCap',  label: 'Market Cap',   sortable: true,  width: 140 },
+  { key: 'volume',     label: '24h Volume',   sortable: true,  width: 140 },
+  { key: 'volatility', label: 'Volatility',   sortable: true,  width: 110 },
+  { key: 'category',   label: 'Category',     sortable: false, width: 110 },
   { key: 'actions',    label: '',             sortable: false, width: 80  },
 ];
 
@@ -66,31 +66,45 @@ function CoinTable({ coins, sortBy, sortOrder, onSort }) {
         </thead>
         <tbody>
           {coins.map((coin, i) => {
-            const initials = getCoinInitials(coin.name, coin.symbol);
+            const initials   = getCoinInitials(coin.name, coin.symbol);
+            // Support both backend field names
+            const change     = coin.dailyReturn ?? coin.daily_return ?? coin.change_24h ?? 0;
+            const mcap       = coin.marketCap   ?? coin.market_cap ?? 0;
+            const vol        = coin.volume      ?? coin.volume_24h ?? 0;
+            const volatility = coin.volatility  ?? 0;
+            // Navigate by coinId slug (e.g. "bitcoin") which works with findCoinByFlexibleId
+            const navId      = coin.coinId || coin._id || coin.id || coin.symbol?.toLowerCase();
+
             return (
               <tr key={coin._id || coin.id || i}>
-                <td className="coin-table-rank">
-                  {coin.rank || i + 1}
-                </td>
+                <td className="coin-table-rank">{coin.rank || i + 1}</td>
                 <td>
                   <div className="coin-table-identity">
-                    <div className="coin-logo-circle">{initials}</div>
+                    {coin.image
+                      ? <img src={coin.image} alt={coin.name} className="coin-logo-img" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+                      : null}
+                    <div className="coin-logo-circle" style={coin.image ? { display: 'none' } : {}}>{initials}</div>
                     <div>
                       <div className="coin-table-name">{coin.name || '—'}</div>
                       <div className="coin-table-symbol">{coin.symbol || '—'}</div>
                     </div>
                   </div>
                 </td>
-                <td className="coin-price">{formatPrice(coin.price ?? coin.close ?? coin.open)}</td>
-                <td><ChangeCell value={coin.change_24h ?? coin.daily_return} /></td>
-                <td>{formatLargeNumber(coin.market_cap)}</td>
-                <td>{formatLargeNumber(coin.volume_24h ?? coin.volume)}</td>
-                <td>{formatPrice(coin.high_24h ?? coin.high)}</td>
-                <td>{formatPrice(coin.low_24h ?? coin.low)}</td>
+                <td className="coin-price">{formatPrice(coin.price)}</td>
+                <td><ChangeCell value={change} /></td>
+                <td>{mcap ? formatLargeNumber(mcap) : '—'}</td>
+                <td>{vol ? formatLargeNumber(vol) : '—'}</td>
+                <td><ChangeCell value={volatility} /></td>
+                <td>
+                  {coin.category
+                    ? <span style={{ fontSize: '0.78rem', padding: '2px 8px', borderRadius: '20px', background: 'rgba(99,102,241,0.12)', color: '#818cf8', whiteSpace: 'nowrap' }}>{coin.category}</span>
+                    : '—'
+                  }
+                </td>
                 <td>
                   <button
                     className="coin-table-action-btn"
-                    onClick={() => navigate(`/coins/${coin._id || coin.id || coin.symbol}`)}
+                    onClick={() => navigate(`/coins/${navId}`)}
                     id={`view-coin-${coin.symbol || i}`}
                   >
                     <FiEye style={{ marginRight: '0.25rem' }} /> View
