@@ -47,7 +47,7 @@ function CoinListRow({ coin }) {
   return (
     <div className="placeholder-row">
       <div className="placeholder-coin">
-        <div className="placeholder-coin-dot">{initials.slice(0, 2)}</div>
+        <div className="placeholder-coin-dot">{typeof initials === 'string' ? initials.slice(0, 2) : '??'}</div>
         <div>
           <div className="placeholder-coin-name">{coin.name}</div>
           <div className="placeholder-coin-sym">{coin.symbol?.toUpperCase()}</div>
