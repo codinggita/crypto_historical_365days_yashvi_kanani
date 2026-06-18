@@ -20,9 +20,7 @@ import {
 
 const router = Router();
 
-// Protect all stats endpoints with verifyJWT
-router.use(verifyJWT);
-
+// All stats endpoints are public (no authentication required)
 // HEAD /stats/market-cap - Check metadata (headers) for market cap
 router.head("/market-cap", (req, res) => {
   res.set("X-Total-Market-Cap-Metadata", "true");
