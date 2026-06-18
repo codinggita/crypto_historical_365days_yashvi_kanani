@@ -121,10 +121,10 @@ const coinSlice = createSlice({
       state.marketSummaryLoading = false;
     },
     setTopGainers: (state, action) => {
-      state.topGainers = action.payload;
+      state.topGainers = Array.isArray(action.payload) ? action.payload : [];
     },
     setTopLosers: (state, action) => {
-      state.topLosers = action.payload;
+      state.topLosers = Array.isArray(action.payload) ? action.payload : [];
     },
   },
 });

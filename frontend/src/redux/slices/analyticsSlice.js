@@ -22,8 +22,8 @@ const analyticsSlice = createSlice({
       const { analyticsData, marketSummary, topGainers, topLosers } = action.payload;
       if (analyticsData !== undefined) state.analyticsData = analyticsData;
       if (marketSummary !== undefined) state.marketSummary = marketSummary;
-      if (topGainers !== undefined) state.topGainers = topGainers;
-      if (topLosers !== undefined) state.topLosers = topLosers;
+      if (topGainers !== undefined) state.topGainers = Array.isArray(topGainers) ? topGainers : [];
+      if (topLosers !== undefined) state.topLosers = Array.isArray(topLosers) ? topLosers : [];
       state.loading = false;
       state.error = null;
     },
