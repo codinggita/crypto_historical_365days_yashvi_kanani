@@ -20,8 +20,8 @@ const portfolioSlice = createSlice({
     fetchSuccess: (state, action) => {
       const { portfolio, holdings, recommendations } = action.payload;
       if (portfolio !== undefined) state.portfolio = portfolio;
-      if (holdings !== undefined) state.holdings = holdings;
-      if (recommendations !== undefined) state.recommendations = recommendations;
+      if (holdings !== undefined) state.holdings = Array.isArray(holdings) ? holdings : [];
+      if (recommendations !== undefined) state.recommendations = Array.isArray(recommendations) ? recommendations : [];
       state.loading = false;
       state.error = null;
     },
@@ -30,18 +30,26 @@ const portfolioSlice = createSlice({
       state.error = action.payload;
     },
     setHoldings: (state, action) => {
-      state.holdings = action.payload;
+      state.holdings = Array.isArray(action.payload) ? action.payload : [];
     },
     addHoldingSuccess: (state, action) => {
-      state.holdings.unshift(action.payload);
+      if (Array.isArray(state.holdings)) {
+        state.holdings.unshift(action.payload);
+      } else {
+        state.holdings = [action.payload];
+      }
     },
     updateHoldingSuccess: (state, action) => {
-      state.holdings = state.holdings.map((h) => 
-        h._id === action.payload._id ? action.payload : h
-      );
+      if (Array.isArray(state.holdings)) {
+        state.holdings = state.holdings.map((h) => 
+          h._id === action.payload._id ? action.payload : h
+        );
+      }
     },
     deleteHoldingSuccess: (state, action) => {
-      state.holdings = state.holdings.filter((h) => h._id !== action.payload);
+      if (Array.isArray(state.holdings)) {
+        state.holdings = state.holdings.filter((h) => h._id !== action.payload);
+      }
     },
     setSimulationResults: (state, action) => {
       state.simulationResults = action.payload;

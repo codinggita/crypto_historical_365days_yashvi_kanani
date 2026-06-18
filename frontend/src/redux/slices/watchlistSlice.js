@@ -40,7 +40,7 @@ const watchlistSlice = createSlice({
     },
     setBookmarks: (state, action) => {
       const { items, meta } = action.payload;
-      state.bookmarks = items || [];
+      state.bookmarks = Array.isArray(items) ? items : [];
       if (meta) {
         state.pagination = { ...state.pagination, ...meta };
       }
@@ -53,7 +53,7 @@ const watchlistSlice = createSlice({
       state.error = null;
     },
     setTrending: (state, action) => {
-      state.trendingBookmarks = action.payload;
+      state.trendingBookmarks = Array.isArray(action.payload) ? action.payload : [];
       state.loading = false;
       state.error = null;
     },
@@ -76,6 +76,9 @@ const watchlistSlice = createSlice({
     },
     addBookmarkOptimistic: (state, action) => {
       const coin = action.payload;
+      if (!Array.isArray(state.bookmarks)) {
+        state.bookmarks = [];
+      }
       // Prevent duplicates by checking coin ID
       if (!state.bookmarks.some((b) => b.coin === coin.coin || b.coinId === coin.coinId)) {
         state.bookmarks.unshift({
@@ -97,25 +100,29 @@ const watchlistSlice = createSlice({
     },
     removeBookmarkOptimistic: (state, action) => {
       const id = action.payload;
-      state.bookmarks = state.bookmarks.filter(
-        (b) => b._id !== id && b.coin !== id && b.coinId !== id
-      );
+      if (Array.isArray(state.bookmarks)) {
+        state.bookmarks = state.bookmarks.filter(
+          (b) => b._id !== id && b.coin !== id && b.coinId !== id
+        );
+      }
       if (state.bookmarkAnalytics && state.bookmarkAnalytics.totalBookmarked > 0) {
         state.bookmarkAnalytics.totalBookmarked -= 1;
       }
     },
     updateBookmarkOptimistic: (state, action) => {
       const { id, category, notes } = action.payload;
-      state.bookmarks = state.bookmarks.map((b) => {
-        if (b._id === id || b.coin === id || b.coinId === id) {
-          return {
-            ...b,
-            category: category !== undefined ? category : b.category,
-            notes: notes !== undefined ? notes : b.notes,
-          };
-        }
-        return b;
-      });
+      if (Array.isArray(state.bookmarks)) {
+        state.bookmarks = state.bookmarks.map((b) => {
+          if (b._id === id || b.coin === id || b.coinId === id) {
+            return {
+              ...b,
+              category: category !== undefined ? category : b.category,
+              notes: notes !== undefined ? notes : b.notes,
+            };
+          }
+          return b;
+        });
+      }
     },
   },
 });
