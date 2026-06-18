@@ -74,6 +74,10 @@ function Dashboard() {
 
   const displayName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Explorer';
 
+  // Ensure arrays are properly initialized
+  const safeTopGainers = Array.isArray(topGainers) ? topGainers : [];
+  const safeTopLosers = Array.isArray(topLosers) ? topLosers : [];
+
   const loadData = useCallback(() => {
     dispatch(fetchMarketSummaryThunk());
     dispatch(fetchTopGainersThunk({ limit: 6 }));
@@ -84,8 +88,8 @@ function Dashboard() {
 
   /* Build KPI stats from live market summary */
   const ms = marketSummary?.data || marketSummary;
-  const gainersTop = topGainers[0];
-  const losersTop  = topLosers[0];
+  const gainersTop = safeTopGainers[0];
+  const losersTop  = safeTopLosers[0];
 
   const stats = [
     {
@@ -204,8 +208,8 @@ function Dashboard() {
           <div className="placeholder-list" role="list" aria-label="Top gaining coins">
             {loading
               ? Array.from({ length: 5 }).map((_, i) => <CoinRowSkeleton key={i} />)
-              : topGainers.length > 0
-                ? topGainers.slice(0, 6).map((coin, i) => <CoinListRow key={coin._id || i} coin={coin} />)
+              : safeTopGainers.length > 0
+                ? safeTopGainers.slice(0, 6).map((coin, i) => <CoinListRow key={coin._id || i} coin={coin} />)
                 : (
                   <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                     No gainers data available.
@@ -213,7 +217,7 @@ function Dashboard() {
                 )
             }
           </div>
-          {topGainers.length > 0 && (
+          {safeTopGainers.length > 0 && (
             <Link
               to="/analytics"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', marginTop: '1rem', fontSize: '0.82rem', color: '#6366f1', textDecoration: 'none', fontWeight: 600 }}
@@ -232,8 +236,8 @@ function Dashboard() {
           <div className="placeholder-list" role="list" aria-label="Top losing coins">
             {loading
               ? Array.from({ length: 5 }).map((_, i) => <CoinRowSkeleton key={i} />)
-              : topLosers.length > 0
-                ? topLosers.slice(0, 6).map((coin, i) => <CoinListRow key={coin._id || i} coin={coin} />)
+              : safeTopLosers.length > 0
+                ? safeTopLosers.slice(0, 6).map((coin, i) => <CoinListRow key={coin._id || i} coin={coin} />)
                 : (
                   <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                     No losers data available.
@@ -241,7 +245,7 @@ function Dashboard() {
                 )
             }
           </div>
-          {topLosers.length > 0 && (
+          {safeTopLosers.length > 0 && (
             <Link
               to="/analytics"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', marginTop: '1rem', fontSize: '0.82rem', color: '#6366f1', textDecoration: 'none', fontWeight: 600 }}

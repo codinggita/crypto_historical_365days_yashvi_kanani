@@ -124,7 +124,7 @@ function Admin() {
                   <table className="admin-table">
                     <thead><tr><th>#</th><th>Query</th><th>Count</th></tr></thead>
                     <tbody>
-                      {(analytics.search.topQueries || analytics.search || []).slice(0, 10).map((q, i) => (
+                      {Array.isArray(analytics.search.topQueries || analytics.search) && (analytics.search.topQueries || analytics.search).slice(0, 10).map((q, i) => (
                         <tr key={i}>
                           <td style={{ color: '#4b5563' }}>{i + 1}</td>
                           <td style={{ fontFamily: 'monospace' }}>{q.query || q.term || q._id || '—'}</td>
@@ -254,7 +254,7 @@ function Admin() {
                   </div>
                   {loading
                     ? <div className="admin-skeleton" style={{ height: '6rem', borderRadius: '10px' }} />
-                    : analytics?.[key]
+                    : analytics?.[key] && typeof analytics[key] === 'object'
                       ? (
                           <div className="admin-health-card" style={{ background: 'transparent', border: 'none', padding: 0 }}>
                             {Object.entries(analytics[key]).slice(0, 6).map(([k, v]) => (

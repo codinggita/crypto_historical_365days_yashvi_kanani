@@ -43,7 +43,9 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 function buildChartData(priceTrend, priceGrowth, priceDrop) {
-  const trendCoins = priceTrend?.data?.topTrenders ?? priceTrend?.data?.data?.topTrenders ?? [];
+  const trendCoins = Array.isArray(priceTrend?.data?.topTrenders ?? priceTrend?.data?.data?.topTrenders ?? [])
+    ? (priceTrend?.data?.topTrenders ?? priceTrend?.data?.data?.topTrenders ?? [])
+    : [];
   const growthCoins = Array.isArray(priceGrowth?.data)
     ? priceGrowth.data
     : Array.isArray(priceGrowth?.data?.data) ? priceGrowth.data.data : [];
