@@ -40,7 +40,7 @@ function extractCoins(raw) {
 }
 
 function VolumeAnalytics({ highestVolume, lowestVolume, averageVolume, volumeSpike }) {
-  const spikeCoins = extractCoins(volumeSpike).slice(0, 8);
+  const spikeCoins = Array.isArray(extractCoins(volumeSpike)) ? extractCoins(volumeSpike).slice(0, 8) : [];
 
   const chartData = spikeCoins.length > 0
     ? spikeCoins.map((c) => ({

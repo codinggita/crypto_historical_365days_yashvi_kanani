@@ -22,7 +22,7 @@ function HistoricalTable({ history }) {
 
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return sortedHistory.slice(start, start + PAGE_SIZE);
+    return Array.isArray(sortedHistory) ? sortedHistory.slice(start, start + PAGE_SIZE) : [];
   }, [sortedHistory, currentPage]);
 
   if (sortedHistory.length === 0) {
