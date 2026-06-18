@@ -15,15 +15,28 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// ── CORS ── Allow Vite dev server + any localhost origin
+// ── CORS ── Allow Vite dev server + production frontend
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    // Allow any localhost / 127.0.0.1 port
+    
+    // Allow any localhost / 127.0.0.1 port (development)
     if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
       return callback(null, true);
     }
+    
+    // Allow production frontend URL from environment variable
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow all origins in development mode
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
     callback(new Error("Not allowed by CORS"));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

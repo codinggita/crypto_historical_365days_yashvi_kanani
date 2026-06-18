@@ -93,9 +93,8 @@ router.head("/", (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// JWT Authenticated Routes
+// Public Routes (No authentication required)
 // ─────────────────────────────────────────────────────────────────────────────
-router.use(verifyJWT);
 
 // Specific named / parameterless endpoints first to avoid parameter collision
 router.route("/latest").get(getLatestCoins);
@@ -131,10 +130,14 @@ router.route("/system/version").get(getSystemVersion);
 router.route("/system/config").get(getSystemConfig);
 router.route("/report").post(submitReport);
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin Protected Routes (JWT + Admin Role required)
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Bulk operations
-router.route("/bulk-create").post(authorizeRoles("admin"), bulkCreateCoins);
-router.route("/bulk-update").patch(authorizeRoles("admin"), bulkUpdateCoins);
-router.route("/bulk-delete").delete(authorizeRoles("admin"), bulkDeleteCoins);
+router.route("/bulk-create").post(verifyJWT, authorizeRoles("admin"), bulkCreateCoins);
+router.route("/bulk-update").patch(verifyJWT, authorizeRoles("admin"), bulkUpdateCoins);
+router.route("/bulk-delete").delete(verifyJWT, authorizeRoles("admin"), bulkDeleteCoins);
 
 // Existence checks
 router.route("/exists/:id").get(checkCoinExists);
@@ -206,7 +209,7 @@ router.route("/history/:coinId/:month").get(getCoinHistoryByMonth);
 router
   .route("/")
   .get(queryCoinValidator(), getAllCoins)
-  .post(authorizeRoles("admin"), createCoinValidator(), createCoin);
+  .post(verifyJWT, authorizeRoles("admin"), createCoinValidator(), createCoin);
 
 // Resource routes with dynamic id parameter
 router
@@ -216,8 +219,8 @@ router
     res.status(200).end();
   })
   .get(getCoinById)
-  .patch(authorizeRoles("admin"), updateCoinValidator(), updateCoin)
-  .put(authorizeRoles("admin"), createCoinValidator(), replaceCoin)
-  .delete(authorizeRoles("admin"), deleteCoin);
+  .patch(verifyJWT, authorizeRoles("admin"), updateCoinValidator(), updateCoin)
+  .put(verifyJWT, authorizeRoles("admin"), createCoinValidator(), replaceCoin)
+  .delete(verifyJWT, authorizeRoles("admin"), deleteCoin);
 
 export default router;
