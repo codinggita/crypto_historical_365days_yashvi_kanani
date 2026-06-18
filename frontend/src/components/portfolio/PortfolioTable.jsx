@@ -155,7 +155,7 @@ export function PortfolioTable({
                     <td>
                       <div className="coin-cell">
                         <div className="coin-icon-placeholder">
-                          {holding.symbol?.slice(0, 3)}
+                          {typeof holding.symbol === 'string' ? holding.symbol.slice(0, 3) : '???'}
                         </div>
                         <div className="coin-info">
                           <span className="coin-name-display">{holding.coinName}</span>

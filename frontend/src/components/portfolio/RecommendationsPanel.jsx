@@ -22,23 +22,26 @@ export function RecommendationsPanel({ recommendations }) {
     return 'Low';
   };
 
+  // Ensure recommendations is an array
+  const safeRecommendations = Array.isArray(recommendations) ? recommendations : [];
+
   return (
     <div className="glass-panel" style={{ width: '100%' }}>
       <div className="panel-header">
         <h2>Recommended Assets</h2>
       </div>
 
-      {recommendations.length === 0 ? (
+      {safeRecommendations.length === 0 ? (
         <div className="empty-state" style={{ border: 'none', padding: '2rem 0' }}>
           <p>No suggested recommendations available at this time.</p>
         </div>
       ) : (
         <div className="recommendations-list">
-          {recommendations.map((coin) => (
+          {safeRecommendations.map((coin) => (
             <div key={coin._id} className="recommendation-card">
               <div className="coin-cell">
                 <div className="coin-icon-placeholder">
-                  {coin.symbol?.slice(0, 3)}
+                  {typeof coin.symbol === 'string' ? coin.symbol.slice(0, 3) : '???'}
                 </div>
                 <div className="coin-info">
                   <span className="coin-name-display">{coin.name}</span>
