@@ -54,13 +54,13 @@ function buildChartData(priceTrend, priceGrowth, priceDrop) {
     : Array.isArray(priceDrop?.data?.data) ? priceDrop.data.data : [];
 
   // Build unified chart data from trendCoins
-  return trendCoins.slice(0, 10).map((coin, idx) => ({
+  return Array.isArray(trendCoins) ? trendCoins.slice(0, 10).map((coin, idx) => ({
     name: coin?.symbol ?? coin?.name ?? `Coin ${idx + 1}`,
     price: parseFloat(coin?.price ?? 0),
     marketCap: parseFloat(coin?.marketCap ?? 0),
     volume: parseFloat(coin?.volume ?? 0),
     dailyReturn: parseFloat(coin?.dailyReturn ?? 0),
-  }));
+  })) : [];
 }
 
 function MarketTrendChart({ priceTrend, priceGrowth, priceDrop }) {
