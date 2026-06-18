@@ -14,5 +14,7 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "buildCommand": "echo 'No build command needed for Node.js backend'",
+  "outputDirectory": "."
 }
