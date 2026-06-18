@@ -38,6 +38,9 @@ export function Portfolio() {
   const [quantity, setQuantity] = useState('');
   const [buyPrice, setBuyPrice] = useState('');
 
+  // Ensure allCoins is an array
+  const safeAllCoins = Array.isArray(allCoins) ? allCoins : [];
+
   const loadData = useCallback(async () => {
     dispatch(fetchStart());
     try {
@@ -122,9 +125,9 @@ export function Portfolio() {
   };
 
   const handleFirstAddOpen = () => {
-    if (allCoins.length > 0) {
-      setSelectedCoinId(allCoins[0].coinId);
-      setBuyPrice(allCoins[0].price.toString());
+    if (safeAllCoins.length > 0) {
+      setSelectedCoinId(safeAllCoins[0].coinId);
+      setBuyPrice(safeAllCoins[0].price.toString());
     }
     setQuantity('');
     setIsFirstAddOpen(true);
@@ -249,12 +252,12 @@ export function Portfolio() {
                   onChange={(e) => {
                     const cid = e.target.value;
                     setSelectedCoinId(cid);
-                    const coin = allCoins.find((c) => c.coinId === cid);
+                    const coin = safeAllCoins.find((c) => c.coinId === cid);
                     if (coin) setBuyPrice(coin.price.toString());
                   }}
                   required
                 >
-                  {allCoins.map((coin) => (
+                  {safeAllCoins.map((coin) => (
                     <option key={coin._id} value={coin.coinId}>
                       {coin.name} ({coin.symbol})
                     </option>
