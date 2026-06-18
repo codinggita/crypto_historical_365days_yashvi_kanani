@@ -38,9 +38,7 @@ import authorizeRoles from "../../middlewares/role.middleware.js";
 
 const router = Router();
 
-// Apply JWT verification globally — all analytics routes are protected
-router.use(verifyJWT);
-
+// All analytics endpoints are public (no authentication required)
 // HEAD route for highest price analytics
 router.head("/price/highest", (req, res) => {
   res.set("X-Highest-Price-Analytics", "true");
@@ -71,7 +69,7 @@ router.get("/returns/cumulative", getCumulativeReturns);
 router.get("/volatility/high", getHighVolatilityCoins);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PUBLIC (any authenticated user)
+// PUBLIC ENDPOINTS
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Master dashboard — combines all analytics in a single call
@@ -90,20 +88,20 @@ router.get("/market/summary", getMarketSummary);
 router.get("/market/category-distribution", getCategoryDistribution);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ADMIN ONLY — RBAC protected with authorizeRoles("admin")
+// ADMIN ONLY — RBAC protected with verifyJWT + authorizeRoles("admin")
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Platform overview (admin sees user counts, admin count, system-wide stats)
-router.get("/overview", authorizeRoles("admin"), getOverview);
+router.get("/overview", verifyJWT, authorizeRoles("admin"), getOverview);
 
 // User growth analytics
-router.get("/users/growth", authorizeRoles("admin"), getUserGrowth);
+router.get("/users/growth", verifyJWT, authorizeRoles("admin"), getUserGrowth);
 
 // Bookmark/interest stats
-router.get("/bookmarks/stats", authorizeRoles("admin"), getBookmarkStats);
+router.get("/bookmarks/stats", verifyJWT, authorizeRoles("admin"), getBookmarkStats);
 
 // System health monitoring
-router.get("/system/health", authorizeRoles("admin"), getSystemHealth);
+router.get("/system/health", verifyJWT, authorizeRoles("admin"), getSystemHealth);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LEGACY ROUTES — kept for backward compatibility with existing API consumers
@@ -115,8 +113,8 @@ router.get("/highest-marketcap", getHighestMarketCap);
 router.get("/highest-volume", getHighestVolume);
 router.get("/volatility/high-legacy", getHighVolatility);
 router.get("/price-ranges", getPriceRanges);
-router.get("/monthly-report", authorizeRoles("admin"), getMonthlyReport);
-router.get("/yearly-report", authorizeRoles("admin"), getYearlyReport);
+router.get("/monthly-report", verifyJWT, authorizeRoles("admin"), getMonthlyReport);
+router.get("/yearly-report", verifyJWT, authorizeRoles("admin"), getYearlyReport);
 router.get("/market-summary", getMarketSummary);
 
 export default router;
