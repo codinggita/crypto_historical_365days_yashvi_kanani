@@ -24,7 +24,7 @@ const coinDetailsSlice = createSlice({
     fetchSuccess: (state, action) => {
       const { coinDetails, history, performance, returns, volatility } = action.payload;
       if (coinDetails !== undefined) state.coinDetails = coinDetails;
-      if (history !== undefined) state.history = history;
+      if (history !== undefined) state.history = Array.isArray(history) ? history : [];
       if (performance !== undefined) state.performance = performance;
       if (returns !== undefined) state.returns = returns;
       if (volatility !== undefined) state.volatility = volatility;
