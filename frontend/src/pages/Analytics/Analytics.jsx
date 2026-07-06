@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
+import { FiAlertTriangle, FiRefreshCw, FiTrendingUp, FiTrendingDown, FiActivity } from 'react-icons/fi';
 import {
   fetchStart,
   fetchSuccess,
@@ -33,6 +33,7 @@ const RANGE_OPTIONS = [
 function Analytics() {
   const dispatch = useDispatch();
   const { analyticsData, loading, error, selectedRange } = useSelector((s) => s.analytics);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const fetchAll = useCallback(async () => {
     dispatch(fetchStart());
@@ -71,8 +72,8 @@ function Analytics() {
         analyticsService.getCumulativeReturns(),
         analyticsService.getHighVolatility(),
         analyticsService.getStatsMarketSummary(),
-        analyticsService.getStatsTopGainers({ limit: 10 }),
-        analyticsService.getStatsTopLosers({ limit: 10 }),
+        analyticsService.getStatsTopGainers({ limit: 15 }),
+        analyticsService.getStatsTopLosers({ limit: 15 }),
       ]);
 
       const resolved = (r) => (r.status === 'fulfilled' ? r.value : null);
@@ -80,26 +81,27 @@ function Analytics() {
       dispatch(
         fetchSuccess({
           analyticsData: {
-            highestPrice:    resolved(highestPrice),
-            lowestPrice:     resolved(lowestPrice),
-            averagePrice:    resolved(averagePrice),
-            priceTrend:      resolved(priceTrend),
-            priceGrowth:     resolved(priceGrowth),
-            priceDrop:       resolved(priceDrop),
-            highestVolume:   resolved(highestVolume),
-            lowestVolume:    resolved(lowestVolume),
-            averageVolume:   resolved(averageVolume),
-            volumeSpike:     resolved(volumeSpike),
-            topReturns:      resolved(topReturns),
-            negativeReturns: resolved(negativeReturns),
-            cumulativeReturns: resolved(cumulativeReturns),
-            highVolatility:  resolved(highVolatility),
+            highestPrice:     resolved(highestPrice),
+            lowestPrice:      resolved(lowestPrice),
+            averagePrice:     resolved(averagePrice),
+            priceTrend:       resolved(priceTrend),
+            priceGrowth:      resolved(priceGrowth),
+            priceDrop:        resolved(priceDrop),
+            highestVolume:    resolved(highestVolume),
+            lowestVolume:     resolved(lowestVolume),
+            averageVolume:    resolved(averageVolume),
+            volumeSpike:      resolved(volumeSpike),
+            topReturns:       resolved(topReturns),
+            negativeReturns:  resolved(negativeReturns),
+            cumulativeReturns:resolved(cumulativeReturns),
+            highVolatility:   resolved(highVolatility),
           },
           marketSummary: resolved(statsMarketSummary),
           topGainers:    resolved(statsTopGainers),
           topLosers:     resolved(statsTopLosers),
         })
       );
+      setLastUpdated(new Date());
     } catch (err) {
       dispatch(fetchFailure(err?.message ?? 'Failed to load analytics data'));
     }
@@ -144,24 +146,81 @@ function Analytics() {
 
   const d = analyticsData ?? {};
 
-  /* overview card data mapped per key */
+  // Extract cumulative summary for market sentiment bar
+  const cumData = d.cumulativeReturns?.data ?? {};
+  const avgReturn = cumData?.averageDailyReturn ?? 0;
+  const bullish   = cumData?.bullishCoins ?? 0;
+  const bearish   = cumData?.bearishCoins ?? 0;
+  const isBullish = avgReturn >= 0;
+
   const overviewData = {
-    highestPrice:  d.highestPrice,
-    lowestPrice:   d.lowestPrice,
-    averagePrice:  d.averagePrice,
-    highestVolume: d.highestVolume,
-    topReturn:     d.topReturns,
-    highVolatility:d.highVolatility,
+    highestPrice:   d.highestPrice,
+    lowestPrice:    d.lowestPrice,
+    averagePrice:   d.averagePrice,
+    highestVolume:  d.highestVolume,
+    topReturn:      d.topReturns,
+    highVolatility: d.highVolatility,
   };
 
   return (
     <div>
       {/* Page Header */}
-      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
-        <h1 className="page-title">Market Analytics</h1>
-        <p className="page-subtitle">
-          Real-time crypto intelligence — prices, volumes, returns &amp; risk metrics
-        </p>
+      <div className="page-header" style={{ marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <h1 className="page-title">Market Analytics</h1>
+            <p className="page-subtitle">
+              Real-time crypto intelligence — prices, volumes, returns &amp; risk metrics
+            </p>
+          </div>
+          {lastUpdated && (
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Market Sentiment Strip */}
+      <div className="analytics-sentiment-strip">
+        <div className="sentiment-item">
+          <span className="sentiment-label">Market Sentiment</span>
+          <span className={`sentiment-value ${isBullish ? 'bullish' : 'bearish'}`}>
+            {isBullish ? <FiTrendingUp /> : <FiTrendingDown />}
+            {isBullish ? ' Bullish' : ' Bearish'}
+          </span>
+        </div>
+        <div className="sentiment-divider" />
+        <div className="sentiment-item">
+          <span className="sentiment-label">Avg Daily Return</span>
+          <span className={`sentiment-value ${avgReturn >= 0 ? 'bullish' : 'bearish'}`}>
+            {avgReturn >= 0 ? '+' : ''}{parseFloat(avgReturn).toFixed(2)}%
+          </span>
+        </div>
+        <div className="sentiment-divider" />
+        <div className="sentiment-item">
+          <FiTrendingUp style={{ color: '#10b981', fontSize: '0.9rem' }} />
+          <span className="sentiment-label">Bullish</span>
+          <span className="sentiment-value bullish">{bullish.toLocaleString()}</span>
+        </div>
+        <div className="sentiment-item">
+          <FiTrendingDown style={{ color: '#ef4444', fontSize: '0.9rem' }} />
+          <span className="sentiment-label">Bearish</span>
+          <span className="sentiment-value bearish">{bearish.toLocaleString()}</span>
+        </div>
+        <div className="sentiment-divider" />
+        <div className="sentiment-item">
+          <span className="sentiment-label">Est. Monthly</span>
+          <span className={`sentiment-value ${(avgReturn * 30) >= 0 ? 'bullish' : 'bearish'}`}>
+            {(avgReturn * 30) >= 0 ? '+' : ''}{(parseFloat(avgReturn) * 30).toFixed(1)}%
+          </span>
+        </div>
+        <div style={{ marginLeft: 'auto' }}>
+          <button className="analytics-refresh-btn" onClick={fetchAll} title="Refresh all data">
+            <FiRefreshCw style={{ marginRight: '0.35rem' }} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Time Range Selector */}
@@ -176,14 +235,6 @@ function Analytics() {
             {r.label}
           </button>
         ))}
-        <button
-          className="range-btn"
-          style={{ marginLeft: 'auto' }}
-          onClick={fetchAll}
-          title="Refresh data"
-        >
-          <FiRefreshCw />
-        </button>
       </div>
 
       {/* Section 1: Overview Cards */}

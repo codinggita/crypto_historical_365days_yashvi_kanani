@@ -22,7 +22,6 @@ const NAV_LINKS = [
   { to: '/dashboard',  label: 'Dashboard',  icon: <FiGrid /> },
   { to: '/coins',      label: 'Coins',       icon: <FiDollarSign /> },
   { to: '/analytics',  label: 'Analytics',   icon: <FiBarChart2 /> },
-  { to: '/stats',      label: 'Statistics',  icon: <FiPieChart /> },
   { to: '/watchlist',  label: 'Watchlist',   icon: <FiBookmark /> },
   { to: '/portfolio',  label: 'Portfolio',   icon: <FiBriefcase /> },
   { to: '/profile',    label: 'Profile',     icon: <FiUser /> },

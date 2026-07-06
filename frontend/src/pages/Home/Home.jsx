@@ -339,7 +339,6 @@ function Home() {
             <Link to="/" className="home-footer-link">Home</Link>
             <Link to="/coins" className="home-footer-link">Coins</Link>
             <Link to="/analytics" className="home-footer-link">Analytics</Link>
-            <Link to="/stats" className="home-footer-link">Statistics</Link>
             <Link to="/portfolio" className="home-footer-link">Portfolio</Link>
             <Link to="/watchlist" className="home-footer-link">Watchlist</Link>
           </nav>
