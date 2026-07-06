@@ -13,9 +13,26 @@ const apiClient = axios.create({
   },
 });
 
-// Request Interceptor: Automatically attach JWT token
+// Request Interceptor: Automatically attach JWT token and normalize URLs
 apiClient.interceptors.request.use(
   (config) => {
+    // Normalize relative URLs to avoid duplicate /api/v1 prefixes or missing ones
+    if (config.url && !config.url.startsWith('http://') && !config.url.startsWith('https://')) {
+      let cleanUrl = config.url.startsWith('/') ? config.url : `/${config.url}`;
+      
+      const hasBaseV1 = config.baseURL && (config.baseURL.endsWith('/api/v1') || config.baseURL.endsWith('/api/v1/'));
+      if (hasBaseV1 && cleanUrl.startsWith('/api/v1')) {
+        cleanUrl = cleanUrl.substring(7); // Remove the "/api/v1" prefix
+      }
+      
+      const baseHasV1 = config.baseURL && config.baseURL.includes('/api/v1');
+      if (!baseHasV1 && !cleanUrl.startsWith('/api/v1')) {
+        cleanUrl = `/api/v1${cleanUrl}`;
+      }
+      
+      config.url = cleanUrl;
+    }
+
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

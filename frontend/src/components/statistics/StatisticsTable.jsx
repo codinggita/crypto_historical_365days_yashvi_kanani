@@ -5,6 +5,10 @@ import { formatPrice, formatLargeNumber, formatPercent } from '../../utils/forma
 function StatisticsTable({ topGainers = [], topLosers = [], highestCap, highestVolume }) {
   const [activeTab, setActiveTab] = useState('performance');
 
+  // Ensure arrays are properly initialized
+  const safeTopGainers = Array.isArray(topGainers) ? topGainers : [];
+  const safeTopLosers = Array.isArray(topLosers) ? topLosers : [];
+
   return (
     <div className="statistics-section">
       <div className="statistics-section-header">
@@ -53,12 +57,12 @@ function StatisticsTable({ topGainers = [], topLosers = [], highestCap, highestV
                     </tr>
                   </thead>
                   <tbody>
-                    {topGainers.length === 0 ? (
+                    {safeTopGainers.length === 0 ? (
                       <tr>
                         <td colSpan="3" className="empty-cell">No gainers data available</td>
                       </tr>
                     ) : (
-                      topGainers.slice(0, 5).map((coin) => (
+                      safeTopGainers.slice(0, 5).map((coin) => (
                         <tr key={coin.coinId || coin._id}>
                           <td>
                             <div className="coin-cell">
@@ -92,12 +96,12 @@ function StatisticsTable({ topGainers = [], topLosers = [], highestCap, highestV
                     </tr>
                   </thead>
                   <tbody>
-                    {topLosers.length === 0 ? (
+                    {safeTopLosers.length === 0 ? (
                       <tr>
                         <td colSpan="3" className="empty-cell">No losers data available</td>
                       </tr>
                     ) : (
-                      topLosers.slice(0, 5).map((coin) => (
+                      safeTopLosers.slice(0, 5).map((coin) => (
                         <tr key={coin.coinId || coin._id}>
                           <td>
                             <div className="coin-cell">

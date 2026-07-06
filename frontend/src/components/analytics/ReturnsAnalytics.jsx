@@ -35,19 +35,19 @@ const ReturnTooltip = ({ active, payload, label }) => {
 };
 
 function ReturnsAnalytics({ topReturns, negativeReturns, cumulativeReturns }) {
-  const topList  = extractList(topReturns).slice(0, 8);
-  const negList  = extractList(negativeReturns).slice(0, 8);
+  const topList  = Array.isArray(extractList(topReturns)) ? extractList(topReturns).slice(0, 8) : [];
+  const negList  = Array.isArray(extractList(negativeReturns)) ? extractList(negativeReturns).slice(0, 8) : [];
 
   const cumulative = cumulativeReturns?.data ?? cumulativeReturns?.data?.data;
   const avgReturn  = cumulative?.averageDailyReturn ?? 0;
   const estMonthly = cumulative?.estimatedMonthlyReturn ?? avgReturn * 30;
 
   // Build chart data from top vs negative
-  const chartData = topList.slice(0, 6).map((c, i) => ({
+  const chartData = Array.isArray(topList) ? topList.slice(0, 6).map((c, i) => ({
     name: c.symbol ?? c.name ?? `#${i + 1}`,
     topReturn: parseFloat(c.dailyReturn ?? 0),
     negReturn: negList[i] ? Math.abs(parseFloat(negList[i].dailyReturn ?? 0)) : 0,
-  }));
+  })) : [];
 
   return (
     <div className="analytics-section">

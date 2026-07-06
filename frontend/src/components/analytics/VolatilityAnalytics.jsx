@@ -45,7 +45,7 @@ function getRiskLabel(volatility) {
 }
 
 function VolatilityAnalytics({ highVolatility }) {
-  const coins = extractList(highVolatility).slice(0, 10);
+  const coins = Array.isArray(extractList(highVolatility)) ? extractList(highVolatility).slice(0, 10) : [];
 
   const chartData = coins.map((c) => ({
     name: c.symbol ?? c.name ?? '?',

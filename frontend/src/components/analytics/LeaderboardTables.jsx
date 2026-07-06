@@ -55,8 +55,8 @@ function LeaderboardTables({ topGainers, topLosers }) {
   const [losersPage,  setLosersPage]  = useState(1);
   const PAGE_SIZE = 10;
 
-  const gainers = extractList(topGainers);
-  const losers  = extractList(topLosers);
+  const gainers = Array.isArray(extractList(topGainers)) ? extractList(topGainers) : [];
+  const losers  = Array.isArray(extractList(topLosers)) ? extractList(topLosers) : [];
 
   const paginatedGainers = gainers.slice(0, gainersPage * PAGE_SIZE);
   const paginatedLosers  = losers.slice(0, losersPage * PAGE_SIZE);

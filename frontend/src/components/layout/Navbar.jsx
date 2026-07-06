@@ -53,7 +53,7 @@ function Navbar() {
 
   // Build avatar initials from user name or email
   const getInitials = () => {
-    if (user?.name) {
+    if (user?.name && typeof user.name === 'string') {
       return user.name
         .split(' ')
         .map((n) => n[0])

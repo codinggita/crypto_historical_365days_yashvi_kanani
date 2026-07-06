@@ -37,6 +37,13 @@ const corsOptions = {
       return callback(null, true);
     }
     
+    // Allow all origins in production for Vercel deployment (temporary fix)
+    // TODO: Restrict to specific origins once deployment is stable
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(`CORS: Allowing origin ${origin} in production mode`);
+      return callback(null, true);
+    }
+    
     callback(new Error("Not allowed by CORS"));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

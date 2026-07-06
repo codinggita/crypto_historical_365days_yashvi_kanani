@@ -50,7 +50,7 @@ const coinSlice = createSlice({
   reducers: {
     setCoins: (state, action) => {
       const { data, pagination } = action.payload;
-      state.coins = data || action.payload;
+      state.coins = Array.isArray(data) ? data : Array.isArray(action.payload) ? action.payload : [];
       if (pagination) {
         state.pagination = {
           ...state.pagination,
@@ -121,10 +121,10 @@ const coinSlice = createSlice({
       state.marketSummaryLoading = false;
     },
     setTopGainers: (state, action) => {
-      state.topGainers = action.payload;
+      state.topGainers = Array.isArray(action.payload) ? action.payload : [];
     },
     setTopLosers: (state, action) => {
-      state.topLosers = action.payload;
+      state.topLosers = Array.isArray(action.payload) ? action.payload : [];
     },
   },
 });

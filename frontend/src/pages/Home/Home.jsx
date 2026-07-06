@@ -93,6 +93,10 @@ function Home() {
   const { marketSummary, topGainers, topLosers, loading, marketSummaryLoading } = useSelector((s) => s.coins);
   const { user, isAuthenticated } = useSelector((s) => s.auth);
 
+  // Ensure arrays are properly initialized
+  const safeTopGainers = Array.isArray(topGainers) ? topGainers : [];
+  const safeTopLosers = Array.isArray(topLosers) ? topLosers : [];
+
   const [trending, setTrending] = React.useState([]);
   const [trendingLoading, setTrendingLoading] = React.useState(false);
 
@@ -243,8 +247,8 @@ function Home() {
             </div>
             {loading
               ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
-              : topGainers.length > 0
-                ? topGainers.slice(0, 5).map((c, i) => <CoinRow key={c._id || i} coin={c} />)
+              : safeTopGainers.length > 0
+                ? safeTopGainers.slice(0, 5).map((c, i) => <CoinRow key={c._id || i} coin={c} />)
                 : <div style={{ padding: '1.5rem', color: 'var(--text-muted)', textAlign: 'center', fontSize: '0.875rem' }}>No gainers data available.</div>
             }
           </div>
@@ -257,8 +261,8 @@ function Home() {
             </div>
             {loading
               ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
-              : topLosers.length > 0
-                ? topLosers.slice(0, 5).map((c, i) => <CoinRow key={c._id || i} coin={c} />)
+              : safeTopLosers.length > 0
+                ? safeTopLosers.slice(0, 5).map((c, i) => <CoinRow key={c._id || i} coin={c} />)
                 : <div style={{ padding: '1.5rem', color: 'var(--text-muted)', textAlign: 'center', fontSize: '0.875rem' }}>No losers data available.</div>
             }
           </div>
