@@ -35,7 +35,77 @@
   line-height: 1.5;
 }
 
+
+/* ─── Market Sentiment Strip ─────────────────────────────── */
+.analytics-sentiment-strip {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1.25rem;
+  background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(16,185,129,0.06));
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+}
+
+.sentiment-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sentiment-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sentiment-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sentiment-value.bullish { color: #10b981; }
+.sentiment-value.bearish { color: #ef4444; }
+
+.sentiment-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-color);
+  flex-shrink: 0;
+}
+
+.analytics-refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.analytics-refresh-btn:hover {
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--accent-primary, #6366f1);
+  background: rgba(99,102,241,0.08);
+}
+
 /* ─── Range Selector ─────────────────────────────────────── */
+
 .analytics-range-bar {
   display: flex;
   align-items: center;

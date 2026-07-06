@@ -38,12 +38,15 @@ function ReturnsAnalytics({ topReturns, negativeReturns, cumulativeReturns }) {
   const topList  = Array.isArray(extractList(topReturns)) ? extractList(topReturns).slice(0, 8) : [];
   const negList  = Array.isArray(extractList(negativeReturns)) ? extractList(negativeReturns).slice(0, 8) : [];
 
-  const cumulative = cumulativeReturns?.data ?? cumulativeReturns?.data?.data;
-  const avgReturn  = cumulative?.averageDailyReturn ?? 0;
-  const estMonthly = cumulative?.estimatedMonthlyReturn ?? avgReturn * 30;
+  const cumulative = cumulativeReturns?.data ?? cumulativeReturns?.data?.data ?? {};
+  const avgReturn   = cumulative?.averageDailyReturn ?? 0;
+  const estMonthly  = cumulative?.estimatedMonthlyReturn ?? avgReturn * 30;
+  const estYearly   = cumulative?.estimatedYearlyReturn ?? avgReturn * 365;
+  const bullish     = cumulative?.bullishCoins ?? 0;
+  const bearish     = cumulative?.bearishCoins ?? 0;
 
   // Build chart data from top vs negative
-  const chartData = Array.isArray(topList) ? topList.slice(0, 6).map((c, i) => ({
+  const chartData = Array.isArray(topList) ? topList.slice(0, 8).map((c, i) => ({
     name: c.symbol ?? c.name ?? `#${i + 1}`,
     topReturn: parseFloat(c.dailyReturn ?? 0),
     negReturn: negList[i] ? Math.abs(parseFloat(negList[i].dailyReturn ?? 0)) : 0,
@@ -66,24 +69,31 @@ function ReturnsAnalytics({ topReturns, negativeReturns, cumulativeReturns }) {
         <div className="vol-metric-card">
           <span className="vol-metric-label">Avg Daily Return</span>
           <span className={`vol-metric-value ${parseFloat(avgReturn) >= 0 ? 'text-green' : 'text-red'}`}>
-            {formatPercent(avgReturn)}
+            {parseFloat(avgReturn) >= 0 ? '+' : ''}{formatPercent(avgReturn)}
           </span>
         </div>
         <div className="vol-metric-card">
           <span className="vol-metric-label">Est. Monthly Return</span>
           <span className={`vol-metric-value ${parseFloat(estMonthly) >= 0 ? 'text-green' : 'text-red'}`}>
-            {formatPercent(estMonthly)}
+            {parseFloat(estMonthly) >= 0 ? '+' : ''}{formatPercent(estMonthly)}
           </span>
         </div>
         <div className="vol-metric-card">
-          <span className="vol-metric-label">Top Performers</span>
-          <span className="vol-metric-value text-indigo">{topList.length}</span>
+          <span className="vol-metric-label">Est. Yearly Return</span>
+          <span className={`vol-metric-value ${parseFloat(estYearly) >= 0 ? 'text-green' : 'text-red'}`}>
+            {parseFloat(estYearly) >= 0 ? '+' : ''}{formatPercent(estYearly)}
+          </span>
         </div>
         <div className="vol-metric-card">
-          <span className="vol-metric-label">Underperformers</span>
-          <span className="vol-metric-value text-red">{negList.length}</span>
+          <span className="vol-metric-label">Bullish / Bearish</span>
+          <span className="vol-metric-value">
+            <span className="text-green">{bullish.toLocaleString()}</span>
+            <span style={{ color: 'var(--text-muted)', margin: '0 4px' }}>/</span>
+            <span className="text-red">{bearish.toLocaleString()}</span>
+          </span>
         </div>
       </div>
+
 
       {/* Returns Chart */}
       <div className="analytics-chart-card" style={{ marginTop: '1.5rem' }}>

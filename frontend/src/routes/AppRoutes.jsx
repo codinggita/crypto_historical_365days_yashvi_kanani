@@ -14,7 +14,6 @@ const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
 const Coins = lazy(() => import('../pages/Coins/Coins'));
 const CoinDetails = lazy(() => import('../pages/CoinDetails/CoinDetails'));
 const Analytics = lazy(() => import('../pages/Analytics/Analytics'));
-const Stats = lazy(() => import('../pages/Stats/Stats'));
 const Watchlist = lazy(() => import('../pages/Watchlist/Watchlist'));
 const Portfolio = lazy(() => import('../pages/Portfolio/Portfolio'));
 const Login = lazy(() => import('../pages/Login/Login'));
@@ -89,22 +88,7 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/stats"
-            element={
-              <ProtectedRoute>
-                <Stats />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/statistics"
-            element={
-              <ProtectedRoute>
-                <Stats />
-              </ProtectedRoute>
-            }
-          />
+
           <Route
             path="/watchlist"
             element={

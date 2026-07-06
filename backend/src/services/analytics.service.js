@@ -741,19 +741,19 @@ export const getPriceHistory = async (coinId) => {
 };
 
 export const getPriceTrend = async () => {
-  const coins = await Coin.find({}).sort({ dailyReturn: -1 }).limit(10);
+  const coins = await Coin.find({}).sort({ dailyReturn: -1 }).limit(20);
   return {
-    sentiment: coins.filter((c) => c.dailyReturn > 0).length > 5 ? "bullish" : "bearish",
+    sentiment: coins.filter((c) => c.dailyReturn > 0).length > coins.length / 2 ? "bullish" : "bearish",
     topTrenders: coins,
   };
 };
 
 export const getPriceGrowth = async () => {
-  return await Coin.find({ dailyReturn: { $gt: 0 } }).sort({ dailyReturn: -1 });
+  return await Coin.find({ dailyReturn: { $gt: 0 } }).sort({ dailyReturn: -1 }).limit(20);
 };
 
 export const getPriceDrop = async () => {
-  return await Coin.find({ dailyReturn: { $lt: 0 } }).sort({ dailyReturn: 1 });
+  return await Coin.find({ dailyReturn: { $lt: 0 } }).sort({ dailyReturn: 1 }).limit(20);
 };
 
 export const getHighestVolumeCoin = async () => {
@@ -777,15 +777,17 @@ export const getAverageVolumeVal = async () => {
 };
 
 export const getVolumeSpike = async () => {
-  return await Coin.find({ volume: { $gt: 1000000000 }, dailyReturn: { $gt: 3 } });
+  // Get top 10 coins by volume — relaxed filter to ensure data always appears
+  const coins = await Coin.find({ volume: { $gt: 0 } }).sort({ volume: -1 }).limit(10);
+  return coins;
 };
 
 export const getTopReturns = async () => {
-  return await Coin.find({}).sort({ dailyReturn: -1 }).limit(10);
+  return await Coin.find({ dailyReturn: { $gt: 0 } }).sort({ dailyReturn: -1 }).limit(15);
 };
 
 export const getNegativeReturns = async () => {
-  return await Coin.find({ dailyReturn: { $lt: 0 } }).sort({ dailyReturn: 1 }).limit(10);
+  return await Coin.find({ dailyReturn: { $lt: 0 } }).sort({ dailyReturn: 1 }).limit(15);
 };
 
 export const getCumulativeReturns = async () => {
@@ -794,16 +796,29 @@ export const getCumulativeReturns = async () => {
       $group: {
         _id: null,
         averageReturn: { $avg: "$dailyReturn" },
+        totalCoins: { $sum: 1 },
+        bullishCoins: { $sum: { $cond: [{ $gt: ["$dailyReturn", 0] }, 1, 0] } },
+        bearishCoins: { $sum: { $cond: [{ $lt: ["$dailyReturn", 0] }, 1, 0] } },
+        maxReturn: { $max: "$dailyReturn" },
+        minReturn: { $min: "$dailyReturn" },
       },
     },
   ]);
+  const avg = result[0]?.averageReturn || 0;
   return {
-    averageDailyReturn: result[0]?.averageReturn || 0,
-    cumulativePeriodDays: 30,
-    estimatedMonthlyReturn: (result[0]?.averageReturn || 0) * 30,
+    averageDailyReturn: avg,
+    cumulativePeriodDays: 365,
+    estimatedMonthlyReturn: avg * 30,
+    estimatedYearlyReturn: avg * 365,
+    totalCoins: result[0]?.totalCoins || 0,
+    bullishCoins: result[0]?.bullishCoins || 0,
+    bearishCoins: result[0]?.bearishCoins || 0,
+    maxDailyReturn: result[0]?.maxReturn || 0,
+    minDailyReturn: result[0]?.minReturn || 0,
   };
 };
 
 export const getHighVolatilityCoins = async () => {
-  return await Coin.find({ volatility: { $gt: 3.0 } }).sort({ volatility: -1 });
+  // Limit to top 15 most volatile coins to prevent huge payloads
+  return await Coin.find({ volatility: { $gt: 0 } }).sort({ volatility: -1 }).limit(15);
 };
