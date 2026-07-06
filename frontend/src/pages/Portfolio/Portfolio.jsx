@@ -60,12 +60,24 @@ export function Portfolio() {
         portfolioService.getRecommendations(),
       ]);
 
-      const holdingsData = holdingsRes.status === 'fulfilled' ? holdingsRes.value.items : [];
-      const summaryData = summaryRes.status === 'fulfilled' ? summaryRes.value : null;
-      const distData = distRes.status === 'fulfilled' ? distRes.value : [];
-      const historyData = historyRes.status === 'fulfilled' ? historyRes.value : [];
-      const coinsData = coinsRes.status === 'fulfilled' ? coinsRes.value.coins : [];
-      const recsData = recsRes.status === 'fulfilled' ? recsRes.value : [];
+      const holdingsData = holdingsRes.status === 'fulfilled'
+        ? holdingsRes.value?.data?.items || holdingsRes.value?.items || []
+        : [];
+      const summaryData = summaryRes.status === 'fulfilled'
+        ? summaryRes.value?.data || summaryRes.value
+        : null;
+      const distData = distRes.status === 'fulfilled'
+        ? distRes.value?.data || distRes.value || []
+        : [];
+      const historyData = historyRes.status === 'fulfilled'
+        ? historyRes.value?.data || historyRes.value || []
+        : [];
+      const coinsData = coinsRes.status === 'fulfilled'
+        ? coinsRes.value?.data?.coins || coinsRes.value?.coins || []
+        : [];
+      const recsData = recsRes.status === 'fulfilled'
+        ? recsRes.value?.data || recsRes.value || []
+        : [];
 
       setAllCoins(coinsData);
       setAllocation(distData);
