@@ -255,7 +255,10 @@ const seedDB = async () => {
 
     const uniqueCoinsFound = Object.keys(coinGroups).length;
 
-    await mongoose.connect(mongoUri);
+    const isAtlas = mongoUri.includes("mongodb+srv");
+    await mongoose.connect(mongoUri, {
+      ...(isAtlas && { tlsAllowInvalidCertificates: true }),
+    });
     console.log("Database Connected\n");
     console.log("Dataset Loaded Successfully\n");
 
