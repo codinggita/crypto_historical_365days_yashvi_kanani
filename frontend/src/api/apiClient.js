@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Retrieve base URL from Vite environment variables
-const baseURL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+// Retrieve base URL from Vite environment variables (fallback to local backend port 5000)
+const baseURL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 // Create a reusable Axios instance
 const apiClient = axios.create({
