@@ -101,9 +101,17 @@ function Home() {
   const [trendingLoading, setTrendingLoading] = React.useState(false);
 
   useEffect(() => {
-    dispatch(fetchMarketSummaryThunk());
-    dispatch(fetchTopGainersThunk({ limit: 5 }));
-    dispatch(fetchTopLosersThunk({ limit: 5 }));
+    if (!marketSummary && !marketSummaryLoading) {
+      dispatch(fetchMarketSummaryThunk());
+    }
+    if (safeTopGainers.length === 0 && !loading) {
+      dispatch(fetchTopGainersThunk({ limit: 5 }));
+    }
+    if (safeTopLosers.length === 0 && !loading) {
+      dispatch(fetchTopLosersThunk({ limit: 5 }));
+    }
+
+    if (trending.length > 0) return;
 
     const loadTrending = async () => {
       setTrendingLoading(true);
@@ -117,6 +125,7 @@ function Home() {
       }
     };
     loadTrending();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   const marketCards = useMemo(() => {

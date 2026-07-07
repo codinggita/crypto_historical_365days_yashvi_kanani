@@ -3,16 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import {
-  FiMenu,
-  FiSearch,
-  FiSun,
-  FiMoon,
-  FiBell,
-  FiUser,
-  FiSettings,
-  FiLogOut,
-  FiChevronDown,
-} from 'react-icons/fi';
+  Menu,
+  Search,
+  Sun,
+  Moon,
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  ChevronDown,
+  Clock,
+} from 'lucide-react';
 import { toggleSidebar, changeTheme } from '../../redux/slices/uiSlice';
 import { logout } from '../../redux/slices/authSlice';
 import authService from '../../services/auth.service';
@@ -25,9 +26,14 @@ function Navbar() {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
   const dropdownRef = useRef(null);
 
-  // Close dropdown on outside click
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -51,7 +57,6 @@ function Navbar() {
     navigate('/login');
   };
 
-  // Build avatar initials from user name or email
   const getInitials = () => {
     if (user?.name && typeof user.name === 'string') {
       return user.name
@@ -66,27 +71,31 @@ function Navbar() {
 
   const displayName = user?.name || user?.email || 'User';
 
+  const formatTime = (date) =>
+    date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+  const formatDate = (date) =>
+    date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+
   return (
     <header className="navbar" role="banner">
-      {/* Hamburger — mobile only */}
       <button
         className="navbar-hamburger"
         onClick={() => dispatch(toggleSidebar())}
         aria-label="Toggle navigation menu"
         aria-expanded={false}
       >
-        <FiMenu />
+        <Menu size={20} />
       </button>
 
-      {/* Search bar */}
       <div className="navbar-search" role="search">
         <div className="navbar-search-inner">
-          <FiSearch className="navbar-search-icon" aria-hidden="true" />
+          <Search className="navbar-search-icon" aria-hidden="true" size={16} />
           <input
             id="navbar-search"
             type="search"
             className="navbar-search-input"
-            placeholder="Search coins, markets…"
+            placeholder="Search assets, analytics…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search cryptocurrencies"
@@ -94,29 +103,35 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Right-side actions */}
+      <div className="navbar-market-status" title="Crypto Markets Connection Status">
+        <span className="market-dot" />
+        <span>Live Trading</span>
+      </div>
+
+      <div className="navbar-clock" title="System Time (UTC+05:30)">
+        <Clock size={12} className="text-muted" />
+        <span>{formatDate(currentTime)} • {formatTime(currentTime)}</span>
+      </div>
+
       <div className="navbar-actions">
-        {/* Theme toggle */}
         <button
           className="navbar-icon-btn"
           onClick={handleThemeToggle}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
         >
-          {theme === 'dark' ? <FiSun /> : <FiMoon />}
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        {/* Notification */}
         <button
           className="navbar-icon-btn"
           aria-label="Notifications"
           title="Notifications"
         >
-          <FiBell />
+          <Bell size={18} />
           <span className="navbar-notif-dot" aria-hidden="true" />
         </button>
 
-        {/* Profile dropdown */}
         <div className="navbar-profile" ref={dropdownRef}>
           <button
             className="navbar-avatar-btn"
@@ -129,11 +144,11 @@ function Navbar() {
               {getInitials()}
             </div>
             <span className="navbar-avatar-name">{displayName}</span>
-            <FiChevronDown
+            <ChevronDown
               size={14}
               style={{
-                color: 'var(--text-muted-layout)',
-                transition: 'transform 0.2s',
+                color: 'var(--text-muted)',
+                transition: 'transform 0.3s',
                 transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
               }}
               aria-hidden="true"
@@ -141,14 +156,19 @@ function Navbar() {
           </button>
 
           {dropdownOpen && (
-            <div className="navbar-dropdown" role="menu">
+            <div className="navbar-dropdown navbar-dropdown--open" role="menu">
+              <div style={{ padding: '0.5rem 0.85rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
+              </div>
+
               <Link
                 to="/profile"
                 className="navbar-dropdown-item"
                 role="menuitem"
                 onClick={() => setDropdownOpen(false)}
               >
-                <FiUser size={15} aria-hidden="true" />
+                <User size={14} aria-hidden="true" />
                 Profile
               </Link>
               <Link
@@ -157,7 +177,7 @@ function Navbar() {
                 role="menuitem"
                 onClick={() => setDropdownOpen(false)}
               >
-                <FiSettings size={15} aria-hidden="true" />
+                <Settings size={14} aria-hidden="true" />
                 Settings
               </Link>
               <div className="navbar-dropdown-divider" role="separator" />
@@ -166,7 +186,7 @@ function Navbar() {
                 role="menuitem"
                 onClick={handleLogout}
               >
-                <FiLogOut size={15} aria-hidden="true" />
+                <LogOut size={14} aria-hidden="true" />
                 Logout
               </button>
             </div>

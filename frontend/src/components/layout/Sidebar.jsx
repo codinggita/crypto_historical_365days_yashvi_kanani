@@ -3,28 +3,28 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import {
-  FiGrid,
-  FiBarChart2,
-  FiDollarSign,
-  FiBookmark,
-  FiPieChart,
-  FiUser,
-  FiLogOut,
-  FiLayers,
-  FiBriefcase,
-  FiShield,
-} from 'react-icons/fi';
+  LayoutGrid,
+  Coins,
+  TrendingUp,
+  Bookmark,
+  Briefcase,
+  User,
+  LogOut,
+  Hexagon,
+  Shield,
+  X
+} from 'lucide-react';
 import { setSidebarOpen } from '../../redux/slices/uiSlice';
 import { logout } from '../../redux/slices/authSlice';
 import authService from '../../services/auth.service';
 
 const NAV_LINKS = [
-  { to: '/dashboard',  label: 'Dashboard',  icon: <FiGrid /> },
-  { to: '/coins',      label: 'Coins',       icon: <FiDollarSign /> },
-  { to: '/analytics',  label: 'Analytics',   icon: <FiBarChart2 /> },
-  { to: '/watchlist',  label: 'Watchlist',   icon: <FiBookmark /> },
-  { to: '/portfolio',  label: 'Portfolio',   icon: <FiBriefcase /> },
-  { to: '/profile',    label: 'Profile',     icon: <FiUser /> },
+  { to: '/dashboard',  label: 'Dashboard',  icon: LayoutGrid, prefetch: () => import('../../pages/Dashboard/Dashboard') },
+  { to: '/coins',      label: 'Coins',       icon: Coins, prefetch: () => import('../../pages/Coins/Coins') },
+  { to: '/analytics',  label: 'Analytics',   icon: TrendingUp, prefetch: () => import('../../pages/Analytics/Analytics') },
+  { to: '/watchlist',  label: 'Watchlist',   icon: Bookmark, prefetch: () => import('../../pages/Watchlist/Watchlist') },
+  { to: '/portfolio',  label: 'Portfolio',   icon: Briefcase, prefetch: () => import('../../pages/Portfolio/Portfolio') },
+  { to: '/profile',    label: 'Profile',     icon: User, prefetch: () => import('../../pages/Profile/Profile') },
 ];
 
 function Sidebar() {
@@ -46,7 +46,6 @@ function Sidebar() {
 
   return (
     <>
-      {/* Overlay (mobile) */}
       {sidebarOpen && (
         <div
           className="sidebar-overlay"
@@ -59,59 +58,89 @@ function Sidebar() {
         className={`sidebar${sidebarOpen ? ' sidebar-open' : ''}`}
         aria-label="Main navigation"
       >
-        {/* Logo */}
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">
-            <FiLayers size={16} />
+            <Hexagon size={18} className="animate-pulse" />
           </div>
-          <span className="sidebar-logo-text">CryptoVerseX</span>
+          <span className="sidebar-logo-text title-gradient">CryptoVerseX</span>
+
+          <button
+            onClick={closeSidebar}
+            className="navbar-hamburger"
+            style={{ display: 'none', marginLeft: 'auto', padding: '0.2rem' }}
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        {/* Navigation */}
         <nav className="sidebar-nav" aria-label="Primary navigation">
           <span className="sidebar-section-label">Main Menu</span>
-          {NAV_LINKS.map(({ to, label, icon }) => (
+          {NAV_LINKS.map(({ to, label, icon: IconComponent, prefetch }) => (
             <NavLink
               key={to}
               to={to}
               onClick={closeSidebar}
+              onMouseEnter={() => prefetch?.()}
               className={({ isActive }) =>
                 `sidebar-link${isActive ? ' active' : ''}`
               }
               aria-label={label}
             >
-              <span className="sidebar-link-icon" aria-hidden="true">{icon}</span>
-              {label}
+              {({ isActive }) => (
+                <>
+                  <span className="sidebar-link-icon" aria-hidden="true">
+                    <IconComponent size={18} color={isActive ? '#00e5ff' : undefined} />
+                  </span>
+                  {label}
+                  {isActive && (
+                    <div
+                      className="sidebar-active-glow"
+                      aria-hidden="true"
+                    />
+                  )}
+                </>
+              )}
             </NavLink>
           ))}
 
-          {/* Admin link — visible only to admins */}
           {user?.role === 'admin' && (
             <>
-              <span className="sidebar-section-label" style={{ marginTop: '1rem' }}>Admin</span>
+              <span className="sidebar-section-label" style={{ marginTop: '1.25rem' }}>Admin</span>
               <NavLink
                 to="/admin"
                 onClick={closeSidebar}
+                onMouseEnter={() => import('../../pages/Admin/Admin')}
                 className={({ isActive }) =>
                   `sidebar-link sidebar-link--admin${isActive ? ' active' : ''}`
                 }
                 aria-label="Admin Panel"
               >
-                <span className="sidebar-link-icon" aria-hidden="true"><FiShield /></span>
-                Admin Panel
+                {({ isActive }) => (
+                  <>
+                    <span className="sidebar-link-icon" aria-hidden="true">
+                      <Shield size={18} color={isActive ? '#00e5ff' : undefined} />
+                    </span>
+                    Admin Panel
+                    {isActive && (
+                      <div className="sidebar-active-glow" aria-hidden="true" />
+                    )}
+                  </>
+                )}
               </NavLink>
             </>
           )}
         </nav>
 
-        {/* Logout */}
         <div className="sidebar-footer">
           <button
             className="sidebar-logout-btn"
             onClick={handleLogout}
             aria-label="Log out"
           >
-            <span className="sidebar-link-icon" aria-hidden="true"><FiLogOut /></span>
+            <span className="sidebar-link-icon" aria-hidden="true">
+              <LogOut size={18} />
+            </span>
             Logout
           </button>
         </div>

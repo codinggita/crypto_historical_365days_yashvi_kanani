@@ -208,7 +208,7 @@
 .admin-kpi-card--emerald{ --kpi-accent: #10b981; --kpi-bg: rgba(16,185,129,0.12); }
 .admin-kpi-card--rose   { --kpi-accent: #ef4444; --kpi-bg: rgba(239,68,68,0.12); }
 .admin-kpi-card--cyan   { --kpi-accent: #06b6d4; --kpi-bg: rgba(6,182,212,0.12); }
-.admin-kpi-card--purple { --kpi-accent: #a855f7; --kpi-bg: rgba(168,85,247,0.12); }
+.admin-kpi-card--purple { --kpi-accent: #00e5ff; --kpi-bg: rgba(0, 229, 255, 0.12); }
 
 /* ── Charts Grid ── */
 .admin-charts-grid {

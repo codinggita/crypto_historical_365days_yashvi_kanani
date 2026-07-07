@@ -35,8 +35,10 @@ import {
 } from "../../controllers/analytics.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 import authorizeRoles from "../../middlewares/role.middleware.js";
+import { cacheMiddleware } from "../../middlewares/cache.middleware.js";
 
 const router = Router();
+const analyticsCache = cacheMiddleware(60);
 
 // All analytics endpoints are public (no authentication required)
 // HEAD route for highest price analytics
@@ -73,18 +75,18 @@ router.get("/volatility/high", getHighVolatilityCoins);
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Master dashboard — combines all analytics in a single call
-router.get("/dashboard", getDashboard);
+router.get("/dashboard", analyticsCache, getDashboard);
 
 // Coin analytics
-router.get("/coins/top-gainers", getTopGainers);
-router.get("/coins/top-losers", getTopLosers);
-router.get("/coins/trending", getTrendingCoins);
+router.get("/coins/top-gainers", analyticsCache, getTopGainers);
+router.get("/coins/top-losers", analyticsCache, getTopLosers);
+router.get("/coins/trending", analyticsCache, getTrendingCoins);
 
 // Search trend analytics
 router.get("/search/trends", getSearchTrends);
 
 // Market analytics
-router.get("/market/summary", getMarketSummary);
+router.get("/market/summary", analyticsCache, getMarketSummary);
 router.get("/market/category-distribution", getCategoryDistribution);
 
 // ─────────────────────────────────────────────────────────────────────────────
