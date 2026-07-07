@@ -1,17 +1,42 @@
-# 🚀 CryptoVerseX
-
 <div align="center">
 
+<img src="https://img.shields.io/badge/CryptoVerseX-Real--Time%20Crypto%20Market%20Analytics-0f172a?style=for-the-badge&logo=bitcoin&logoColor=f59e0b" alt="CryptoVerseX Banner" width="100%"/>
+
+# 🚀 CryptoVerseX
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 [![React](https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react)](https://react.dev/)
+[![Redux Toolkit](https://img.shields.io/badge/Redux-Toolkit-purple?style=flat-square&logo=redux)](https://redux-toolkit.js.org/)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-🍃-13aa52?style=flat-square&logo=mongodb)](https://mongodb.com/)
+
+### *Advanced Cryptocurrency Market Intelligence Platform*
+
+**Enterprise-Grade MERN Stack Crypto Analytics Dashboard** — Real-time cryptocurrency tracking, analytics, portfolio simulation, market intelligence, and historical data insights powered by MongoDB aggregation pipelines.
+
+<br/>
+
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-Web%20App-2563eb?style=for-the-badge)](https://crypto-historical-365days-yashvi-ka.vercel.app/)
+[![Frontend](https://img.shields.io/badge/▲%20Vercel-Frontend%20Deploy-000000?style=for-the-badge&logo=vercel)](https://crypto-historical-365days-yashvi-ka.vercel.app/)
+[![Backend](https://img.shields.io/badge/🚀%20Vercel-Backend%20API-000000?style=for-the-badge&logo=vercel)](https://cryptoversex-backend.vercel.app/)
+[![MongoDB](https://img.shields.io/badge/🍃%20MongoDB-Atlas-13aa52?style=for-the-badge&logo=mongodb)](https://mongodb.com/)
+[![GitHub Repo](https://img.shields.io/badge/⭐%20GitHub-Source%20Code-181717?style=for-the-badge&logo=github)](https://github.com/kananiyashvi180-svg/crypto_historical_365days_yashvi_kanani)
+
+<br/>
+
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Redux Toolkit](https://img.shields.io/badge/Redux%20Toolkit-764ABC?style=flat-square&logo=redux&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
+![MUI](https://img.shields.io/badge/MUI-007FFF?style=flat-square&logo=mui&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat-square&logo=axios&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
 
 </div>
-
----
-
-CryptoVerseX is a modern MERN Stack cryptocurrency analytics platform that provides historical market insights, real-time market statistics, advanced filtering, portfolio tracking, watchlists, and interactive dashboards through a responsive web interface.
 
 ---
 
@@ -50,7 +75,7 @@ CryptoVerseX solves this by combining cryptocurrency analytics, historical data,
 - **Portfolio**: Personal portfolio tracker showing asset counts and simulated worth.
 - **Watchlist**: Custom watchlist to monitor price fluctuations of preferred coins.
 - **Responsive Design**: Responsive layout designed to look premium on all viewports.
-- **REST API**: Robust API routing structure to access historical and aggregated analytical data.
+- **REST API**: Robust API routing structure to access historical and aggregated data.
 - **Secure Backend**: Input validation, password hashing, and secured HTTP headers.
 
 ---
@@ -76,7 +101,7 @@ CryptoVerseX solves this by combining cryptocurrency analytics, historical data,
 
 ### Tools
 - **Postman** - Automated API documentation and routing test suite
-- **Git & GitHub** - Collaborative source code version control
+- **Git & GitHub** - Version control
 - **Vercel** - Hosting serverless deployment infrastructure
 
 ---
