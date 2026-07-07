@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiRefreshCw, FiList, FiGrid, FiTrendingUp } from 'react-icons/fi';
+import { motion } from 'framer-motion';
+import { RefreshCw, List, Grid, TrendingUp } from 'lucide-react';
 
 // Redux
 import {
@@ -94,11 +95,9 @@ function Coins() {
       };
 
       const response = await coinService.getCoins(params);
-      // Server returns: { success, data: { coins, pagination }, meta }
       const raw = response?.data || response;
 
       if (Array.isArray(raw)) {
-        // Fallback: bare array — no server-side pagination
         dispatch(setCoins({
           data: raw,
           pagination: {
@@ -113,7 +112,6 @@ function Coins() {
         return;
       }
 
-      // New API shape: data.coins + data.pagination
       const coinArray     = raw?.coins ?? raw?.data?.coins ?? [];
       const paginationObj = raw?.pagination ?? raw?.data?.pagination;
 
@@ -127,7 +125,6 @@ function Coins() {
             hasPrevPage: paginationObj.hasPrevPage  ?? false,
           }
         : {
-            // Legacy shape: flat fields at root
             page:        raw?.page        ?? pagination.page,
             limit:       raw?.limit       ?? pagination.limit,
             total:       raw?.total       ?? raw?.totalCoins ?? coinArray.length,
@@ -164,7 +161,6 @@ function Coins() {
   /* ── Handlers ── */
   const handleFilterChange = (updates) => {
     if ('limit' in updates) {
-      // Limit changes must reset page to 1 via setLimit (not setFilters)
       dispatch(setLimit(Number(updates.limit)));
     } else {
       dispatch(setFilters(updates));
@@ -190,54 +186,72 @@ function Coins() {
   const startRecord = totalCoins === 0 ? 0 : (pagination.page - 1) * pagination.limit + 1;
   const endRecord   = Math.min(pagination.page * pagination.limit, totalCoins);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="coins-page">
+    <motion.div 
+      className="coins-page"
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+    >
       {/* ── Page Header ── */}
       <div className="coins-header">
         <div className="coins-header-row">
           <div>
-            <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <FiTrendingUp style={{ color: '#818cf8' }} />
-              Cryptocurrencies
+            <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+              <TrendingUp className="text-primary" size={26} />
+              <span className="title-gradient">Cryptocurrencies</span>
             </h1>
             <p className="page-subtitle">
               Live market data, prices, market caps, volume, and 24h performance.
             </p>
           </div>
-          <button
+          <motion.button
             id="coin-refresh-btn"
-            className="btn-reset-filter"
+            className="btn-secondary"
             onClick={handleRefresh}
-            style={{
-              background:  'rgba(99,102,241,0.08)',
-              borderColor: 'rgba(99,102,241,0.2)',
-              color:       '#a5b4fc',
-              display:     'flex',
-              alignItems:  'center',
-              gap:         '0.4rem',
-            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.55rem 1.1rem', fontSize: '0.85rem' }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <FiRefreshCw style={{ fontSize: '0.85rem' }} />
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Refresh
-          </button>
+          </motion.button>
         </div>
       </div>
 
       {/* ── Market Summary ── */}
-      {marketSummaryLoading
-        ? <MarketSummarySkeleton />
-        : <MarketSummaryCards summary={marketSummary} />
-      }
+      {marketSummaryLoading ? (
+        <MarketSummarySkeleton />
+      ) : (
+        <motion.div variants={itemVariants}>
+          <MarketSummaryCards summary={marketSummary} />
+        </motion.div>
+      )}
 
       {/* ── Filters ── */}
-      <CoinFilters
-        filters={{ ...filters, limit: pagination.limit }}
-        onFilterChange={handleFilterChange}
-        onReset={handleResetFilters}
-      />
+      <motion.div variants={itemVariants}>
+        <CoinFilters
+          filters={{ ...filters, limit: pagination.limit }}
+          onFilterChange={handleFilterChange}
+          onReset={handleResetFilters}
+        />
+      </motion.div>
 
       {/* ── Content Header ── */}
-      <div className="coins-content-header">
+      <motion.div className="coins-content-header" variants={itemVariants}>
         <div className="coins-count-label">
           {loading ? (
             'Loading…'
@@ -258,7 +272,7 @@ function Coins() {
             onClick={() => handleViewMode('table')}
             title="Table view"
           >
-            <FiList />
+            <List size={18} />
           </button>
           <button
             id="view-toggle-grid"
@@ -266,45 +280,49 @@ function Coins() {
             onClick={() => handleViewMode('grid')}
             title="Grid view"
           >
-            <FiGrid />
+            <Grid size={18} />
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* ── Main Content ── */}
-      {loading ? (
-        <LoadingSkeleton viewMode={viewMode} rows={pagination.limit} cards={pagination.limit} />
-      ) : error ? (
-        <ErrorState message={error} onRetry={handleRefresh} />
-      ) : coins.length === 0 ? (
-        <EmptyState hasFilters={!!hasActiveFilters} onReset={handleResetFilters} />
-      ) : viewMode === 'grid' ? (
-        <div className="coin-grid">
-          {coins.map((coin, i) => (
-            <CoinCard key={coin._id || coin.id || i} coin={coin} index={i} />
-          ))}
-        </div>
-      ) : (
-        <CoinTable
-          coins={coins}
-          sortBy={filters.sortBy}
-          sortOrder={filters.sortOrder}
-          onSort={handleSort}
-        />
-      )}
+      <motion.div variants={itemVariants} style={{ minHeight: '300px' }}>
+        {loading ? (
+          <LoadingSkeleton viewMode={viewMode} rows={pagination.limit} cards={pagination.limit} />
+        ) : error ? (
+          <ErrorState message={error} onRetry={handleRefresh} />
+        ) : coins.length === 0 ? (
+          <EmptyState hasFilters={!!hasActiveFilters} onReset={handleResetFilters} />
+        ) : viewMode === 'grid' ? (
+          <div className="coin-grid">
+            {coins.map((coin, i) => (
+              <CoinCard key={coin._id || coin.id || i} coin={coin} index={i} />
+            ))}
+          </div>
+        ) : (
+          <CoinTable
+            coins={coins}
+            sortBy={filters.sortBy}
+            sortOrder={filters.sortOrder}
+            onSort={handleSort}
+          />
+        )}
+      </motion.div>
 
       {/* ── Pagination ── */}
       {!loading && !error && totalCoins > 0 && (
-        <Pagination
-          page={pagination.page}
-          totalPages={totalPages}
-          totalItems={totalCoins}
-          limit={pagination.limit}
-          onPageChange={handlePageChange}
-          onLimitChange={(val) => handleFilterChange({ limit: val })}
-        />
+        <motion.div variants={itemVariants}>
+          <Pagination
+            page={pagination.page}
+            totalPages={totalPages}
+            totalItems={totalCoins}
+            limit={pagination.limit}
+            onPageChange={handlePageChange}
+            onLimitChange={(val) => handleFilterChange({ limit: val })}
+          />
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

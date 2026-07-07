@@ -14,6 +14,12 @@ function MainLayout() {
 
   return (
     <div className="app-shell">
+      {/* Premium Layered Background Decorations */}
+      <div className="bg-glowing-dots" aria-hidden="true">
+        <div className="bg-glow-circle-1" />
+        <div className="bg-glow-circle-2" />
+      </div>
+
       <Sidebar />
       <div className="main-content">
         <Navbar />
@@ -26,4 +32,3 @@ function MainLayout() {
 }
 
 export default MainLayout;
-

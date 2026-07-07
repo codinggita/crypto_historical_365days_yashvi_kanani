@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
-import { FiAlertTriangle } from 'react-icons/fi';
+import { motion } from 'framer-motion';
+import { AlertTriangle } from 'lucide-react';
 import authService from '../../services/auth.service';
 import { setUser, setLoading, setError } from '../../redux/slices/authSlice';
 
@@ -35,20 +36,15 @@ function Login() {
         password: data.password,
       });
 
-      // The API response is wrapped in ApiResponse: { success: true, data: { user, token } }
       const { user, token } = response.data;
 
-      // Handle Remember Me
       if (data.rememberMe) {
         localStorage.setItem('rememberedEmail', data.email);
       } else {
         localStorage.removeItem('rememberedEmail');
       }
 
-      // Store JWT token
       localStorage.setItem('token', token);
-
-      // Dispatch details to Redux
       dispatch(setUser({ user, token }));
 
       toast.success('Successfully logged in!');
@@ -73,10 +69,14 @@ function Login() {
       </div>
 
       {error && (
-        <div className="auth-error-banner">
-          <FiAlertTriangle size={18} style={{ flexShrink: 0 }} />
+        <motion.div 
+          className="auth-error-banner"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <AlertTriangle size={18} style={{ flexShrink: 0 }} />
           <span>{error}</span>
-        </div>
+        </motion.div>
       )}
 
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
@@ -150,7 +150,13 @@ function Login() {
         </div>
 
         {/* Submit Button */}
-        <button type="submit" className="btn-submit" disabled={loading}>
+        <motion.button 
+          type="submit" 
+          className="btn-submit" 
+          disabled={loading}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
           {loading ? (
             <>
               <div className="spinner" />
@@ -159,7 +165,7 @@ function Login() {
           ) : (
             'Log In'
           )}
-        </button>
+        </motion.button>
       </form>
     </div>
   );

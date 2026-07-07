@@ -2,29 +2,30 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
+import { motion } from 'framer-motion';
 import {
-  FiGrid,
-  FiBarChart2,
-  FiDollarSign,
-  FiBookmark,
-  FiPieChart,
-  FiUser,
-  FiLogOut,
-  FiLayers,
-  FiBriefcase,
-  FiShield,
-} from 'react-icons/fi';
+  LayoutGrid,
+  Coins,
+  TrendingUp,
+  Bookmark,
+  Briefcase,
+  User,
+  LogOut,
+  Hexagon,
+  Shield,
+  X
+} from 'lucide-react';
 import { setSidebarOpen } from '../../redux/slices/uiSlice';
 import { logout } from '../../redux/slices/authSlice';
 import authService from '../../services/auth.service';
 
 const NAV_LINKS = [
-  { to: '/dashboard',  label: 'Dashboard',  icon: <FiGrid /> },
-  { to: '/coins',      label: 'Coins',       icon: <FiDollarSign /> },
-  { to: '/analytics',  label: 'Analytics',   icon: <FiBarChart2 /> },
-  { to: '/watchlist',  label: 'Watchlist',   icon: <FiBookmark /> },
-  { to: '/portfolio',  label: 'Portfolio',   icon: <FiBriefcase /> },
-  { to: '/profile',    label: 'Profile',     icon: <FiUser /> },
+  { to: '/dashboard',  label: 'Dashboard',  icon: LayoutGrid },
+  { to: '/coins',      label: 'Coins',       icon: Coins },
+  { to: '/analytics',  label: 'Analytics',   icon: TrendingUp },
+  { to: '/watchlist',  label: 'Watchlist',   icon: Bookmark },
+  { to: '/portfolio',  label: 'Portfolio',   icon: Briefcase },
+  { to: '/profile',    label: 'Profile',     icon: User },
 ];
 
 function Sidebar() {
@@ -62,15 +63,25 @@ function Sidebar() {
         {/* Logo */}
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">
-            <FiLayers size={16} />
+            <Hexagon size={18} className="animate-pulse" />
           </div>
-          <span className="sidebar-logo-text">CryptoVerseX</span>
+          <span className="sidebar-logo-text title-gradient">CryptoVerseX</span>
+          
+          {/* Close button on mobile */}
+          <button 
+            onClick={closeSidebar} 
+            className="navbar-hamburger" 
+            style={{ display: 'none', marginLeft: 'auto', padding: '0.2rem' }}
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Navigation */}
         <nav className="sidebar-nav" aria-label="Primary navigation">
           <span className="sidebar-section-label">Main Menu</span>
-          {NAV_LINKS.map(({ to, label, icon }) => (
+          {NAV_LINKS.map(({ to, label, icon: IconComponent }) => (
             <NavLink
               key={to}
               to={to}
@@ -80,15 +91,41 @@ function Sidebar() {
               }
               aria-label={label}
             >
-              <span className="sidebar-link-icon" aria-hidden="true">{icon}</span>
-              {label}
+              {({ isActive }) => (
+                <>
+                  <motion.span 
+                    className="sidebar-link-icon" 
+                    aria-hidden="true"
+                    whileHover={{ scale: 1.12, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  >
+                    <IconComponent size={18} color={isActive ? "#00e5ff" : undefined} />
+                  </motion.span>
+                  {label}
+                  {isActive && (
+                    <motion.div 
+                      layoutId="activeGlow" 
+                      className="absolute inset-0 w-full h-full rounded-xl"
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'rgba(0, 229, 255, 0.04)',
+                        border: '1px solid rgba(0, 229, 255, 0.12)',
+                        zIndex: -1,
+                        pointerEvents: 'none'
+                      }}
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </>
+              )}
             </NavLink>
           ))}
 
           {/* Admin link — visible only to admins */}
           {user?.role === 'admin' && (
             <>
-              <span className="sidebar-section-label" style={{ marginTop: '1rem' }}>Admin</span>
+              <span className="sidebar-section-label" style={{ marginTop: '1.25rem' }}>Admin</span>
               <NavLink
                 to="/admin"
                 onClick={closeSidebar}
@@ -97,8 +134,34 @@ function Sidebar() {
                 }
                 aria-label="Admin Panel"
               >
-                <span className="sidebar-link-icon" aria-hidden="true"><FiShield /></span>
-                Admin Panel
+                {({ isActive }) => (
+                  <>
+                    <motion.span 
+                      className="sidebar-link-icon" 
+                      aria-hidden="true"
+                      whileHover={{ scale: 1.12, rotate: -5 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    >
+                      <Shield size={18} color={isActive ? "#00e5ff" : undefined} />
+                    </motion.span>
+                    Admin Panel
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeGlow" 
+                        className="absolute inset-0 w-full h-full rounded-xl"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'rgba(0, 229, 255, 0.04)',
+                          border: '1px solid rgba(0, 229, 255, 0.12)',
+                          zIndex: -1,
+                          pointerEvents: 'none'
+                        }}
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </>
+                )}
               </NavLink>
             </>
           )}
@@ -106,14 +169,18 @@ function Sidebar() {
 
         {/* Logout */}
         <div className="sidebar-footer">
-          <button
+          <motion.button
             className="sidebar-logout-btn"
             onClick={handleLogout}
             aria-label="Log out"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <span className="sidebar-link-icon" aria-hidden="true"><FiLogOut /></span>
+            <span className="sidebar-link-icon" aria-hidden="true">
+              <LogOut size={18} />
+            </span>
             Logout
-          </button>
+          </motion.button>
         </div>
       </aside>
     </>

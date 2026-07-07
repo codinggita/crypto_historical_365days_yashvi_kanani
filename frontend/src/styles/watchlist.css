@@ -113,7 +113,7 @@
 .watchlist-analytic-icon.indigo { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
 .watchlist-analytic-icon.emerald { background: rgba(16, 185, 129, 0.15); color: #10b981; }
 .watchlist-analytic-icon.amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.watchlist-analytic-icon.purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+.watchlist-analytic-icon.purple { background: rgba(0, 229, 255, 0.15); color: #00e5ff; }
 
 /* ─── Filters & Search ───────────────────────────────────── */
 .watchlist-filters-card {

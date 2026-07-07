@@ -2,17 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FiMenu,
-  FiSearch,
-  FiSun,
-  FiMoon,
-  FiBell,
-  FiUser,
-  FiSettings,
-  FiLogOut,
-  FiChevronDown,
-} from 'react-icons/fi';
+  Menu,
+  Search,
+  Sun,
+  Moon,
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  ChevronDown,
+  Clock,
+  Activity
+} from 'lucide-react';
 import { toggleSidebar, changeTheme } from '../../redux/slices/uiSlice';
 import { logout } from '../../redux/slices/authSlice';
 import authService from '../../services/auth.service';
@@ -25,7 +28,16 @@ function Navbar() {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
   const dropdownRef = useRef(null);
+
+  // Update clock every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -51,7 +63,7 @@ function Navbar() {
     navigate('/login');
   };
 
-  // Build avatar initials from user name or email
+  // Build avatar initials
   const getInitials = () => {
     if (user?.name && typeof user.name === 'string') {
       return user.name
@@ -66,6 +78,15 @@ function Navbar() {
 
   const displayName = user?.name || user?.email || 'User';
 
+  // Format date and time
+  const formatTime = (date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
   return (
     <header className="navbar" role="banner">
       {/* Hamburger — mobile only */}
@@ -75,18 +96,18 @@ function Navbar() {
         aria-label="Toggle navigation menu"
         aria-expanded={false}
       >
-        <FiMenu />
+        <Menu size={20} />
       </button>
 
       {/* Search bar */}
       <div className="navbar-search" role="search">
         <div className="navbar-search-inner">
-          <FiSearch className="navbar-search-icon" aria-hidden="true" />
+          <Search className="navbar-search-icon" aria-hidden="true" size={16} />
           <input
             id="navbar-search"
             type="search"
             className="navbar-search-input"
-            placeholder="Search coins, markets…"
+            placeholder="Search assets, analytics…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search cryptocurrencies"
@@ -94,27 +115,43 @@ function Navbar() {
         </div>
       </div>
 
+      {/* Live Market Status Ticker */}
+      <div className="navbar-market-status" title="Crypto Markets Connection Status">
+        <span className="market-dot" />
+        <span>Live Trading</span>
+      </div>
+
+      {/* Current Clock Widget */}
+      <div className="navbar-clock" title="System Time (UTC+05:30)">
+        <Clock size={12} className="text-muted" />
+        <span>{formatDate(currentTime)} • {formatTime(currentTime)}</span>
+      </div>
+
       {/* Right-side actions */}
       <div className="navbar-actions">
         {/* Theme toggle */}
-        <button
+        <motion.button
           className="navbar-icon-btn"
           onClick={handleThemeToggle}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          {theme === 'dark' ? <FiSun /> : <FiMoon />}
-        </button>
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        </motion.button>
 
         {/* Notification */}
-        <button
+        <motion.button
           className="navbar-icon-btn"
           aria-label="Notifications"
           title="Notifications"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <FiBell />
+          <Bell size={18} />
           <span className="navbar-notif-dot" aria-hidden="true" />
-        </button>
+        </motion.button>
 
         {/* Profile dropdown */}
         <div className="navbar-profile" ref={dropdownRef}>
@@ -129,48 +166,62 @@ function Navbar() {
               {getInitials()}
             </div>
             <span className="navbar-avatar-name">{displayName}</span>
-            <FiChevronDown
+            <ChevronDown
               size={14}
               style={{
-                color: 'var(--text-muted-layout)',
-                transition: 'transform 0.2s',
+                color: 'var(--text-muted)',
+                transition: 'transform 0.3s',
                 transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
               }}
               aria-hidden="true"
             />
           </button>
 
-          {dropdownOpen && (
-            <div className="navbar-dropdown" role="menu">
-              <Link
-                to="/profile"
-                className="navbar-dropdown-item"
-                role="menuitem"
-                onClick={() => setDropdownOpen(false)}
+          <AnimatePresence>
+            {dropdownOpen && (
+              <motion.div 
+                className="navbar-dropdown" 
+                role="menu"
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
               >
-                <FiUser size={15} aria-hidden="true" />
-                Profile
-              </Link>
-              <Link
-                to="/profile"
-                className="navbar-dropdown-item"
-                role="menuitem"
-                onClick={() => setDropdownOpen(false)}
-              >
-                <FiSettings size={15} aria-hidden="true" />
-                Settings
-              </Link>
-              <div className="navbar-dropdown-divider" role="separator" />
-              <button
-                className="navbar-dropdown-item danger"
-                role="menuitem"
-                onClick={handleLogout}
-              >
-                <FiLogOut size={15} aria-hidden="true" />
-                Logout
-              </button>
-            </div>
-          )}
+                <div style={{ padding: '0.5rem 0.85rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', white-space: 'nowrap' }}>{user?.email}</div>
+                </div>
+                
+                <Link
+                  to="/profile"
+                  className="navbar-dropdown-item"
+                  role="menuitem"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  <User size={14} aria-hidden="true" />
+                  Profile
+                </Link>
+                <Link
+                  to="/profile"
+                  className="navbar-dropdown-item"
+                  role="menuitem"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  <Settings size={14} aria-hidden="true" />
+                  Settings
+                </Link>
+                <div className="navbar-dropdown-divider" role="separator" />
+                <button
+                  className="navbar-dropdown-item danger"
+                  role="menuitem"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={14} aria-hidden="true" />
+                  Logout
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </header>

@@ -15,13 +15,13 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
-import { FiTrendingUp, FiBarChart2, FiActivity, FiZap } from 'react-icons/fi';
+import { TrendingUp, BarChart3, Activity, Zap } from 'lucide-react';
 import { formatPrice, formatLargeNumber, formatPercent } from '../../utils/format';
 
 const CHART_TYPES = [
-  { id: 'area', label: 'Area', icon: <FiActivity /> },
-  { id: 'line', label: 'Line', icon: <FiTrendingUp /> },
-  { id: 'bar',  label: 'Bar',  icon: <FiBarChart2 /> },
+  { id: 'area', label: 'Area', icon: <Activity size={16} /> },
+  { id: 'line', label: 'Line', icon: <TrendingUp size={16} /> },
+  { id: 'bar',  label: 'Bar',  icon: <BarChart3 size={16} /> },
 ];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -47,12 +47,9 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 function extractTrenders(priceTrend) {
-  // API response shape: { statusCode, data: { sentiment, topTrenders: [...] }, message }
   const inner = priceTrend?.data;
   if (inner?.topTrenders && Array.isArray(inner.topTrenders)) return inner.topTrenders;
-  // Fallback for wrapped response
   if (inner?.data?.topTrenders && Array.isArray(inner.data.topTrenders)) return inner.data.topTrenders;
-  // If data itself is an array (direct array response)
   if (Array.isArray(inner)) return inner;
   return [];
 }
@@ -74,7 +71,6 @@ function buildPriceChartData(priceTrend, priceGrowth, priceDrop) {
       dailyReturn: parseFloat(coin?.dailyReturn ?? 0),
     }));
   }
-  // Fallback to priceGrowth
   return extractArray(priceGrowth).slice(0, 12).map((coin) => ({
     name: coin?.symbol ?? coin?.name ?? '?',
     price: parseFloat(coin?.price ?? 0),
@@ -112,10 +108,10 @@ function MarketTrendChart({ priceTrend, priceGrowth, priceDrop }) {
   const sentiment = priceTrend?.data?.sentiment ?? priceTrend?.data?.data?.sentiment ?? 'neutral';
   const isBullish = sentiment === 'bullish';
 
-  const displayData = view === 'gainers' ? glData : marketData;
-
+  // Base premium colors: cyan, success green, light blue
+  const baseColor = mode === 'price' ? '#00e5ff' : mode === 'marketCap' ? '#00ff9d' : '#38bdf8';
   const dataKey    = mode === 'price' ? 'price' : mode === 'marketCap' ? 'marketCap' : 'volume';
-  const baseColor  = mode === 'price' ? '#6366f1' : mode === 'marketCap' ? '#f59e0b' : '#10b981';
+  const gradientId = `trend-gradient-${mode}`;
 
   const formatYAxis = (val) => {
     if (val >= 1e9) return `$${(val / 1e9).toFixed(1)}B`;
@@ -129,57 +125,66 @@ function MarketTrendChart({ priceTrend, priceGrowth, priceDrop }) {
       data: marketData,
       margin: { top: 10, right: 10, left: 0, bottom: 0 },
     };
-    const xAxis = <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} tickLine={false} />;
-    const yAxis = <YAxis tickFormatter={formatYAxis} tick={{ fill: 'var(--text-muted)', fontSize: 11 }} tickLine={false} axisLine={false} width={72} />;
-    const grid  = <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />;
-    const tip   = <Tooltip content={<CustomTooltip />} />;
-    const leg   = <Legend wrapperStyle={{ fontSize: '12px', color: 'var(--text-muted)' }} />;
+    const xAxis = <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} tickLine={false} />;
+    const yAxis = <YAxis tickFormatter={formatYAxis} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} tickLine={false} axisLine={false} width={72} />;
+    const grid  = <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.04)" vertical={false} />;
+    const tip   = <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(0, 229, 255, 0.15)', strokeWidth: 1 }} />;
+    const leg   = <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }} />;
     const name  = mode === 'price' ? 'Price' : mode === 'marketCap' ? 'Market Cap' : 'Volume';
 
     if (chartType === 'line') return (
       <LineChart {...commonProps}>
-        <defs>
-          <linearGradient id="lgGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={baseColor} stopOpacity={0.3} />
-            <stop offset="95%" stopColor={baseColor} stopOpacity={0} />
-          </linearGradient>
-        </defs>
         {grid}{xAxis}{yAxis}{tip}{leg}
-        <Line type="monotone" dataKey={dataKey} stroke={baseColor} strokeWidth={2.5}
-          dot={{ r: 4, fill: baseColor }} activeDot={{ r: 6 }} name={name} />
+        <Line 
+          type="monotone" 
+          dataKey={dataKey} 
+          stroke={baseColor} 
+          strokeWidth={3}
+          dot={{ r: 4, fill: baseColor, strokeWidth: 0 }} 
+          activeDot={{ r: 6, stroke: '#050816', strokeWidth: 2 }} 
+          name={name} 
+        />
       </LineChart>
     );
     if (chartType === 'bar') return (
       <BarChart {...commonProps}>
         {grid}{xAxis}{yAxis}{tip}{leg}
-        <Bar dataKey={dataKey} fill={baseColor} radius={[4, 4, 0, 0]} name={name} maxBarSize={40} />
+        <Bar dataKey={dataKey} fill={baseColor} radius={[6, 6, 0, 0]} name={name} maxBarSize={30} />
       </BarChart>
     );
     return (
       <AreaChart {...commonProps}>
         <defs>
-          <linearGradient id="aGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={baseColor} stopOpacity={0.35} />
-            <stop offset="95%" stopColor={baseColor} stopOpacity={0.02} />
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={baseColor} stopOpacity={0.25} />
+            <stop offset="100%" stopColor={baseColor} stopOpacity={0.0} />
           </linearGradient>
         </defs>
         {grid}{xAxis}{yAxis}{tip}{leg}
-        <Area type="monotone" dataKey={dataKey} stroke={baseColor} strokeWidth={2.5}
-          fill="url(#aGrad)" dot={false} activeDot={{ r: 6, strokeWidth: 2 }} name={name} />
+        <Area 
+          type="monotone" 
+          dataKey={dataKey} 
+          stroke={baseColor} 
+          strokeWidth={3}
+          fill={`url(#${gradientId})`} 
+          dot={false} 
+          activeDot={{ r: 6, stroke: '#050816', strokeWidth: 2 }} 
+          name={name} 
+        />
       </AreaChart>
     );
   };
 
   const renderGainersChart = () => (
     <ComposedChart data={glData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
-      <XAxis dataKey="index" tickFormatter={(v) => `#${v}`} tick={{ fill: 'var(--text-muted)', fontSize: 11 }} tickLine={false} />
-      <YAxis tickFormatter={(v) => `${v.toFixed(1)}%`} tick={{ fill: 'var(--text-muted)', fontSize: 11 }} tickLine={false} axisLine={false} width={55} />
-      <ReferenceLine y={0} stroke="var(--border-color)" strokeDasharray="4 2" />
-      <Tooltip content={<CustomTooltip />} />
-      <Legend wrapperStyle={{ fontSize: '12px', color: 'var(--text-muted)' }} />
-      <Bar dataKey="gainerReturn" fill="#10b981" radius={[4, 4, 0, 0]} name="Top Gain %" maxBarSize={36} />
-      <Bar dataKey="loserReturn"  fill="#ef4444" radius={[4, 4, 0, 0]} name="Top Loss %" maxBarSize={36} />
+      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.04)" vertical={false} />
+      <XAxis dataKey="index" tickFormatter={(v) => `#${v}`} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} tickLine={false} />
+      <YAxis tickFormatter={(v) => `${v.toFixed(1)}%`} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} tickLine={false} axisLine={false} width={55} />
+      <ReferenceLine y={0} stroke="rgba(255, 255, 255, 0.06)" strokeDasharray="4 2" />
+      <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.015)' }} />
+      <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600 }} />
+      <Bar dataKey="gainerReturn" fill="#00ff9d" radius={[5, 5, 0, 0]} name="Top Gain %" maxBarSize={28} />
+      <Bar dataKey="loserReturn"  fill="#ff4d6d" radius={[5, 5, 0, 0]} name="Top Loss %" maxBarSize={28} />
     </ComposedChart>
   );
 
@@ -189,12 +194,12 @@ function MarketTrendChart({ priceTrend, priceGrowth, priceDrop }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <h2 className="analytics-section-title">
-              <FiTrendingUp className="section-title-icon" />
+              <TrendingUp className="section-title-icon" size={18} />
               Market Trends
             </h2>
             <p className="analytics-section-subtitle">
               Price, market cap, and volume trends — Sentiment:&nbsp;
-              <span style={{ color: isBullish ? '#10b981' : '#ef4444', fontWeight: 700 }}>
+              <span style={{ color: isBullish ? 'var(--color-success)' : 'var(--color-danger)', fontWeight: 700 }}>
                 {isBullish ? '🐂 Bullish' : '🐻 Bearish'}
               </span>
             </p>
@@ -209,19 +214,23 @@ function MarketTrendChart({ priceTrend, priceGrowth, priceDrop }) {
             <button
               className={`chart-mode-btn ${view === 'market' ? 'active' : ''}`}
               onClick={() => setView('market')}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}
             >
-              <FiActivity style={{ marginRight: '0.25rem' }} />Market
+              <Activity size={14} />
+              <span>Market Overview</span>
             </button>
             <button
               className={`chart-mode-btn ${view === 'gainers' ? 'active' : ''}`}
               onClick={() => setView('gainers')}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}
             >
-              <FiZap style={{ marginRight: '0.25rem' }} />Gainers vs Losers
+              <Zap size={14} />
+              <span>Gainers vs Losers</span>
             </button>
           </div>
 
           {view === 'market' && (
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
               <div className="chart-mode-tabs">
                 {[
                   { id: 'price', label: 'Price' },
@@ -253,11 +262,11 @@ function MarketTrendChart({ priceTrend, priceGrowth, priceDrop }) {
           )}
         </div>
 
-        {/* Chart */}
+        {/* Chart wrapper */}
         <div className="chart-wrapper">
           {(view === 'market' ? marketData : glData).length === 0 ? (
             <div className="analytics-empty">
-              <FiBarChart2 size={40} />
+              <BarChart3 size={40} className="text-muted" />
               <p>No trend data available</p>
             </div>
           ) : (

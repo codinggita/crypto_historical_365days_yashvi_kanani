@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiAlertTriangle, FiRefreshCw, FiTrendingUp, FiTrendingDown, FiActivity } from 'react-icons/fi';
+import { motion } from 'framer-motion';
+import { AlertTriangle, RefreshCw, TrendingUp, TrendingDown } from 'lucide-react';
 import {
   fetchStart,
   fetchSuccess,
@@ -132,11 +133,11 @@ function Analytics() {
           <h1 className="page-title">Market Analytics</h1>
         </div>
         <div className="analytics-error-card">
-          <div className="analytics-error-icon"><FiAlertTriangle /></div>
+          <div className="analytics-error-icon"><AlertTriangle size={48} /></div>
           <h3 className="analytics-error-title">Failed to load analytics</h3>
           <p className="analytics-error-msg">{error}</p>
           <button className="analytics-retry-btn" onClick={fetchAll}>
-            <FiRefreshCw style={{ marginRight: '0.4rem' }} />
+            <RefreshCw size={14} style={{ marginRight: '0.4rem', display: 'inline-block' }} />
             Retry
           </button>
         </div>
@@ -146,7 +147,6 @@ function Analytics() {
 
   const d = analyticsData ?? {};
 
-  // Extract cumulative summary for market sentiment bar
   const cumData = d.cumulativeReturns?.data ?? {};
   const avgReturn = cumData?.averageDailyReturn ?? 0;
   const bullish   = cumData?.bullishCoins ?? 0;
@@ -162,19 +162,36 @@ function Analytics() {
     highVolatility: d.highVolatility,
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+    >
       {/* Page Header */}
-      <div className="page-header" style={{ marginBottom: '1.25rem' }}>
+      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 className="page-title">Market Analytics</h1>
+            <h1 className="page-title"><span className="title-gradient">Market Analytics</span></h1>
             <p className="page-subtitle">
               Real-time crypto intelligence — prices, volumes, returns &amp; risk metrics
             </p>
           </div>
           {lastUpdated && (
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
               Updated {lastUpdated.toLocaleTimeString()}
             </span>
           )}
@@ -182,11 +199,11 @@ function Analytics() {
       </div>
 
       {/* Market Sentiment Strip */}
-      <div className="analytics-sentiment-strip">
+      <motion.div className="analytics-sentiment-strip" variants={itemVariants}>
         <div className="sentiment-item">
           <span className="sentiment-label">Market Sentiment</span>
           <span className={`sentiment-value ${isBullish ? 'bullish' : 'bearish'}`}>
-            {isBullish ? <FiTrendingUp /> : <FiTrendingDown />}
+            {isBullish ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
             {isBullish ? ' Bullish' : ' Bearish'}
           </span>
         </div>
@@ -199,12 +216,12 @@ function Analytics() {
         </div>
         <div className="sentiment-divider" />
         <div className="sentiment-item">
-          <FiTrendingUp style={{ color: '#10b981', fontSize: '0.9rem' }} />
+          <TrendingUp size={14} style={{ color: 'var(--color-success)' }} />
           <span className="sentiment-label">Bullish</span>
           <span className="sentiment-value bullish">{bullish.toLocaleString()}</span>
         </div>
         <div className="sentiment-item">
-          <FiTrendingDown style={{ color: '#ef4444', fontSize: '0.9rem' }} />
+          <TrendingDown size={14} style={{ color: 'var(--color-danger)' }} />
           <span className="sentiment-label">Bearish</span>
           <span className="sentiment-value bearish">{bearish.toLocaleString()}</span>
         </div>
@@ -217,14 +234,14 @@ function Analytics() {
         </div>
         <div style={{ marginLeft: 'auto' }}>
           <button className="analytics-refresh-btn" onClick={fetchAll} title="Refresh all data">
-            <FiRefreshCw style={{ marginRight: '0.35rem' }} />
+            <RefreshCw size={12} className={loading ? 'animate-spin' : ''} style={{ marginRight: '0.25rem' }} />
             Refresh
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Time Range Selector */}
-      <div className="analytics-range-bar">
+      <motion.div className="analytics-range-bar" variants={itemVariants}>
         <span className="analytics-range-label">Range:</span>
         {RANGE_OPTIONS.map((r) => (
           <button
@@ -235,53 +252,67 @@ function Analytics() {
             {r.label}
           </button>
         ))}
-      </div>
+      </motion.div>
 
       {/* Section 1: Overview Cards */}
-      <AnalyticsOverview data={overviewData} />
+      <motion.div variants={itemVariants}>
+        <AnalyticsOverview data={overviewData} />
+      </motion.div>
 
       {/* Section 2: Market Trend Charts */}
-      <MarketTrendChart
-        priceTrend={d.priceTrend}
-        priceGrowth={d.priceGrowth}
-        priceDrop={d.priceDrop}
-      />
+      <motion.div variants={itemVariants}>
+        <MarketTrendChart
+          priceTrend={d.priceTrend}
+          priceGrowth={d.priceGrowth}
+          priceDrop={d.priceDrop}
+        />
+      </motion.div>
 
       {/* Section 3: Top Gainers & Losers Leaderboard */}
-      <LeaderboardTables
-        topGainers={d.topReturns}
-        topLosers={d.negativeReturns}
-      />
+      <motion.div variants={itemVariants}>
+        <LeaderboardTables
+          topGainers={d.topReturns}
+          topLosers={d.negativeReturns}
+        />
+      </motion.div>
 
       {/* Section 4: Volume Analytics */}
-      <VolumeAnalytics
-        highestVolume={d.highestVolume}
-        lowestVolume={d.lowestVolume}
-        averageVolume={d.averageVolume}
-        volumeSpike={d.volumeSpike}
-      />
+      <motion.div variants={itemVariants}>
+        <VolumeAnalytics
+          highestVolume={d.highestVolume}
+          lowestVolume={d.lowestVolume}
+          averageVolume={d.averageVolume}
+          volumeSpike={d.volumeSpike}
+        />
+      </motion.div>
 
       {/* Section 5: Returns Analytics */}
-      <ReturnsAnalytics
-        topReturns={d.topReturns}
-        negativeReturns={d.negativeReturns}
-        cumulativeReturns={d.cumulativeReturns}
-      />
+      <motion.div variants={itemVariants}>
+        <ReturnsAnalytics
+          topReturns={d.topReturns}
+          negativeReturns={d.negativeReturns}
+          cumulativeReturns={d.cumulativeReturns}
+        />
+      </motion.div>
 
       {/* Section 6: Volatility Analysis */}
-      <VolatilityAnalytics highVolatility={d.highVolatility} />
+      <motion.div variants={itemVariants}>
+        <VolatilityAnalytics highVolatility={d.highVolatility} />
+      </motion.div>
 
       {/* Section 7: Market Insights */}
-      <MarketInsights
-        topGainers={d.topReturns}
-        topLosers={d.negativeReturns}
-        highVolatility={d.highVolatility}
-        highestVolume={d.highestVolume}
-        highestPrice={d.highestPrice}
-        averagePrice={d.averagePrice}
-        cumulativeReturns={d.cumulativeReturns}
-      />
-    </div>
+      <motion.div variants={itemVariants}>
+        <MarketInsights
+          topGainers={d.topReturns}
+          topLosers={d.negativeReturns}
+          highVolatility={d.highVolatility}
+          highestVolume={d.highestVolume}
+          highestPrice={d.highestPrice}
+          averagePrice={d.averagePrice}
+          cumulativeReturns={d.cumulativeReturns}
+        />
+      </motion.div>
+    </motion.div>
   );
 }
 
