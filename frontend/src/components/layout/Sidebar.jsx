@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
-import { motion } from 'framer-motion';
 import {
   LayoutGrid,
   Coins,
@@ -20,12 +19,12 @@ import { logout } from '../../redux/slices/authSlice';
 import authService from '../../services/auth.service';
 
 const NAV_LINKS = [
-  { to: '/dashboard',  label: 'Dashboard',  icon: LayoutGrid },
-  { to: '/coins',      label: 'Coins',       icon: Coins },
-  { to: '/analytics',  label: 'Analytics',   icon: TrendingUp },
-  { to: '/watchlist',  label: 'Watchlist',   icon: Bookmark },
-  { to: '/portfolio',  label: 'Portfolio',   icon: Briefcase },
-  { to: '/profile',    label: 'Profile',     icon: User },
+  { to: '/dashboard',  label: 'Dashboard',  icon: LayoutGrid, prefetch: () => import('../../pages/Dashboard/Dashboard') },
+  { to: '/coins',      label: 'Coins',       icon: Coins, prefetch: () => import('../../pages/Coins/Coins') },
+  { to: '/analytics',  label: 'Analytics',   icon: TrendingUp, prefetch: () => import('../../pages/Analytics/Analytics') },
+  { to: '/watchlist',  label: 'Watchlist',   icon: Bookmark, prefetch: () => import('../../pages/Watchlist/Watchlist') },
+  { to: '/portfolio',  label: 'Portfolio',   icon: Briefcase, prefetch: () => import('../../pages/Portfolio/Portfolio') },
+  { to: '/profile',    label: 'Profile',     icon: User, prefetch: () => import('../../pages/Profile/Profile') },
 ];
 
 function Sidebar() {
@@ -47,7 +46,6 @@ function Sidebar() {
 
   return (
     <>
-      {/* Overlay (mobile) */}
       {sidebarOpen && (
         <div
           className="sidebar-overlay"
@@ -60,17 +58,15 @@ function Sidebar() {
         className={`sidebar${sidebarOpen ? ' sidebar-open' : ''}`}
         aria-label="Main navigation"
       >
-        {/* Logo */}
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">
             <Hexagon size={18} className="animate-pulse" />
           </div>
           <span className="sidebar-logo-text title-gradient">CryptoVerseX</span>
-          
-          {/* Close button on mobile */}
-          <button 
-            onClick={closeSidebar} 
-            className="navbar-hamburger" 
+
+          <button
+            onClick={closeSidebar}
+            className="navbar-hamburger"
             style={{ display: 'none', marginLeft: 'auto', padding: '0.2rem' }}
             aria-label="Close menu"
           >
@@ -78,14 +74,14 @@ function Sidebar() {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="sidebar-nav" aria-label="Primary navigation">
           <span className="sidebar-section-label">Main Menu</span>
-          {NAV_LINKS.map(({ to, label, icon: IconComponent }) => (
+          {NAV_LINKS.map(({ to, label, icon: IconComponent, prefetch }) => (
             <NavLink
               key={to}
               to={to}
               onClick={closeSidebar}
+              onMouseEnter={() => prefetch?.()}
               className={({ isActive }) =>
                 `sidebar-link${isActive ? ' active' : ''}`
               }
@@ -93,28 +89,14 @@ function Sidebar() {
             >
               {({ isActive }) => (
                 <>
-                  <motion.span 
-                    className="sidebar-link-icon" 
-                    aria-hidden="true"
-                    whileHover={{ scale: 1.12, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                  >
-                    <IconComponent size={18} color={isActive ? "#00e5ff" : undefined} />
-                  </motion.span>
+                  <span className="sidebar-link-icon" aria-hidden="true">
+                    <IconComponent size={18} color={isActive ? '#00e5ff' : undefined} />
+                  </span>
                   {label}
                   {isActive && (
-                    <motion.div 
-                      layoutId="activeGlow" 
-                      className="absolute inset-0 w-full h-full rounded-xl"
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'rgba(0, 229, 255, 0.04)',
-                        border: '1px solid rgba(0, 229, 255, 0.12)',
-                        zIndex: -1,
-                        pointerEvents: 'none'
-                      }}
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    <div
+                      className="sidebar-active-glow"
+                      aria-hidden="true"
                     />
                   )}
                 </>
@@ -122,13 +104,13 @@ function Sidebar() {
             </NavLink>
           ))}
 
-          {/* Admin link — visible only to admins */}
           {user?.role === 'admin' && (
             <>
               <span className="sidebar-section-label" style={{ marginTop: '1.25rem' }}>Admin</span>
               <NavLink
                 to="/admin"
                 onClick={closeSidebar}
+                onMouseEnter={() => import('../../pages/Admin/Admin')}
                 className={({ isActive }) =>
                   `sidebar-link sidebar-link--admin${isActive ? ' active' : ''}`
                 }
@@ -136,29 +118,12 @@ function Sidebar() {
               >
                 {({ isActive }) => (
                   <>
-                    <motion.span 
-                      className="sidebar-link-icon" 
-                      aria-hidden="true"
-                      whileHover={{ scale: 1.12, rotate: -5 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                    >
-                      <Shield size={18} color={isActive ? "#00e5ff" : undefined} />
-                    </motion.span>
+                    <span className="sidebar-link-icon" aria-hidden="true">
+                      <Shield size={18} color={isActive ? '#00e5ff' : undefined} />
+                    </span>
                     Admin Panel
                     {isActive && (
-                      <motion.div 
-                        layoutId="activeGlow" 
-                        className="absolute inset-0 w-full h-full rounded-xl"
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          background: 'rgba(0, 229, 255, 0.04)',
-                          border: '1px solid rgba(0, 229, 255, 0.12)',
-                          zIndex: -1,
-                          pointerEvents: 'none'
-                        }}
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
+                      <div className="sidebar-active-glow" aria-hidden="true" />
                     )}
                   </>
                 )}
@@ -167,20 +132,17 @@ function Sidebar() {
           )}
         </nav>
 
-        {/* Logout */}
         <div className="sidebar-footer">
-          <motion.button
+          <button
             className="sidebar-logout-btn"
             onClick={handleLogout}
             aria-label="Log out"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             <span className="sidebar-link-icon" aria-hidden="true">
               <LogOut size={18} />
             </span>
             Logout
-          </motion.button>
+          </button>
         </div>
       </aside>
     </>

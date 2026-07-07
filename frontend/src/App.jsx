@@ -4,34 +4,28 @@ import { useDispatch } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
 import AppRoutes from './routes/AppRoutes';
 import authService from './services/auth.service';
-import { setUser, logout, setLoading } from './redux/slices/authSlice';
+import { setUser, logout } from './redux/slices/authSlice';
 
 function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const restoreSession = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        return;
-      }
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-      dispatch(setLoading(true));
+    const verifySession = async () => {
       try {
         const response = await authService.getProfile();
-        // Backend returns response wrapped in ApiResponse: { success: true, data: { user } }
         const user = response.data?.user || response.data || response;
         dispatch(setUser({ user, token }));
       } catch (error) {
-        console.error('Session restoration failed:', error);
+        console.error('Session verification failed:', error);
         localStorage.removeItem('token');
         dispatch(logout());
-      } finally {
-        dispatch(setLoading(false));
       }
     };
 
-    restoreSession();
+    verifySession();
   }, [dispatch]);
 
   return (

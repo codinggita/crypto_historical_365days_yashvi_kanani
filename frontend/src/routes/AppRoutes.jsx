@@ -3,10 +3,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
 import MainLayout from '../layouts/MainLayout';
-import AuthLayout from '../layouts/AuthLayout';
+const AuthLayout = lazy(() => import('../layouts/AuthLayout'));
 
-// Skeletons
-import PageSkeleton from '../components/common/Skeleton';
+import RouteFallback from '../components/common/RouteFallback';
 
 // Pages via Lazy Loading
 const Home = lazy(() => import('../pages/Home/Home'));
@@ -28,7 +27,7 @@ import PublicRoute from './PublicRoute';
 
 function AppRoutes() {
   return (
-    <Suspense fallback={<PageSkeleton />}>
+    <Suspense fallback={<RouteFallback />}>
       <Routes>
         {/* Auth Layout / Public Routes */}
         <Route element={<AuthLayout />}>

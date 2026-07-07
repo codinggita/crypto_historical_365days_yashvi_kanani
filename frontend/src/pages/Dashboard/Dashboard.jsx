@@ -113,7 +113,18 @@ function Dashboard() {
     dispatch(fetchTopLosersThunk({ limit: 6 }));
   }, [dispatch]);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    if (!marketSummary && !marketSummaryLoading) {
+      dispatch(fetchMarketSummaryThunk());
+    }
+    if (safeTopGainers.length === 0 && !loading) {
+      dispatch(fetchTopGainersThunk({ limit: 6 }));
+    }
+    if (safeTopLosers.length === 0 && !loading) {
+      dispatch(fetchTopLosersThunk({ limit: 6 }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   const ms = marketSummary?.data || marketSummary;
   const gainersTop = safeTopGainers[0];

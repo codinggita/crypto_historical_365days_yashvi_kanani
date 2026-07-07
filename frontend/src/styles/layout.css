@@ -199,6 +199,26 @@
   transition: all var(--transition-normal);
 }
 
+.sidebar-active-glow {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 229, 255, 0.04);
+  border: 1px solid rgba(0, 229, 255, 0.12);
+  border-radius: 12px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.sidebar-active-glow {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 229, 255, 0.04);
+  border: 1px solid rgba(0, 229, 255, 0.12);
+  border-radius: 12px;
+  z-index: -1;
+  pointer-events: none;
+}
+
 .sidebar-footer {
   padding: 1rem;
   border-top: 1px solid var(--navbar-border);

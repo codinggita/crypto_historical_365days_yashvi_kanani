@@ -53,6 +53,9 @@ import {
 } from "../../controllers/coin.controller.js";
 import { verifyJWT } from "../../middlewares/auth.middleware.js";
 import authorizeRoles from "../../middlewares/role.middleware.js";
+import { cacheMiddleware } from "../../middlewares/cache.middleware.js";
+
+const marketCache = cacheMiddleware(60);
 import {
   createCoinValidator,
   updateCoinValidator,
@@ -100,21 +103,21 @@ router.head("/", (req, res) => {
 router.route("/latest").get(getLatestCoins);
 router.route("/oldest").get(getOldestCoins);
 router.route("/newest").get(getNewestCoins);
-router.route("/trending").get(getTrendingCoins);
+router.route("/trending").get(marketCache, getTrendingCoins);
 router.route("/recent").get(getRecentCoins);
 router.route("/random").get(getRandomCoin);
 
 router.route("/top-market-cap").get(getTopMarketCapCoins);
 router.route("/top-volume").get(getTopVolumeCoins);
-router.route("/top-gainers").get(getTopGainers);
-router.route("/top-losers").get(getTopLosers);
+router.route("/top-gainers").get(marketCache, getTopGainers);
+router.route("/top-losers").get(marketCache, getTopLosers);
 
 router.route("/recommendations").get(getRecommendations);
 router.route("/predictions").get(getPredictions);
 router.route("/heatmap").get(getHeatmapData);
 router.route("/market-status").get(getMarketStatusDetails);
 
-router.route("/market/summary").get(getMarketSummary);
+router.route("/market/summary").get(marketCache, getMarketSummary);
 router.route("/search/global").get(searchCoinValidator(), getGlobalSearch);
 
 // Performance / Alerts

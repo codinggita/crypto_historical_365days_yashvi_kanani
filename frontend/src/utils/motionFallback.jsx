@@ -15,13 +15,22 @@ const filterProps = (props) => {
   return clean;
 };
 
-export const motion = {
-  div: React.forwardRef((props, ref) => <div {...filterProps(props)} ref={ref} />),
-  button: React.forwardRef((props, ref) => <button {...filterProps(props)} ref={ref} />),
-  span: React.forwardRef((props, ref) => <span {...filterProps(props)} ref={ref} />),
-  h1: React.forwardRef((props, ref) => <h1 {...filterProps(props)} ref={ref} />),
-  h2: React.forwardRef((props, ref) => <h2 {...filterProps(props)} ref={ref} />),
-  li: React.forwardRef((props, ref) => <li {...filterProps(props)} ref={ref} />),
-};
+const cache = {};
+
+const createMotionComponent = (tag) =>
+  React.forwardRef((props, ref) => {
+    const Tag = tag;
+    return <Tag {...filterProps(props)} ref={ref} />;
+  });
+
+export const motion = new Proxy(
+  {},
+  {
+    get: (_, tag) => {
+      if (!cache[tag]) cache[tag] = createMotionComponent(tag);
+      return cache[tag];
+    },
+  }
+);
 
 export const AnimatePresence = ({ children }) => <>{children}</>;

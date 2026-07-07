@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu,
   Search,
@@ -14,7 +13,6 @@ import {
   LogOut,
   ChevronDown,
   Clock,
-  Activity
 } from 'lucide-react';
 import { toggleSidebar, changeTheme } from '../../redux/slices/uiSlice';
 import { logout } from '../../redux/slices/authSlice';
@@ -31,15 +29,11 @@ function Navbar() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const dropdownRef = useRef(null);
 
-  // Update clock every second
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
     return () => clearInterval(timer);
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -63,7 +57,6 @@ function Navbar() {
     navigate('/login');
   };
 
-  // Build avatar initials
   const getInitials = () => {
     if (user?.name && typeof user.name === 'string') {
       return user.name
@@ -78,18 +71,14 @@ function Navbar() {
 
   const displayName = user?.name || user?.email || 'User';
 
-  // Format date and time
-  const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  };
+  const formatTime = (date) =>
+    date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-  };
+  const formatDate = (date) =>
+    date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
     <header className="navbar" role="banner">
-      {/* Hamburger — mobile only */}
       <button
         className="navbar-hamburger"
         onClick={() => dispatch(toggleSidebar())}
@@ -99,7 +88,6 @@ function Navbar() {
         <Menu size={20} />
       </button>
 
-      {/* Search bar */}
       <div className="navbar-search" role="search">
         <div className="navbar-search-inner">
           <Search className="navbar-search-icon" aria-hidden="true" size={16} />
@@ -115,45 +103,35 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Live Market Status Ticker */}
       <div className="navbar-market-status" title="Crypto Markets Connection Status">
         <span className="market-dot" />
         <span>Live Trading</span>
       </div>
 
-      {/* Current Clock Widget */}
       <div className="navbar-clock" title="System Time (UTC+05:30)">
         <Clock size={12} className="text-muted" />
         <span>{formatDate(currentTime)} • {formatTime(currentTime)}</span>
       </div>
 
-      {/* Right-side actions */}
       <div className="navbar-actions">
-        {/* Theme toggle */}
-        <motion.button
+        <button
           className="navbar-icon-btn"
           onClick={handleThemeToggle}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-        </motion.button>
+        </button>
 
-        {/* Notification */}
-        <motion.button
+        <button
           className="navbar-icon-btn"
           aria-label="Notifications"
           title="Notifications"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
         >
           <Bell size={18} />
           <span className="navbar-notif-dot" aria-hidden="true" />
-        </motion.button>
+        </button>
 
-        {/* Profile dropdown */}
         <div className="navbar-profile" ref={dropdownRef}>
           <button
             className="navbar-avatar-btn"
@@ -177,51 +155,42 @@ function Navbar() {
             />
           </button>
 
-          <AnimatePresence>
-            {dropdownOpen && (
-              <motion.div 
-                className="navbar-dropdown" 
-                role="menu"
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
+          {dropdownOpen && (
+            <div className="navbar-dropdown navbar-dropdown--open" role="menu">
+              <div style={{ padding: '0.5rem 0.85rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
+              </div>
+
+              <Link
+                to="/profile"
+                className="navbar-dropdown-item"
+                role="menuitem"
+                onClick={() => setDropdownOpen(false)}
               >
-                <div style={{ padding: '0.5rem 0.85rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
-                </div>
-                
-                <Link
-                  to="/profile"
-                  className="navbar-dropdown-item"
-                  role="menuitem"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <User size={14} aria-hidden="true" />
-                  Profile
-                </Link>
-                <Link
-                  to="/profile"
-                  className="navbar-dropdown-item"
-                  role="menuitem"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  <Settings size={14} aria-hidden="true" />
-                  Settings
-                </Link>
-                <div className="navbar-dropdown-divider" role="separator" />
-                <button
-                  className="navbar-dropdown-item danger"
-                  role="menuitem"
-                  onClick={handleLogout}
-                >
-                  <LogOut size={14} aria-hidden="true" />
-                  Logout
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <User size={14} aria-hidden="true" />
+                Profile
+              </Link>
+              <Link
+                to="/profile"
+                className="navbar-dropdown-item"
+                role="menuitem"
+                onClick={() => setDropdownOpen(false)}
+              >
+                <Settings size={14} aria-hidden="true" />
+                Settings
+              </Link>
+              <div className="navbar-dropdown-divider" role="separator" />
+              <button
+                className="navbar-dropdown-item danger"
+                role="menuitem"
+                onClick={handleLogout}
+              >
+                <LogOut size={14} aria-hidden="true" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
