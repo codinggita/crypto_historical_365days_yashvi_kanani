@@ -179,14 +179,6 @@ VITE_API_BASE_URL=http://localhost:5000/api/v1
 ### Analytics
 ![Analytics](frontend/public/images/analytics.png)
 
-### Portfolio
-![Portfolio](frontend/public/images/portfolio.png)
-
-### Watchlist
-![Watchlist](frontend/public/images/watchlist.png)
-
-### Profile
-![Profile](frontend/public/images/profile.png)
 
 ---
 
