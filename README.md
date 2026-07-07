@@ -1283,16 +1283,52 @@ npm run preview
 
 ---
 
-# Screenshots
+# 📸 Application Screenshots
 
-| Module                 | Preview     |
-| ---------------------- | ----------- |
-| 📊 Analytics Dashboard | Completed   |
-| 🪙 Coin Listing Page   | Coming Soon |
-| 📈 Market Trends       | Coming Soon |
-| 👨‍💼 Admin Dashboard  | Coming Soon |
-| 🔐 Login System        | Coming Soon |
-| 📱 Mobile Dashboard    | Coming Soon |
+This section showcases the redesigned user interface of CryptoVerseX. All images are hosted locally inside the frontend assets directory.
+
+## Login Screen
+
+The redesigned Login screen features a futuristic split-panel layout, combining a holographic visual grid on the left with a polished glassmorphism login form on the right.
+
+![Login Screen](frontend/public/images/login.png)
+
+## Register Screen
+
+A matching split-panel sign-up interface that provides interactive validation checks and a seamless entry flow.
+
+![Register Screen](frontend/public/images/register.png)
+
+## Dashboard
+
+The central command center of the application, featuring glowing KPI cards with integrated Recharts sparkline overlays showing price trends.
+
+![Dashboard](frontend/public/images/dashboard.png)
+
+## Coins
+
+The coin directory provides a tabular overview with custom density selection (Normal, Spacious, Compact), dynamic column visibility controls, sorting, and pagination.
+
+![Coins](frontend/public/images/coins.png)
+
+## Analytics
+
+A deep-dive analytics dashboard featuring TradingView-style interactive trend charts with custom glowing neon tooltips and gainers/losers leaderboard widgets.
+
+![Analytics](frontend/public/images/analytics.png)
+
+## Watchlist
+
+A personalized list allowing users to monitor specific digital assets with real-time analytics updates.
+
+## Portfolio
+
+An interactive portfolio simulator that tracks coin values and simulates investment growth over custom time frames.
+
+## Profile
+
+Manage security preferences, view the developer status, and track JWT session timestamps and account logs via an interactive timeline.
+
 
 ---
 
