@@ -189,7 +189,7 @@ function Navbar() {
               >
                 <div style={{ padding: '0.5rem 0.85rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', white-space: 'nowrap' }}>{user?.email}</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
                 </div>
                 
                 <Link

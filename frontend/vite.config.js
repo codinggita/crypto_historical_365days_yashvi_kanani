@@ -11,6 +11,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': '/src',
+      'framer-motion': '/src/utils/motionFallback.jsx',
+      'lucide-react': '/src/utils/lucideFallback.jsx',
     },
   },
 })
