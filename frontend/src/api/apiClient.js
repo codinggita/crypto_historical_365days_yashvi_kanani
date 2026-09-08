@@ -3,6 +3,26 @@ import axios from 'axios';
 // Retrieve base URL from Vite environment variables (fallback to local backend port 5000)
 const baseURL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
+// Guard: warn clearly when the app is deployed but VITE_API_URL was never set at build time.
+// Vite bakes env vars into the bundle; if the variable was missing during `vite build`,
+// the bundle silently falls back to localhost and every API call fails with a Network error.
+if (
+  typeof window !== 'undefined' &&
+  baseURL.includes('localhost') &&
+  window.location.hostname !== 'localhost' &&
+  window.location.hostname !== '127.0.0.1'
+) {
+  console.error(
+    '[apiClient] ⚠️  MISCONFIGURATION DETECTED: The API base URL is pointing to ' +
+    `"${baseURL}" but this page is being served from "${window.location.hostname}". ` +
+    'VITE_API_URL (or VITE_API_BASE_URL) was NOT set at build time and fell back to ' +
+    'localhost. All API requests will fail.\n\n' +
+    'Fix: Go to your hosting provider\'s dashboard (e.g. Vercel → Project Settings → ' +
+    'Environment Variables), add VITE_API_URL=<your-backend-url>, then redeploy ' +
+    'so Vite can bake the correct URL into the production bundle.'
+  );
+}
+
 // Create a reusable Axios instance
 const apiClient = axios.create({
   baseURL,
